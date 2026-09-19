@@ -80,7 +80,7 @@ export default function LandingPage() {
                   {String(number).padStart(2, "0")}
                 </span>
                 <div
-                  className="relative rounded-2xl border-2 p-4 pt-7 text-left shadow-lg"
+                  className="relative rounded-3xl border-2 p-4 pt-7 text-left shadow-lg"
                   style={{ backgroundColor: palette.bg, borderColor: palette.border }}
                 >
                   <span

@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { getSubmission } from "@/lib/submissions";
 import { evidenceChecklist } from "@/lib/content";
 import { saveSubmission } from "@/app/actions";
+import { competencyArtifacts } from "@/lib/competency-artifacts";
+import { ActivityFlow } from "../../competencies/[number]/ActivityFlow";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +21,11 @@ export default async function NewSubmissionPage({
 
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
-    include: { competency: true },
+    include: { competency: true, projects: true },
   });
   if (!exercise) notFound();
+
+  const artifacts = competencyArtifacts([exercise]);
 
   const session = await getServerSession(authOptions);
   const existing = await getSubmission(Number(session!.user.id), exercise.id);
@@ -35,11 +39,24 @@ export default async function NewSubmissionPage({
   );
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-4xl px-6 py-12">
       <h1 className="text-xl font-semibold tracking-tight text-fg">
         Submit: {String(exercise.number).padStart(2, "0")} ·{" "}
         {exercise.title}
       </h1>
+
+      <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+        <h2 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
+          What This Submission Proves
+        </h2>
+        <ActivityFlow
+          competencyNumber={exercise.competency.number}
+          title={exercise.title}
+          inputs={artifacts.inputs}
+          outputs={artifacts.outputs}
+          outputsTruncatedCount={artifacts.outputsTruncatedCount}
+        />
+      </section>
 
       <form
         action={saveSubmission}

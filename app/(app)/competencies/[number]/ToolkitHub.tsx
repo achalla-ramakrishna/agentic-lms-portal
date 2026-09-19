@@ -29,7 +29,7 @@ export function ToolkitHub({
   });
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[420px]">
+    <div className="relative mx-auto aspect-square w-full max-w-[480px]">
       <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full">
         {points.map((p, i) => (
           <line
@@ -54,18 +54,25 @@ export function ToolkitHub({
       </div>
 
       {points.map((p, i) => (
-        <span
+        <div
           key={i}
-          className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border bg-canvas-subtle px-2.5 py-1 text-xs font-medium text-fg"
+          className="absolute flex w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
           style={{
             left: `${(p.x / 400) * 100}%`,
             top: `${(p.y / 400) * 100}%`,
-            borderColor: palette.border,
           }}
         >
-          <span aria-hidden="true">{ARTIFACT_ICON[artifactCategory(p.tag)]}</span>
-          {p.tag}
-        </span>
+          <span
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 bg-canvas-subtle text-3xl shadow-md"
+            style={{ borderColor: palette.border }}
+            aria-hidden="true"
+          >
+            {ARTIFACT_ICON[artifactCategory(p.tag)]}
+          </span>
+          <span className="text-center text-[11px] font-medium leading-tight text-fg">
+            {p.tag}
+          </span>
+        </div>
       ))}
     </div>
   );

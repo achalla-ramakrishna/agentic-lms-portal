@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
 import { StatusBadge } from "@/app/status-badge";
 import { evidenceChecklist } from "@/lib/content";
 import { decideSubmission } from "@/app/actions";
+import { competencyArtifacts } from "@/lib/competency-artifacts";
+import { ActivityFlow } from "../../competencies/[number]/ActivityFlow";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +21,13 @@ export default async function SubmissionDetailPage({
   const submission = await prisma.submission.findUnique({
     where: { id: Number(id) },
     include: {
-      exercise: { include: { competency: true } },
+      exercise: { include: { competency: true, projects: true } },
       evidenceArtifacts: true,
     },
   });
   if (!submission) notFound();
+
+  const artifacts = competencyArtifacts([submission.exercise]);
 
   const session = await getServerSession(authOptions);
   // Own-submission-only for this chunk — a facilitator's cross-learner
@@ -40,7 +44,7 @@ export default async function SubmissionDetailPage({
   );
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-4xl px-6 py-12">
       <Link
         href={`/competencies/${exercise.competency.number}/exercises/${exercise.number}`}
         className="text-sm font-medium text-accent hover:underline"
@@ -54,6 +58,19 @@ export default async function SubmissionDetailPage({
         </h1>
         <StatusBadge status={submission.status} />
       </div>
+
+      <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+        <h2 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
+          What This Submission Proves
+        </h2>
+        <ActivityFlow
+          competencyNumber={exercise.competency.number}
+          title={exercise.title}
+          inputs={artifacts.inputs}
+          outputs={artifacts.outputs}
+          outputsTruncatedCount={artifacts.outputsTruncatedCount}
+        />
+      </section>
 
       <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
