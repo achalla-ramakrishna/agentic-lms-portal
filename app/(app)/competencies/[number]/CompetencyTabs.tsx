@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { StatusBadge } from "@/app/status-badge";
+import { ToolkitHub } from "./ToolkitHub";
+import { HowToFlow } from "./HowToFlow";
 import type { SubmissionStatus } from "@prisma/client";
 
 type ExerciseTabData = {
@@ -82,15 +84,11 @@ export function CompetencyTabs({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 border-t border-line pt-5">
-            {toolkitTags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-md border border-line bg-canvas px-3 py-1 text-xs font-medium text-fg-muted"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="border-t border-line pt-6">
+            <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
+              Toolkit
+            </h3>
+            <ToolkitHub competencyNumber={competencyNumber} tags={toolkitTags} />
           </div>
         </section>
       )}
@@ -112,17 +110,9 @@ export function CompetencyTabs({
               >
                 {String(ex.number).padStart(2, "0")} {ex.title}
               </Link>
-              {ex.howToSteps.length === 0 ? (
-                <p className="mt-2 text-sm text-fg-subtle">
-                  No steps listed for this exercise.
-                </p>
-              ) : (
-                <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-fg">
-                  {ex.howToSteps.map((step, i) => (
-                    <li key={i}>{step}</li>
-                  ))}
-                </ol>
-              )}
+              <div className="mt-4">
+                <HowToFlow steps={ex.howToSteps} />
+              </div>
             </div>
           ))}
         </section>
