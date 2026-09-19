@@ -17,8 +17,18 @@ npm run db:seed      # populates it from content/seed.json
 npm run dev
 ```
 
-Open http://localhost:3000, or jump straight to
-http://localhost:3000/competencies (auth isn't wired up until chunk 3).
+Open http://localhost:3000 and log in (see demo accounts below) — every
+`/competencies/**` page requires a session.
+
+## Demo accounts
+
+Seeded by `npm run db:seed`, dev-only, intentionally fake — never reuse
+these values for anything real:
+
+| Role        | Email                    | Password             |
+|-------------|--------------------------|-----------------------|
+| Learner     | `learner@example.com`     | `learner-demo-pw`     |
+| Facilitator | `facilitator@example.com` | `facilitator-demo-pw` |
 
 ## Regenerating seed content
 

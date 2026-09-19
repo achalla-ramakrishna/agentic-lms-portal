@@ -23,8 +23,10 @@ passed/needs-rework. See `docs/SPEC.md` for the full requirements and
 - `content/` — seed manifest (competency/exercise data parsed from the
   guidebook and exercise-set repo READMEs) consumed by `prisma/seed.ts`.
 - `lib/` — shared server-side helpers (auth, db client, data access).
-- `docs/` — spec, architecture, ADRs. Keep these current as the system
-  changes; they are load-bearing, not historical record.
+- `docs/` — spec, architecture, ADRs, and `docs/features/` (one
+  spec-per-feature doc, written before implementation — see Conventions
+  below). Keep these current as the system changes; they are load-bearing,
+  not historical record.
 
 ## Conventions
 
@@ -40,6 +42,12 @@ passed/needs-rework. See `docs/SPEC.md` for the full requirements and
 - **Fixed ordering**: competencies always render 01→12, exercises 01→04
   within a competency — never re-sorted by recency or alphabet (see
   `docs/SPEC.md` §4).
+- **Spec before code**: a non-trivial feature (auth, submission flow,
+  facilitator review — not a one-line fix) gets a short spec in
+  `docs/features/NNNN-name.md` before implementation, per Competency 02
+  (Spec Framing): goal, non-goals, user-facing behavior, and acceptance
+  criteria. If the build diverges from the spec, update the doc in the
+  same commit — don't let it silently go stale.
 
 ## Commands
 

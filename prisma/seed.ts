@@ -4,6 +4,7 @@
 import { PrismaClient } from "@prisma/client";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -107,8 +108,39 @@ async function main() {
     });
   }
 
+  // Dev-only demo accounts — see README "Demo accounts" for the fake,
+  // documented credentials. Real accounts replace these once there's an
+  // actual cohort (docs/features/0003-auth-roles.md non-goals).
+  const demoUsers = [
+    {
+      email: "learner@example.com",
+      name: "Demo Learner",
+      password: "learner-demo-pw",
+      role: "learner" as const,
+    },
+    {
+      email: "facilitator@example.com",
+      name: "Demo Facilitator",
+      password: "facilitator-demo-pw",
+      role: "facilitator" as const,
+    },
+  ];
+  for (const u of demoUsers) {
+    const passwordHash = await bcrypt.hash(u.password, 10);
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: { name: u.name, role: u.role, passwordHash },
+      create: {
+        email: u.email,
+        name: u.name,
+        role: u.role,
+        passwordHash,
+      },
+    });
+  }
+
   console.log(
-    `Seeded ${seed.competencies.length} competencies, ${seed.exercises.length} exercises.`,
+    `Seeded ${seed.competencies.length} competencies, ${seed.exercises.length} exercises, ${demoUsers.length} demo users.`,
   );
 }
 

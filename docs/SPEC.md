@@ -193,8 +193,13 @@ Chunked so each commit lands a coherent, working slice.
   vendored into this repo. `prisma/seed.ts` (idempotent upsert), and
   read-only `/competencies` + `/competencies/:number` +
   `/competencies/:number/exercises/:exerciseNumber` pages (no auth yet).
-- [ ] **Chunk 3 — Auth & roles**: NextAuth credentials, seeded demo
-  learner/facilitator users, `/login`, role-gated `/admin/*`.
+- [x] **Chunk 3 — Auth & roles** (this commit): NextAuth (v4) credentials,
+  seeded demo learner/facilitator users, `/login`, role-gated `/admin/*`.
+  Spec written first per Competency 02 (Spec Framing) —
+  `docs/features/0003-auth-roles.md`; all 6 acceptance criteria verified
+  end-to-end (redirect-to-login, callback-URL bounce-back, facilitator
+  reaching `/admin`, learner getting a real HTTP 403 on `/admin`, wrong
+  password rejected generically, clean build).
 - [ ] **Chunk 4 — Learner flow**: dashboard, exercise detail with
   start/submit, submission panel (Flow A end-to-end).
 - [ ] **Chunk 5 — Facilitator flow**: roster, submission review, decision
