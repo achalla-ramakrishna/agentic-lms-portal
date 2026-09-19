@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { buildRoster, pendingSubmissions } from "@/lib/roster";
+import { templateCoverage } from "@/lib/template-coverage";
 
 export const dynamic = "force-dynamic";
 
@@ -9,9 +10,10 @@ export default async function RosterPage() {
     orderBy: { number: "asc" }, // fixed 01→12 — docs/SPEC.md §4
     select: { number: true },
   });
-  const [roster, pending] = await Promise.all([
+  const [roster, pending, coverage] = await Promise.all([
     buildRoster(),
     pendingSubmissions(),
+    templateCoverage(),
   ]);
 
   return (
@@ -104,6 +106,49 @@ export default async function RosterPage() {
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-muted">
+          Available Templates
+        </h2>
+        <p className="mb-3 text-xs text-fg-subtle">
+          Real evidence templates and contract docs pulled from the
+          exercise-set repo, by competency — reference this before pointing
+          a learner at &ldquo;Templates &amp; Guidelines&rdquo; on a
+          competency or exercise page.
+        </p>
+        <div className="overflow-x-auto rounded-xl border border-line bg-canvas-subtle">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-line text-left text-xs font-semibold uppercase tracking-wide text-fg-muted">
+                <th className="px-4 py-3">Competency</th>
+                <th className="px-2 py-3 text-center">Exercises w/ templates</th>
+                <th className="px-4 py-3 text-right">Total templates</th>
+              </tr>
+            </thead>
+            <tbody>
+              {coverage.map((c) => (
+                <tr key={c.number} className="border-b border-line-muted">
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/competencies/${c.number}`}
+                      className="font-medium text-accent hover:underline"
+                    >
+                      {String(c.number).padStart(2, "0")} {c.title}
+                    </Link>
+                  </td>
+                  <td className="px-2 py-3 text-center text-fg-muted">
+                    {c.exercisesWithDocs}/{c.exerciseCount}
+                  </td>
+                  <td className="px-4 py-3 text-right text-fg">
+                    {c.totalDocs}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   );
