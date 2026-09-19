@@ -16,16 +16,8 @@ type GuidanceDoc = {
 // readGuidanceDocs) — not authored by the portal. Rendered as markdown
 // (tables, headings) since several of these are literally fill-in-the-blank
 // evidence templates with real tables the learner needs to read as tables.
-export function GuidanceDocs({
-  docs,
-  defaultOpenFirst = true,
-}: {
-  docs: GuidanceDoc[];
-  defaultOpenFirst?: boolean;
-}) {
-  const [openId, setOpenId] = useState<number | null>(
-    defaultOpenFirst ? docs[0]?.id ?? null : null,
-  );
+export function GuidanceDocs({ docs }: { docs: GuidanceDoc[] }) {
+  const [openId, setOpenId] = useState<number | null>(docs[0]?.id ?? null);
 
   if (docs.length === 0) return null;
 

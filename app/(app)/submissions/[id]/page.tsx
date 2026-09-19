@@ -8,7 +8,6 @@ import { evidenceChecklist } from "@/lib/content";
 import { decideSubmission } from "@/app/actions";
 import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { ActivityFlow } from "../../competencies/[number]/ActivityFlow";
-import { GuidanceDocs } from "../../competencies/[number]/GuidanceDocs";
 
 export const dynamic = "force-dynamic";
 
@@ -23,11 +22,7 @@ export default async function SubmissionDetailPage({
     where: { id: Number(id) },
     include: {
       exercise: {
-        include: {
-          competency: true,
-          projects: true,
-          guidanceDocs: { orderBy: { sortOrder: "asc" } },
-        },
+        include: { competency: true, projects: true },
       },
       evidenceArtifacts: true,
     },
@@ -153,21 +148,6 @@ export default async function SubmissionDetailPage({
           </ul>
         )}
       </section>
-
-      {exercise.guidanceDocs.length > 0 && (
-        <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
-            Templates &amp; Guidelines
-          </h2>
-          <p className="mt-1 text-xs text-fg-subtle">
-            Real templates for this exercise&apos;s evidence, for reference
-            during review.
-          </p>
-          <div className="mt-4">
-            <GuidanceDocs docs={exercise.guidanceDocs} />
-          </div>
-        </section>
-      )}
 
       {submission.learnerNote && (
         <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
