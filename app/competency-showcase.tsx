@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
+import { useConnectorPaths, ConnectorOverlay } from "@/app/connector-lines";
 
 type Competency = { title: string; subtitle: string };
 
@@ -13,30 +14,6 @@ const SNAKE_ORDER = [0, 1, 2, 3, 7, 6, 5, 4, 8, 9, 10, 11];
 
 const ROTATIONS = ["-1.5deg", "1deg", "-0.75deg", "1.5deg"];
 
-type Rect = { x: number; y: number; width: number; height: number };
-
-// Connector path between two cards, computed from their real rendered
-// positions (not hardcoded percentages) so it stays correct across the
-// grid's responsive column count and each card's rotation/reflow.
-function connectorPath(a: Rect, b: Rect): string {
-  const sameRow =
-    Math.abs(a.y + a.height / 2 - (b.y + b.height / 2)) <
-    Math.min(a.height, b.height) / 2;
-
-  if (sameRow) {
-    const [left, right] = a.x <= b.x ? [a, b] : [b, a];
-    const start = { x: left.x + left.width, y: left.y + left.height / 2 };
-    const end = { x: right.x, y: right.y + right.height / 2 };
-    return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
-  }
-
-  const [top, bottom] = a.y <= b.y ? [a, b] : [b, a];
-  const start = { x: top.x + top.width / 2, y: top.y + top.height };
-  const end = { x: bottom.x + bottom.width / 2, y: bottom.y };
-  const midY = (start.y + end.y) / 2;
-  return `M ${start.x} ${start.y} C ${start.x} ${midY}, ${end.x} ${midY}, ${end.x} ${end.y}`;
-}
-
 export function CompetencyShowcase({
   competencies,
 }: {
@@ -44,57 +21,11 @@ export function CompetencyShowcase({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [paths, setPaths] = useState<string[]>([]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const recompute = () => {
-      const containerRect = container.getBoundingClientRect();
-      const toRect = (el: HTMLDivElement): Rect => {
-        const r = el.getBoundingClientRect();
-        return { x: r.left - containerRect.left, y: r.top - containerRect.top, width: r.width, height: r.height };
-      };
-
-      const next: string[] = [];
-      for (let number = 1; number < 12; number++) {
-        const a = cardRefs.current[number - 1];
-        const b = cardRefs.current[number];
-        if (!a || !b) continue;
-        next.push(connectorPath(toRect(a), toRect(b)));
-      }
-      setPaths(next);
-    };
-
-    recompute();
-    const observer = new ResizeObserver(recompute);
-    observer.observe(container);
-    window.addEventListener("resize", recompute);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", recompute);
-    };
-  }, []);
+  const paths = useConnectorPaths(containerRef, cardRefs, competencies.length);
 
   return (
     <div ref={containerRef} className="relative">
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-        aria-hidden="true"
-      >
-        {paths.map((d, i) => (
-          <path
-            key={i}
-            d={d}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            strokeDasharray="5 5"
-            className="text-fg-subtle"
-          />
-        ))}
-      </svg>
+      <ConnectorOverlay paths={paths} />
 
       <div className="relative grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-4">
         {SNAKE_ORDER.map((idx, position) => {

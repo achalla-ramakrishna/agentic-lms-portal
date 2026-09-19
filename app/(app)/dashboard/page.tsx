@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
+import { CompetencyGrid } from "./CompetencyGrid";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
     totalExercises === 0 ? 0 : Math.round((passedCount / totalExercises) * 100);
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-fg">
           Welcome back, {session!.user.name}
@@ -64,37 +64,20 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-muted">
+      <section className="mt-10">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Competencies
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {competencies.map((c) => {
-            const passed = c.exercises.filter(
+        <CompetencyGrid
+          competencies={competencies.map((c) => ({
+            number: c.number,
+            title: c.title,
+            passed: c.exercises.filter(
               (ex) => statusByExercise.get(ex.id) === "passed",
-            ).length;
-            const palette = competencyStyle(c.number);
-            return (
-              <Link
-                key={c.id}
-                href={`/competencies/${c.number}`}
-                className="rounded-lg border-t-2 border-line bg-canvas-subtle p-4 hover:border-fg-subtle"
-                style={{ borderTopColor: palette.border }}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-fg-subtle">
-                    {String(c.number).padStart(2, "0")}
-                  </span>
-                  <span aria-hidden="true">{COMPETENCY_ICON[c.number]}</span>
-                </div>
-                <div className="mt-1 text-sm font-medium text-fg">{c.title}</div>
-                <div className="mt-2 text-xs text-fg-muted">
-                  {passed}/{c.exercises.length}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+            ).length,
+            total: c.exercises.length,
+          }))}
+        />
       </section>
     </main>
   );
