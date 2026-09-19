@@ -1,6 +1,6 @@
 import { AppHeader } from "@/app/app-header";
 
-export default function CompetenciesLayout({
+export default function SubmissionsLayout({
   children,
 }: {
   children: React.ReactNode;

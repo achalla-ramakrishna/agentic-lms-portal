@@ -200,8 +200,14 @@ Chunked so each commit lands a coherent, working slice.
   end-to-end (redirect-to-login, callback-URL bounce-back, facilitator
   reaching `/admin`, learner getting a real HTTP 403 on `/admin`, wrong
   password rejected generically, clean build).
-- [ ] **Chunk 4 — Learner flow**: dashboard, exercise detail with
-  start/submit, submission panel (Flow A end-to-end).
+- [x] **Chunk 4 — Learner flow** (this commit): `/dashboard`, exercise
+  detail wired to real start/submit, `/submissions/new`, `/submissions/:id`
+  (Flow A steps 1–6 end-to-end). Spec first —
+  `docs/features/0004-learner-flow.md`; all acceptance criteria verified
+  live via Playwright against a built+served instance (start flips
+  status, submit creates exactly the right evidence rows and flips to
+  `submitted`, draft doesn't flip status, cross-user submission access is
+  blocked, dashboard/competency pages show real per-user status).
 - [ ] **Chunk 5 — Facilitator flow**: roster, submission review, decision
   (Flow B end-to-end).
 - [ ] **Chunk 6 — Polish**: profile page, empty/error states, basic tests

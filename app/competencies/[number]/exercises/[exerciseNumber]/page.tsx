@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getSubmission, STATUS_LABEL } from "@/lib/submissions";
+import { startExercise } from "@/app/actions";
 import {
   completionCriteria,
   evidenceChecklist,
   howToSteps,
 } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
 
 export default async function ExercisePage({
   params,
@@ -28,6 +34,16 @@ export default async function ExercisePage({
     include: { projects: true },
   });
   if (!exercise) notFound();
+
+  const session = await getServerSession(authOptions);
+  const submission = await getSubmission(Number(session!.user.id), exercise.id);
+  const status = submission?.status ?? "not_started";
+  const pagePath = `/competencies/${competency.number}/exercises/${exercise.number}`;
+  const startExerciseWithArgs = startExercise.bind(
+    null,
+    exercise.id,
+    pagePath,
+  );
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -111,9 +127,49 @@ export default async function ExercisePage({
         </section>
       </div>
 
-      <p className="mt-6 text-sm text-neutral-400">
-        Start/Submit is wired up once auth lands (docs/SPEC.md §7, chunk 3–4).
-      </p>
+      <section className="mt-6 flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-7">
+        <span className="text-sm font-medium">{STATUS_LABEL[status]}</span>
+
+        {status === "not_started" && (
+          <form action={startExerciseWithArgs}>
+            <button
+              type="submit"
+              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+            >
+              Start Exercise
+            </button>
+          </form>
+        )}
+
+        {(status === "in_progress" || status === "needs_rework") && (
+          <Link
+            href={`/submissions/new?exercise=${exercise.id}`}
+            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+          >
+            {status === "needs_rework" ? "Resubmit Evidence" : "Submit Evidence"}
+          </Link>
+        )}
+
+        {(status === "submitted" || status === "passed") && submission && (
+          <Link
+            href={`/submissions/${submission.id}`}
+            className="text-sm font-medium underline"
+          >
+            View submission →
+          </Link>
+        )}
+      </section>
+
+      {status === "needs_rework" && submission?.facilitatorComment && (
+        <section className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">
+            Facilitator feedback
+          </p>
+          <p className="mt-1 text-sm text-amber-900">
+            {submission.facilitatorComment}
+          </p>
+        </section>
+      )}
     </main>
   );
 }

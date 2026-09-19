@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { masteryBullets, toolkitTags } from "@/lib/content";
+import { STATUS_LABEL } from "@/lib/submissions";
+
+export const dynamic = "force-dynamic";
 
 export default async function CompetencyPage({
   params,
@@ -15,6 +20,18 @@ export default async function CompetencyPage({
   });
 
   if (!competency) notFound();
+
+  const session = await getServerSession(authOptions);
+  const submissions = await prisma.submission.findMany({
+    where: {
+      userId: Number(session!.user.id),
+      exerciseId: { in: competency.exercises.map((ex) => ex.id) },
+    },
+    select: { exerciseId: true, status: true },
+  });
+  const statusByExercise = new Map(
+    submissions.map((s) => [s.exerciseId, s.status]),
+  );
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -87,8 +104,11 @@ export default async function CompetencyPage({
                   </span>
                   <span className="font-medium">{ex.title}</span>
                 </span>
-                <span className="text-sm text-neutral-500">
+                <span className="flex items-center gap-3 text-sm text-neutral-500">
                   {ex.durationLabel}
+                  <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+                    {STATUS_LABEL[statusByExercise.get(ex.id) ?? "not_started"]}
+                  </span>
                 </span>
               </Link>
             </li>
