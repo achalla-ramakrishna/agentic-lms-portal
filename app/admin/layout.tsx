@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { forbidden } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { SignOutButton } from "@/app/sign-out-button";
+import { AppSidebar } from "@/app/app-sidebar";
 
 export default async function AdminLayout({
   children,
@@ -16,7 +17,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div>
+    <div className="flex min-h-screen flex-col">
       <header className="flex items-center justify-between border-b border-line bg-canvas-subtle px-6 py-3">
         <span className="text-sm font-semibold text-fg">
           Agentic Engineering — Admin
@@ -29,7 +30,10 @@ export default async function AdminLayout({
           <SignOutButton />
         </div>
       </header>
-      {children}
+      <div className="flex flex-1">
+        <AppSidebar />
+        <div className="min-w-0 flex-1">{children}</div>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SignOutButton } from "@/app/sign-out-button";
+import { CodewalnutLogo } from "@/app/codewalnut-logo";
 
 // Shared shell for every session-protected page (/dashboard,
 // /competencies/**, /submissions/**). proxy.ts already guarantees a
@@ -10,9 +11,16 @@ export async function AppHeader() {
 
   return (
     <header className="flex items-center justify-between border-b border-line bg-canvas-subtle px-6 py-3">
-      <a href="/dashboard" className="text-sm font-semibold text-fg">
-        Agentic Engineering
-      </a>
+      <div className="flex items-center gap-3">
+        <a href="/dashboard" className="text-sm font-semibold text-fg">
+          Agentic Engineering
+        </a>
+        <span className="hidden items-center gap-1.5 text-xs text-fg-subtle sm:flex">
+          <span className="text-fg-subtle">·</span>
+          crafted by
+          <CodewalnutLogo className="text-fg-muted" />
+        </span>
+      </div>
       <div className="flex items-center gap-4 text-sm">
         <a href="/dashboard" className="font-medium text-fg hover:text-accent">
           Dashboard

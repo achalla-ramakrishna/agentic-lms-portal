@@ -81,11 +81,16 @@ export default async function ExercisePage({
         <ul className="mt-2 space-y-1">
           {exercise.projects.map((p) => (
             <li key={p.id} className="text-sm text-fg">
-              📁 <code className="font-mono text-accent">{p.displayName}</code>
+              📁 <code className="font-mono">{p.displayName}</code>
               <span className="ml-2 text-fg-subtle">{p.repoPath}</span>
             </li>
           ))}
         </ul>
+        <p className="mt-3 text-xs text-fg-subtle">
+          This is a path in your own clone of the exercise-set repo, not a
+          link — the portal doesn&apos;t host or open the project (see
+          &ldquo;How To Go About It&rdquo; above).
+        </p>
       </section>
 
       <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">

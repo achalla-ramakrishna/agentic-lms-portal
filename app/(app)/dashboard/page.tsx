@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
 
 export const dynamic = "force-dynamic";
 
@@ -72,14 +73,19 @@ export default async function DashboardPage() {
             const passed = c.exercises.filter(
               (ex) => statusByExercise.get(ex.id) === "passed",
             ).length;
+            const palette = competencyStyle(c.number);
             return (
               <Link
                 key={c.id}
                 href={`/competencies/${c.number}`}
-                className="rounded-lg border border-line bg-canvas-subtle p-4 hover:border-fg-subtle"
+                className="rounded-lg border-t-2 border-line bg-canvas-subtle p-4 hover:border-fg-subtle"
+                style={{ borderTopColor: palette.border }}
               >
-                <div className="font-mono text-xs text-fg-subtle">
-                  {String(c.number).padStart(2, "0")}
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-fg-subtle">
+                    {String(c.number).padStart(2, "0")}
+                  </span>
+                  <span aria-hidden="true">{COMPETENCY_ICON[c.number]}</span>
                 </div>
                 <div className="mt-1 text-sm font-medium text-fg">{c.title}</div>
                 <div className="mt-2 text-xs text-fg-muted">

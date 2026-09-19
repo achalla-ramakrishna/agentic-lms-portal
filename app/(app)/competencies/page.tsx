@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
 
 // DB-backed content that changes via `npm run db:seed`, not a rebuild —
 // don't let Next prerender this at build time (also means `next build`
@@ -25,9 +26,11 @@ export default async function CompetenciesPage() {
           <li key={c.id}>
             <Link
               href={`/competencies/${c.number}`}
-              className="flex items-center justify-between rounded-lg border border-line bg-canvas-subtle px-5 py-4 hover:border-fg-subtle"
+              className="flex items-center justify-between rounded-lg border-l-2 border-line bg-canvas-subtle px-5 py-4 hover:border-fg-subtle"
+              style={{ borderLeftColor: competencyStyle(c.number).border }}
             >
               <span className="flex items-center gap-4">
+                <span aria-hidden="true">{COMPETENCY_ICON[c.number]}</span>
                 <span className="font-mono text-sm text-fg-subtle">
                   {String(c.number).padStart(2, "0")}
                 </span>
