@@ -1,4 +1,5 @@
 import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
+import { ARTIFACT_ICON, artifactCategory } from "@/lib/artifact-icons";
 
 // Hub-and-spoke rendering of a competency's toolkitTags, replacing a flat
 // row of pills — same real data, arranged as a diagram instead of a list.
@@ -55,14 +56,15 @@ export function ToolkitHub({
       {points.map((p, i) => (
         <span
           key={i}
-          className="absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border bg-canvas-subtle px-2.5 py-1 text-xs font-medium text-fg"
+          className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border bg-canvas-subtle px-2.5 py-1 text-xs font-medium text-fg"
           style={{
             left: `${(p.x / 400) * 100}%`,
             top: `${(p.y / 400) * 100}%`,
             borderColor: palette.border,
           }}
         >
-          {points[i].tag}
+          <span aria-hidden="true">{ARTIFACT_ICON[artifactCategory(p.tag)]}</span>
+          {p.tag}
         </span>
       ))}
     </div>
