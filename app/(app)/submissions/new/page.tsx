@@ -7,6 +7,7 @@ import { evidenceChecklist } from "@/lib/content";
 import { saveSubmission } from "@/app/actions";
 import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { ActivityFlow } from "../../competencies/[number]/ActivityFlow";
+import { GuidanceDocs } from "../../competencies/[number]/GuidanceDocs";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,11 @@ export default async function NewSubmissionPage({
 
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
-    include: { competency: true, projects: true },
+    include: {
+      competency: true,
+      projects: true,
+      guidanceDocs: { orderBy: { sortOrder: "asc" } },
+    },
   });
   if (!exercise) notFound();
 
@@ -57,6 +62,21 @@ export default async function NewSubmissionPage({
           outputsTruncatedCount={artifacts.outputsTruncatedCount}
         />
       </section>
+
+      {exercise.guidanceDocs.length > 0 && (
+        <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
+            Templates &amp; Guidelines
+          </h2>
+          <p className="mt-1 text-xs text-fg-subtle">
+            Real templates for this exercise&apos;s evidence — copy one and
+            fill it in before pasting links below.
+          </p>
+          <div className="mt-4">
+            <GuidanceDocs docs={exercise.guidanceDocs} />
+          </div>
+        </section>
+      )}
 
       <form
         action={saveSubmission}
