@@ -15,7 +15,7 @@ import { competencyStyle } from "@/lib/competency-style";
 import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { ActivityFlow } from "../../ActivityFlow";
 import { HowToFlow } from "../../HowToFlow";
-import { GuidanceDocs } from "./GuidanceDocs";
+import { GuidanceDocs } from "../../GuidanceDocs";
 
 export const dynamic = "force-dynamic";
 

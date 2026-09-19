@@ -21,7 +21,10 @@ export default async function CompetencyPage({
     include: {
       exercises: {
         orderBy: { number: "asc" },
-        include: { projects: true },
+        include: {
+          projects: true,
+          guidanceDocs: { orderBy: { sortOrder: "asc" } },
+        },
       },
     },
   });
@@ -29,6 +32,13 @@ export default async function CompetencyPage({
   if (!competency) notFound();
 
   const artifacts = competencyArtifacts(competency.exercises);
+  const guidanceGroups = competency.exercises
+    .filter((ex) => ex.guidanceDocs.length > 0)
+    .map((ex) => ({
+      exerciseNumber: ex.number,
+      exerciseTitle: ex.title,
+      docs: ex.guidanceDocs,
+    }));
 
   const session = await getServerSession(authOptions);
   const submissions = await prisma.submission.findMany({
@@ -73,6 +83,7 @@ export default async function CompetencyPage({
           inputArtifacts={artifacts.inputs}
           outputArtifacts={artifacts.outputs}
           outputArtifactsTruncatedCount={artifacts.outputsTruncatedCount}
+          guidanceGroups={guidanceGroups}
           exercises={competency.exercises.map((ex) => ({
             id: ex.id,
             number: ex.number,

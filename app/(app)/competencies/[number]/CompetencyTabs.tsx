@@ -6,6 +6,7 @@ import { StatusBadge } from "@/app/status-badge";
 import { ToolkitHub } from "./ToolkitHub";
 import { HowToFlow } from "./HowToFlow";
 import { ActivityFlow } from "./ActivityFlow";
+import { TemplatesLibrary } from "./TemplatesLibrary";
 import { competencyStyle } from "@/lib/competency-style";
 import type { SubmissionStatus } from "@prisma/client";
 
@@ -18,6 +19,12 @@ type ExerciseTabData = {
   status: SubmissionStatus;
 };
 
+type GuidanceGroup = {
+  exerciseNumber: number;
+  exerciseTitle: string;
+  docs: { id: number; filename: string; title: string; content: string }[];
+};
+
 type Props = {
   competencyNumber: number;
   competencyTitle: string;
@@ -28,6 +35,7 @@ type Props = {
   inputArtifacts: string[];
   outputArtifacts: string[];
   outputArtifactsTruncatedCount: number;
+  guidanceGroups: GuidanceGroup[];
   exercises: ExerciseTabData[];
 };
 
@@ -44,6 +52,7 @@ export function CompetencyTabs({
   inputArtifacts,
   outputArtifacts,
   outputArtifactsTruncatedCount,
+  guidanceGroups,
   exercises,
 }: Props) {
   const [tab, setTab] = useState<Tab>("Learn");
@@ -114,6 +123,23 @@ export function CompetencyTabs({
             </h3>
             <ToolkitHub competencyNumber={competencyNumber} tags={toolkitTags} />
           </div>
+
+          {guidanceGroups.length > 0 && (
+            <div className="border-t border-line pt-6">
+              <h3 className="mb-1 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
+                Templates &amp; Guidelines
+              </h3>
+              <p className="mb-4 text-center text-xs text-fg-subtle">
+                Real reference docs from this competency&apos;s exercises —
+                grouped by exercise since each one&apos;s evidence template
+                and contracts are genuinely different.
+              </p>
+              <TemplatesLibrary
+                competencyNumber={competencyNumber}
+                groups={guidanceGroups}
+              />
+            </div>
+          )}
         </section>
       )}
 
