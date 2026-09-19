@@ -75,27 +75,35 @@ export default function LandingPage() {
             const palette = competencyStyle(number);
             const rotation = ROTATIONS[position % ROTATIONS.length];
             return (
-              <div key={idx} className="relative pt-3" style={{ transform: `rotate(${rotation})` }}>
-                <span className="absolute -top-1 left-1 font-mono text-sm font-bold text-fg-subtle">
+              <div key={idx} className="relative pt-8" style={{ transform: `rotate(${rotation})` }}>
+                <span className="absolute -top-1 left-2 font-mono text-sm font-bold text-fg-subtle">
                   {String(number).padStart(2, "0")}
                 </span>
-                <div
-                  className="relative rounded-3xl border-2 p-4 pt-7 text-left shadow-lg"
-                  style={{ backgroundColor: palette.bg, borderColor: palette.border }}
-                >
+                {/* White photo-frame mount, like a pinned card on a corkboard */}
+                <div className="relative rounded-[28px] bg-white p-3 pt-6 shadow-xl">
                   <span
-                    className="absolute -top-3 right-4 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white text-base"
+                    className="absolute -top-1.5 left-5 h-3.5 w-3.5 rounded-full shadow-md ring-2 ring-white"
+                    style={{ backgroundColor: palette.border }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-full border-2 bg-white text-base shadow-md"
                     style={{ borderColor: palette.border }}
                     aria-hidden="true"
                   >
                     {COMPETENCY_ICON[number]}
                   </span>
-                  <h3 className="text-sm font-bold" style={{ color: palette.text }}>
-                    {c.title}
-                  </h3>
-                  <p className="mt-1 text-xs leading-snug" style={{ color: palette.text }}>
-                    {c.subtitle}
-                  </p>
+                  <div
+                    className="rounded-2xl border-2 p-4 text-left"
+                    style={{ backgroundColor: palette.bg, borderColor: palette.border }}
+                  >
+                    <h3 className="text-sm font-bold" style={{ color: palette.text }}>
+                      {c.title}
+                    </h3>
+                    <p className="mt-1 text-xs leading-snug" style={{ color: palette.text }}>
+                      {c.subtitle}
+                    </p>
+                  </div>
                 </div>
               </div>
             );
