@@ -3,6 +3,7 @@ import { forbidden } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { SignOutButton } from "@/app/sign-out-button";
 import { AppSidebar } from "@/app/app-sidebar";
+import { CodewalnutLogo } from "@/app/codewalnut-logo";
 
 export default async function AdminLayout({
   children,
@@ -19,9 +20,12 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex items-center justify-between border-b border-line bg-canvas-subtle px-6 py-3">
-        <span className="text-sm font-semibold text-fg">
-          Agentic Engineering — Admin
-        </span>
+        <div className="flex items-center gap-3">
+          <CodewalnutLogo height={22} />
+          <span className="hidden text-sm font-semibold text-fg sm:inline">
+            Agentic Engineering — Admin
+          </span>
+        </div>
         <div className="flex items-center gap-4 text-sm">
           <span className="text-fg-muted">{session.user.email}</span>
           <a href="/competencies" className="font-medium text-fg hover:text-accent">

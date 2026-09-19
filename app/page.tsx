@@ -34,9 +34,12 @@ export default function LandingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col items-center gap-14 px-6 py-16 text-center">
       <header className="flex w-full items-center justify-between">
-        <span className="text-sm font-semibold tracking-wide text-fg">
-          Agentic Engineering
-        </span>
+        <div className="flex items-center gap-3">
+          <CodewalnutLogo height={24} />
+          <span className="hidden text-sm font-semibold tracking-wide text-fg sm:inline">
+            Agentic Engineering
+          </span>
+        </div>
         <a
           href="/login"
           className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-fg hover:bg-white/5"
