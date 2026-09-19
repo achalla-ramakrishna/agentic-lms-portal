@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { STATUS_LABEL } from "@/lib/submissions";
+import { evidenceChecklist } from "@/lib/content";
+import { decideSubmission } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,9 @@ export default async function SubmissionDetailPage({
   }
 
   const { exercise } = submission;
+  const coveredLabels = new Set(
+    submission.evidenceArtifacts.map((a) => a.checklistLabel),
+  );
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -71,6 +76,30 @@ export default async function SubmissionDetailPage({
           )}
         </p>
       </section>
+
+      {isFacilitator && (
+        <section className="mt-6 rounded-xl border border-neutral-200 bg-white p-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Evidence checklist (from the exercise)
+          </h2>
+          <ul className="mt-2 space-y-1 text-sm">
+            {evidenceChecklist(exercise).map((item, i) => (
+              <li key={i} className="flex gap-2">
+                <span>{coveredLabels.has(item.label) ? "☑" : "☐"}</span>
+                <span
+                  className={
+                    coveredLabels.has(item.label)
+                      ? "text-neutral-700"
+                      : "text-neutral-400"
+                  }
+                >
+                  {item.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-6 rounded-xl border border-neutral-200 bg-white p-7">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
@@ -135,6 +164,43 @@ export default async function SubmissionDetailPage({
             Edit submission
           </Link>
         )}
+
+      {isFacilitator && submission.status === "submitted" && (
+        <form
+          action={decideSubmission}
+          className="mt-6 flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-7"
+        >
+          <input type="hidden" name="submissionId" value={submission.id} />
+          <p className="text-sm font-medium">Decision</p>
+          <div className="flex gap-6 text-sm">
+            <label className="flex items-center gap-2">
+              <input type="radio" name="decision" value="passed" required />
+              Passed
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="decision" value="needs_rework" />
+              Needs Rework
+            </label>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="facilitatorComment" className="text-sm font-medium">
+              Comment (optional)
+            </label>
+            <textarea
+              id="facilitatorComment"
+              name="facilitatorComment"
+              rows={3}
+              className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="self-end rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+          >
+            Submit Decision
+          </button>
+        </form>
+      )}
     </main>
   );
 }

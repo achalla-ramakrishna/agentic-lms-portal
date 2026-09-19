@@ -208,8 +208,16 @@ Chunked so each commit lands a coherent, working slice.
   status, submit creates exactly the right evidence rows and flips to
   `submitted`, draft doesn't flip status, cross-user submission access is
   blocked, dashboard/competency pages show real per-user status).
-- [ ] **Chunk 5 — Facilitator flow**: roster, submission review, decision
-  (Flow B end-to-end).
+- [x] **Chunk 5 — Facilitator flow** (this commit): `/admin/roster`,
+  submission review + decision, needs_rework feedback loop (Flow B
+  end-to-end). Spec first — `docs/features/0005-facilitator-flow.md`;
+  acceptance criteria verified live via Playwright (roster pending count,
+  decision persists status/decidedAt/decidedById/comment, pending list
+  drops the item post-decision, learner sees needs_rework feedback and a
+  resubmit path) plus direct SQLite checks. The decision action's role
+  check is server-side and unconditional (`requireFacilitatorId` calls
+  `forbidden()` regardless of caller), verified by code inspection rather
+  than a forged raw request — noted honestly rather than overclaimed.
 - [ ] **Chunk 6 — Polish**: profile page, empty/error states, basic tests
   for status transitions and roster aggregation.
 
