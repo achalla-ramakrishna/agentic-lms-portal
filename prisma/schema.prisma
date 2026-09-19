@@ -23,11 +23,11 @@ model Competency {
 }
 
 model Exercise {
-  id                Int               @id @default(autoincrement())
+  id                Int                    @id @default(autoincrement())
   competencyId      Int
-  competency        Competency        @relation(fields: [competencyId], references: [id])
+  competency        Competency             @relation(fields: [competencyId], references: [id])
   number            Int
-  slug              String            @unique
+  slug              String                 @unique
   title             String
   missionMarkdown   String
   durationLabel     String
@@ -35,6 +35,7 @@ model Exercise {
   evidenceChecklist String // JSON-encoded {label: string}[]
   completionCriteria String // JSON-encoded string[]
   projects          ExerciseProject[]
+  guidanceDocs      ExerciseGuidanceDoc[]
   submissions       Submission[]
 
   @@unique([competencyId, number])
@@ -47,6 +48,22 @@ model ExerciseProject {
   repoPath    String
   displayName String
   isPrimary   Boolean  @default(false)
+}
+
+// Real, already-written guidance docs pulled verbatim from each exercise's
+// own docs/ folder (evidence-template.md, *-contract.md, a real AGENTS.md
+// or SKILL.md example, ...) — not authored by the portal. See
+// scripts/generate-seed.mjs's readGuidanceDocs for the source and
+// docs/adr/ for why we surface real repo content instead of writing our
+// own generic templates.
+model ExerciseGuidanceDoc {
+  id         Int      @id @default(autoincrement())
+  exerciseId Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  filename   String // relative to the exercise's docs/ folder, e.g. "context-sources/AGENTS.md"
+  title      String
+  content    String
+  sortOrder  Int
 }
 
 enum Role {

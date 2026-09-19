@@ -14,6 +14,7 @@ type SeedProject = {
   repoPath: string;
   isPrimary: boolean;
 };
+type SeedGuidanceDoc = { filename: string; title: string; content: string };
 type SeedExercise = {
   competencyNumber: number;
   number: number;
@@ -25,6 +26,7 @@ type SeedExercise = {
   evidenceChecklist: SeedEvidenceItem[];
   completionCriteria: string[];
   projects: SeedProject[];
+  guidanceDocs: SeedGuidanceDoc[];
 };
 type SeedCompetency = {
   number: number;
@@ -104,6 +106,22 @@ async function main() {
         repoPath: p.repoPath,
         displayName: p.displayName,
         isPrimary: p.isPrimary,
+      })),
+    });
+
+    // Same replace-wholesale approach as projects — content/seed.json's
+    // generate-seed.mjs already sorts guidanceDocs (evidence-template.md
+    // first, then A-Z), so array index is the display order.
+    await prisma.exerciseGuidanceDoc.deleteMany({
+      where: { exerciseId: exercise.id },
+    });
+    await prisma.exerciseGuidanceDoc.createMany({
+      data: e.guidanceDocs.map((d, i) => ({
+        exerciseId: exercise.id,
+        filename: d.filename,
+        title: d.title,
+        content: d.content,
+        sortOrder: i,
       })),
     });
   }

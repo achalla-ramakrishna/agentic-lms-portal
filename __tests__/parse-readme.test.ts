@@ -4,6 +4,7 @@ import {
   bulletLines,
   numberedLines,
   decodePathSegment,
+  deriveDocTitle,
 } from "../scripts/lib/parse-readme.mjs";
 
 describe("section", () => {
@@ -87,6 +88,34 @@ describe("decodePathSegment", () => {
   it("decodes '&' encoded as %26 (e.g. 'Docs & Diagrams')", () => {
     expect(decodePathSegment("./07%20Docs%20%26%20Diagrams")).toBe(
       "07 Docs & Diagrams",
+    );
+  });
+});
+
+describe("deriveDocTitle", () => {
+  it("prefers the file's own top-level heading", () => {
+    const content = "# Guardrail Contract\n\nThe exercise supports...";
+    expect(deriveDocTitle("guardrail-contract.md", content)).toBe(
+      "Guardrail Contract",
+    );
+  });
+
+  it("prefers the heading even when the file is under a subfolder", () => {
+    const content = "# Repository Rules\n\nKeep public adapter behavior...";
+    expect(deriveDocTitle("context-sources/AGENTS.md", content)).toBe(
+      "Repository Rules",
+    );
+  });
+
+  it("keeps an all-caps filename as-is when there's no heading to fall back to", () => {
+    expect(deriveDocTitle("context-sources/AGENTS.md", "no heading here")).toBe(
+      "AGENTS",
+    );
+  });
+
+  it("prettifies a hyphenated filename when there's no heading", () => {
+    expect(deriveDocTitle("evidence-template.md", "no heading here")).toBe(
+      "Evidence Template",
     );
   });
 });

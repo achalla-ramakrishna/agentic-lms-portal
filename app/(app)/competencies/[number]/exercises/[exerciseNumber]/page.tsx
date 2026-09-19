@@ -15,6 +15,7 @@ import { competencyStyle } from "@/lib/competency-style";
 import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { ActivityFlow } from "../../ActivityFlow";
 import { HowToFlow } from "../../HowToFlow";
+import { GuidanceDocs } from "./GuidanceDocs";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,10 @@ export default async function ExercisePage({
         number: Number(exerciseNumber),
       },
     },
-    include: { projects: true },
+    include: {
+      projects: true,
+      guidanceDocs: { orderBy: { sortOrder: "asc" } },
+    },
   });
   if (!exercise) notFound();
 
@@ -162,6 +166,23 @@ export default async function ExercisePage({
           )}
         </section>
       </div>
+
+      {exercise.guidanceDocs.length > 0 && (
+        <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
+            Templates &amp; Guidelines
+          </h2>
+          <p className="mt-1 text-xs text-fg-subtle">
+            Real reference docs from this exercise&apos;s own repo folder —
+            not generic advice. Copy a template and fill it in, or use a
+            contract doc to check your output&apos;s structure before you
+            submit.
+          </p>
+          <div className="mt-4">
+            <GuidanceDocs docs={exercise.guidanceDocs} />
+          </div>
+        </section>
+      )}
 
       <section className="mt-6 flex items-center justify-between rounded-xl border border-line bg-canvas-subtle p-7">
         <StatusBadge status={status} />

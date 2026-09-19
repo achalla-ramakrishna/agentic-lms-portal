@@ -40,3 +40,19 @@ export function numberedLines(text) {
 export function decodePathSegment(s) {
   return decodeURIComponent(s.replace(/^\.\//, ""));
 }
+
+// Title for a guidance doc (an exercise's docs/*.md file, e.g.
+// "evidence-template.md" or "context-sources/AGENTS.md"): prefer the
+// file's own first "# Heading" (what its author called it), falling back
+// to a prettified filename when the file has no top-level heading.
+export function deriveDocTitle(relPath, content) {
+  const headingMatch = content.match(/^#\s+(.+)$/m);
+  if (headingMatch) return headingMatch[1].trim();
+
+  const base = relPath.split("/").pop().replace(/\.md$/i, "");
+  if (base === base.toUpperCase()) return base; // e.g. AGENTS, SKILL
+  return base
+    .split(/[-_]/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
