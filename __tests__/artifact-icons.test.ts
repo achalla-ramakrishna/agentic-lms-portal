@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { artifactCategory } from "@/lib/artifact-icons";
+import { artifactCategory, groupToolkitTags } from "@/lib/artifact-icons";
 
 describe("artifactCategory", () => {
   it("classifies plain doc/config files", () => {
@@ -86,5 +86,34 @@ describe("artifactCategory", () => {
   it("is case-insensitive", () => {
     expect(artifactCategory("agents.md")).toBe("doc");
     expect(artifactCategory("PLAYWRIGHT")).toBe("test");
+  });
+});
+
+describe("groupToolkitTags", () => {
+  it("groups tags into one lane per distinct category, dropping empty lanes", () => {
+    const lanes = groupToolkitTags(["AGENTS.md", "CLIs/MCP", "PreToolUse hooks", "sandboxing"]);
+    expect(lanes.map((l) => l.category)).toEqual(["doc", "guardrail", "cli"]);
+    expect(lanes.find((l) => l.category === "guardrail")?.tags).toEqual([
+      "PreToolUse hooks",
+      "sandboxing",
+    ]);
+  });
+
+  it("keeps every tag across all lanes with none dropped or duplicated", () => {
+    const tags = ["AGENTS.md", "CLAUDE.md", "Playwright", "Testing Library", "SKILL.md"];
+    const lanes = groupToolkitTags(tags);
+    const flattened = lanes.flatMap((l) => l.tags);
+    expect(flattened.sort()).toEqual([...tags].sort());
+  });
+
+  it("returns lanes in a fixed reading order regardless of input order", () => {
+    const forward = groupToolkitTags(["SKILL.md", "spec.md", "Mermaid"]);
+    const reversed = groupToolkitTags(["Mermaid", "spec.md", "SKILL.md"]);
+    expect(forward.map((l) => l.category)).toEqual(["spec", "diagram", "skill"]);
+    expect(reversed.map((l) => l.category)).toEqual(["spec", "diagram", "skill"]);
+  });
+
+  it("returns nothing for an empty tag list", () => {
+    expect(groupToolkitTags([])).toEqual([]);
   });
 });

@@ -32,6 +32,24 @@ export const ARTIFACT_ICON: Record<ArtifactCategory, string> = {
   spec: "📋",
 };
 
+// Swimlane label for a category, used to group a competency's toolkit
+// tags by real, already-classified type (ToolkitHub) rather than an
+// invented process phase — every competency's tags land in 1-3 of
+// these lanes with no gaps or made-up structure.
+export const ARTIFACT_LANE_LABEL: Record<ArtifactCategory, string> = {
+  doc: "Docs",
+  command: "Commands",
+  cli: "CLI Tools",
+  guardrail: "Guardrails",
+  test: "Testing",
+  skill: "Skills",
+  agent: "Multi-Agent",
+  diagram: "Diagrams",
+  review: "Review & Evidence",
+  metric: "Metrics",
+  spec: "Spec & Requirements",
+};
+
 // Proper nouns with no generic keyword to match on.
 const EXACT_OVERRIDES: Record<string, ArtifactCategory> = {
   mergemitra: "review",
@@ -104,4 +122,43 @@ export function artifactCategory(tag: string): ArtifactCategory {
     return "spec";
 
   return "doc"; // .md files and anything else fall through here
+}
+
+// Fixed reading order for lanes so the same category always appears in
+// the same relative position across competencies, rather than shuffling
+// based on tag order in content/seed.json.
+const CATEGORY_ORDER: ArtifactCategory[] = [
+  "spec",
+  "doc",
+  "diagram",
+  "guardrail",
+  "command",
+  "cli",
+  "skill",
+  "agent",
+  "test",
+  "review",
+  "metric",
+];
+
+export type ToolkitLane = {
+  category: ArtifactCategory;
+  tags: string[];
+};
+
+// Groups a competency's toolkitTags into swimlanes by their real,
+// already-classified artifact type — not an invented process phase.
+// Only categories actually present are returned, in CATEGORY_ORDER.
+export function groupToolkitTags(tags: string[]): ToolkitLane[] {
+  const byCategory = new Map<ArtifactCategory, string[]>();
+  for (const tag of tags) {
+    const category = artifactCategory(tag);
+    const existing = byCategory.get(category);
+    if (existing) existing.push(tag);
+    else byCategory.set(category, [tag]);
+  }
+
+  return CATEGORY_ORDER.filter((category) => byCategory.has(category)).map(
+    (category) => ({ category, tags: byCategory.get(category)! }),
+  );
 }

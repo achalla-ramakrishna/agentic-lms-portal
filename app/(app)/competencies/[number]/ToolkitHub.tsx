@@ -1,11 +1,16 @@
-import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
-import { ARTIFACT_ICON, artifactCategory } from "@/lib/artifact-icons";
+import { competencyStyle } from "@/lib/competency-style";
+import {
+  ARTIFACT_ICON,
+  ARTIFACT_LANE_LABEL,
+  artifactCategory,
+  groupToolkitTags,
+} from "@/lib/artifact-icons";
 
-// Hub-and-spoke rendering of a competency's toolkitTags, replacing a flat
-// row of pills — same real data, arranged as a diagram instead of a list.
-// SVG draws the spoke lines (cheap, scales cleanly); labels are plain
-// positioned HTML rather than SVG <text> so variable-length tag names
-// don't need manual wrapping/measurement logic.
+// Swimlane rendering of a competency's toolkitTags: each lane is a real
+// artifact category (lib/artifact-icons.ts' classifier, already checked
+// against every tag in content/seed.json), not an invented process phase
+// like the RUP reference's "Analysis"/"Design" — grouping by the type of
+// thing the tag actually is (a guardrail, a test tool, a doc, ...).
 export function ToolkitHub({
   competencyNumber,
   tags,
@@ -16,62 +21,40 @@ export function ToolkitHub({
   if (tags.length === 0) return null;
 
   const palette = competencyStyle(competencyNumber);
-  const center = 200;
-  const radius = 150;
-
-  const points = tags.map((tag, i) => {
-    const angle = (-90 + (360 / tags.length) * i) * (Math.PI / 180);
-    return {
-      tag,
-      x: center + radius * Math.cos(angle),
-      y: center + radius * Math.sin(angle),
-    };
-  });
+  const lanes = groupToolkitTags(tags);
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[480px]">
-      <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full">
-        {points.map((p, i) => (
-          <line
-            key={i}
-            x1={center}
-            y1={center}
-            x2={p.x}
-            y2={p.y}
-            stroke={palette.border}
-            strokeWidth={1.5}
-            strokeOpacity={0.5}
-          />
-        ))}
-      </svg>
-
-      <div
-        className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 bg-canvas text-2xl"
-        style={{ borderColor: palette.border }}
-        aria-hidden="true"
-      >
-        {COMPETENCY_ICON[competencyNumber]}
-      </div>
-
-      {points.map((p, i) => (
+    <div className="flex flex-col gap-3">
+      {lanes.map((lane) => (
         <div
-          key={i}
-          className="absolute flex w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
-          style={{
-            left: `${(p.x / 400) * 100}%`,
-            top: `${(p.y / 400) * 100}%`,
-          }}
+          key={lane.category}
+          className="flex flex-col gap-3 rounded-2xl border-2 p-4 sm:flex-row sm:items-center"
+          style={{ borderColor: palette.border }}
         >
-          <span
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 bg-canvas-subtle text-3xl shadow-md"
-            style={{ borderColor: palette.border }}
-            aria-hidden="true"
-          >
-            {ARTIFACT_ICON[artifactCategory(p.tag)]}
-          </span>
-          <span className="text-center text-[11px] font-medium leading-tight text-fg">
-            {p.tag}
-          </span>
+          <div className="shrink-0 sm:w-36 sm:border-r sm:pr-4" style={{ borderColor: palette.border }}>
+            <span
+              className="text-xs font-bold uppercase tracking-wide"
+              style={{ color: palette.text }}
+            >
+              {ARTIFACT_LANE_LABEL[lane.category]}
+            </span>
+          </div>
+          <div className="flex flex-1 flex-wrap gap-4">
+            {lane.tags.map((tag) => (
+              <div key={tag} className="flex w-20 flex-col items-center gap-1.5">
+                <span
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 bg-canvas-subtle text-2xl shadow-sm"
+                  style={{ borderColor: palette.border }}
+                  aria-hidden="true"
+                >
+                  {ARTIFACT_ICON[artifactCategory(tag)]}
+                </span>
+                <span className="text-center text-[10px] font-medium leading-tight text-fg">
+                  {tag}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       ))}
     </div>
