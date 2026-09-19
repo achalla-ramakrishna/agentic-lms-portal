@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { masteryBullets, toolkitTags, howToSteps } from "@/lib/content";
 import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
+import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { CompetencyTabs } from "./CompetencyTabs";
 
 export const dynamic = "force-dynamic";
@@ -17,10 +18,17 @@ export default async function CompetencyPage({
   const { number } = await params;
   const competency = await prisma.competency.findUnique({
     where: { number: Number(number) },
-    include: { exercises: { orderBy: { number: "asc" } } }, // fixed 01→04
+    include: {
+      exercises: {
+        orderBy: { number: "asc" },
+        include: { projects: true },
+      },
+    },
   });
 
   if (!competency) notFound();
+
+  const artifacts = competencyArtifacts(competency.exercises);
 
   const session = await getServerSession(authOptions);
   const submissions = await prisma.submission.findMany({
@@ -35,7 +43,7 @@ export default async function CompetencyPage({
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main className="mx-auto max-w-5xl px-6 py-12">
       <Link href="/competencies" className="text-sm font-medium text-accent hover:underline">
         ← All competencies
       </Link>
@@ -57,10 +65,14 @@ export default async function CompetencyPage({
       <div className="mt-6">
         <CompetencyTabs
           competencyNumber={competency.number}
+          competencyTitle={competency.title}
           shiftMarkdown={competency.shiftMarkdown}
           masteryBullets={masteryBullets(competency)}
           commonMistakeMarkdown={competency.commonMistakeMarkdown}
           toolkitTags={toolkitTags(competency)}
+          inputArtifacts={artifacts.inputs}
+          outputArtifacts={artifacts.outputs}
+          outputArtifactsTruncatedCount={artifacts.outputsTruncatedCount}
           exercises={competency.exercises.map((ex) => ({
             id: ex.id,
             number: ex.number,

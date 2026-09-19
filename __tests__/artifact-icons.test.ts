@@ -58,6 +58,7 @@ describe("artifactCategory", () => {
     expect(artifactCategory("API Mocks")).toBe("test");
     expect(artifactCategory("Role Locators")).toBe("test");
     expect(artifactCategory("characterization tests")).toBe("test");
+    expect(artifactCategory("npm run verify:exercise")).toBe("test");
   });
 
   it("classifies review/evidence artifacts", () => {

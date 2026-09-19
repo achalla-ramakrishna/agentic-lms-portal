@@ -79,7 +79,8 @@ export function artifactCategory(tag: string): ArtifactCategory {
     t.includes("test") ||
     t.includes("mock") ||
     t.includes("locator") ||
-    t.includes("playwright")
+    t.includes("playwright") ||
+    t.includes("verify")
   )
     return "test";
   if (

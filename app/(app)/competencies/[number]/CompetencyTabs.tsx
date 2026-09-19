@@ -5,6 +5,8 @@ import { useState } from "react";
 import { StatusBadge } from "@/app/status-badge";
 import { ToolkitHub } from "./ToolkitHub";
 import { HowToFlow } from "./HowToFlow";
+import { ActivityFlow } from "./ActivityFlow";
+import { competencyStyle } from "@/lib/competency-style";
 import type { SubmissionStatus } from "@prisma/client";
 
 type ExerciseTabData = {
@@ -18,10 +20,14 @@ type ExerciseTabData = {
 
 type Props = {
   competencyNumber: number;
+  competencyTitle: string;
   shiftMarkdown: string;
   masteryBullets: string[];
   commonMistakeMarkdown: string;
   toolkitTags: string[];
+  inputArtifacts: string[];
+  outputArtifacts: string[];
+  outputArtifactsTruncatedCount: number;
   exercises: ExerciseTabData[];
 };
 
@@ -30,13 +36,18 @@ type Tab = (typeof TABS)[number];
 
 export function CompetencyTabs({
   competencyNumber,
+  competencyTitle,
   shiftMarkdown,
   masteryBullets,
   commonMistakeMarkdown,
   toolkitTags,
+  inputArtifacts,
+  outputArtifacts,
+  outputArtifactsTruncatedCount,
   exercises,
 }: Props) {
   const [tab, setTab] = useState<Tab>("Learn");
+  const color = competencyStyle(competencyNumber).border;
 
   return (
     <div>
@@ -86,6 +97,19 @@ export function CompetencyTabs({
 
           <div className="border-t border-line pt-6">
             <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
+              How This Competency Flows
+            </h3>
+            <ActivityFlow
+              competencyNumber={competencyNumber}
+              title={competencyTitle}
+              inputs={inputArtifacts}
+              outputs={outputArtifacts}
+              outputsTruncatedCount={outputArtifactsTruncatedCount}
+            />
+          </div>
+
+          <div className="border-t border-line pt-6">
+            <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
               Toolkit
             </h3>
             <ToolkitHub competencyNumber={competencyNumber} tags={toolkitTags} />
@@ -111,7 +135,7 @@ export function CompetencyTabs({
                 {String(ex.number).padStart(2, "0")} {ex.title}
               </Link>
               <div className="mt-4">
-                <HowToFlow steps={ex.howToSteps} />
+                <HowToFlow steps={ex.howToSteps} color={color} />
               </div>
             </div>
           ))}
