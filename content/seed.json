@@ -1,0 +1,1916 @@
+{
+  "competencies": [
+    {
+      "number": 1,
+      "title": "Toolchain Setup",
+      "subtitle": "Project Rules, Hooks, Guardrails & CLI/MCP Wiring",
+      "shiftMarkdown": "You've always configured your own setup, and it lived in your head and your dotfiles. Now you're configuring for someone else: an agent that starts every session blind to your repo. Set it up once so every session inherits it.",
+      "masteryBullets": [
+        "New sessions need almost no re-explaining",
+        "the agent runs your checks without being told",
+        "it never reaches for a tool or path you did not grant."
+      ],
+      "commonMistakeMarkdown": "YOLO mode (--dangerously-skip-permissions) is how a stray command nukes a branch or leaks a secret. Convenience now, incident later.",
+      "toolkitTags": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        "PreToolUse hooks",
+        "sandboxing",
+        "secret scanning",
+        "CLIs/MCP"
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Spec Framing",
+      "subtitle": "Requirements Decomposition & Testable Spec Creation",
+      "shiftMarkdown": "Fuzzy tickets used to be survivable — your judgment caught the missing edge case before review. Give an agent the same fuzzy ticket and it fills the gaps too, but without your judgment: it guesses confidently and builds fast. Use the agent to find assumptions and draft product questions, then turn the answers into a clear, testable spec.",
+      "masteryBullets": [
+        "Implementation starts from clear acceptance criteria",
+        "the first diff matches intent",
+        "each chunk merges on its own."
+      ],
+      "commonMistakeMarkdown": "A spec the agent cannot test is not a useful spec. \"Make it better\" gives it room to invent, and it will.",
+      "toolkitTags": [
+        "/plan",
+        "spec.md",
+        "acceptance criteria",
+        "Given/When/Then",
+        "EARS"
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Context Engineering",
+      "subtitle": "Agent Working-Context Curation",
+      "shiftMarkdown": "You used to carry the project map in your head — how the system is shaped, why a hard decision was made. An agent does not arrive with that map; it needs a shared context layer of repo overview, architecture, conventions, and ADRs. Put that knowledge where the agent can find it, before the chat starts.",
+      "masteryBullets": [
+        "New sessions understand the repo shape without a long briefing",
+        "architecture, conventions, and commands live in versioned files",
+        "repeated corrections become durable context."
+      ],
+      "commonMistakeMarkdown": "Treating context as chat paste. If architecture, rules, and repo maps live only in prompts, every session starts from zero.",
+      "toolkitTags": [
+        "AGENTS.md",
+        "repo-maps",
+        "ADRs",
+        "architecture.md",
+        "conventions.md"
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Test Automation",
+      "subtitle": "Reliable E2E Test Generation",
+      "shiftMarkdown": "Under deadline, tests were always the first thing to slip. Agents change the cost — they can generate a whole suite in seconds, but cheap tests are often bad tests: flaky, brittle, or checking nothing users see. Direct the agent toward tests you can trust; you decide what \"working\" means.",
+      "masteryBullets": [
+        "Tests fail for real regressions, not timing",
+        "the suite stays green across repeated CI runs",
+        "you would trust it enough to refactor behind it."
+      ],
+      "commonMistakeMarkdown": "A flaky test trains the team to ignore red. \"All green\" means nothing if the suite never fails when it should.",
+      "toolkitTags": [
+        "Playwright",
+        "Testing Library",
+        "API Mocks",
+        "Role Locators",
+        "Trace Viewer"
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Skill Packaging",
+      "subtitle": "Workflow Packaging into Reusable Skills",
+      "shiftMarkdown": "Every team has one engineer with the useful prompt, trapped in their chat history. Now you can package that workflow as a skill — a folder with a SKILL.md the agent loads when the task matches, shipped through git like any other project asset.",
+      "masteryBullets": [
+        "Teammates get your workflow without you in the room",
+        "the agent invokes the right skill on its own",
+        "output is consistent across people and machines."
+      ],
+      "commonMistakeMarkdown": "A vague description means the agent never loads the skill, or loads it at the wrong time. The \"Use when...\" line decides whether it gets used.",
+      "toolkitTags": [
+        "SKILL.md",
+        ".agents/skills",
+        ".claude/skills/",
+        "Skill Creator Skill"
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Multi-Agent Workflows",
+      "subtitle": "Parallel Agents on Isolated Tasks",
+      "shiftMarkdown": "You have probably worked one task at a time, even with an agent. Independent work does not need to queue — give each separate task its own agent, branch, and git worktree, and use subagents inside one complex task for focused search or checks.",
+      "masteryBullets": [
+        "Independent tasks run side by side, not in a queue",
+        "worktrees keep branches from colliding",
+        "you are reviewing and merging, not babysitting one session."
+      ],
+      "commonMistakeMarkdown": "Parallel agents on overlapping files do not go faster; they overwrite each other. Isolate first, or you will spend the saved time fixing conflicts.",
+      "toolkitTags": [
+        "git worktrees",
+        "subagents",
+        "agent teams",
+        "Treehouse"
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Docs & Diagrams",
+      "subtitle": "Diagrams & Arch. Decision Records",
+      "shiftMarkdown": "Documentation was often the first thing to go because it took time to write well. Agents reduce that cost — they can read a repo, draft an ADR, and turn a design into a diagram quickly. Capture decisions while the context is fresh, then verify the diagram against the code.",
+      "masteryBullets": [
+        "The why behind decisions is written down and committed",
+        "docs and diagrams stay updated as code evolves",
+        "a newcomer or agent can onboard from the repo alone."
+      ],
+      "commonMistakeMarkdown": "A generated diagram that is wrong in a small way is worse than none because people trust it. Always check it against the code.",
+      "toolkitTags": [
+        "ADR / MADR",
+        "Mermaid",
+        "C4",
+        "excalidraw skill"
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Evidence-led PRs",
+      "subtitle": "PR Gate Evidence & Handoff",
+      "shiftMarkdown": "\"Trust me, it works\" used to carry more weight, back when a PR was small enough to read in one sitting. Now a PR can be a thousand lines an agent wrote in minutes — treat quality gates as deliverables and make the PR answer the reviewer's questions before they ask them.",
+      "masteryBullets": [
+        "Reviewers stop asking \"did you test this\"",
+        "the PR evidence pack is mostly automated",
+        "merge confidence comes from visible proof."
+      ],
+      "commonMistakeMarkdown": "A green checkmark with no visible evidence still makes the reviewer do your work. Put the proof where they can see it.",
+      "toolkitTags": [
+        "gh CLI",
+        "CI artifacts",
+        "PR template",
+        "Coverage Report"
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Code Review",
+      "subtitle": "Code Quality & Risk Review for Merge Confidence",
+      "shiftMarkdown": "Review was always demanding, but the trust model was clearer when a vetted teammate wrote the code by hand. An agent can hand you a large PR in minutes that looks clean and confident — but clean-looking code is not always correct, secure, or maintainable. Review becomes part of the core work, not a quick approval step.",
+      "masteryBullets": [
+        "A fresh session reviewer adds findings, not noise",
+        "security and accessibility are explicit checks",
+        "you can explain why every meaningful change belongs in the merge."
+      ],
+      "commonMistakeMarkdown": "\"Looks right\" is the trap. Agent-written code can be clean and confident while still being wrong. Clean is not the same as correct.",
+      "toolkitTags": [
+        "/review",
+        "MergeMitra",
+        "SuperPowers Skills"
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Token Economics",
+      "subtitle": "Right Model & Token Cost Optimizations",
+      "shiftMarkdown": "For most of your career, the cost of writing code was your time, not tokens. With agents, every turn has a cost — context gets billed again, reasoning costs more. Use a strong model to plan and review, a cheaper one for routine implementation.",
+      "masteryBullets": [
+        "You pick model and effort on purpose, per task",
+        "your bill tracks task difficulty, not session count",
+        "routine work runs cheap while architectural design calls get deeper thinking."
+      ],
+      "commonMistakeMarkdown": "Do not use the strongest model on simple edits. Max effort by habit spends expensive tokens on work that never needed them.",
+      "toolkitTags": [
+        "/compact",
+        "/usage",
+        "Graphify",
+        "Hand-off Skill"
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Agentic Refactoring",
+      "subtitle": "Test-Driven Tech-Debt Cleanup",
+      "shiftMarkdown": "Every codebase has a module nobody wants to open, because without tests any cleanup can break behavior nobody knew existed. Agents make cleanup cheaper, but a clean rewrite that changes behavior is still a bug — the move is test-first: characterize, then change in small steps.",
+      "masteryBullets": [
+        "A green baseline exists before you start",
+        "every chunk leaves the suite green",
+        "behavior is identical, only structure improved."
+      ],
+      "commonMistakeMarkdown": "A clean-looking rewrite that changes behavior is still a bug. Do not refactor without tests.",
+      "toolkitTags": [
+        "behavior spec",
+        "characterization tests",
+        "feature flags",
+        "Strangler Pattern"
+      ]
+    },
+    {
+      "number": 12,
+      "title": "Agentic Retrospective",
+      "subtitle": "Session Review, Waste Reduction & Improvement",
+      "shiftMarkdown": "Every sprint ends with a retro, yet most of us drive a coding agent for months and never review a single session. Those sessions are data now — create a workflow where the agent reviews its own trace and drafts the fix, and you approve the merge.",
+      "masteryBullets": [
+        "The same mistake stops recurring across sessions",
+        "rules and skills grow from real session evidence",
+        "cost and rework trend down cycle over cycle."
+      ],
+      "commonMistakeMarkdown": "Letting the agent rewrite its own rules unattended bloats context and buries the load-bearing rules. Review the diff before it merges; the pattern is the signal, not the model.",
+      "toolkitTags": [
+        "session logs",
+        "Stop/PreToolUse hooks",
+        "agenttrace"
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "competencyNumber": 1,
+      "number": 1,
+      "slug": "exercise-01-agent-onboarding-kit",
+      "title": "Agent Onboarding Kit",
+      "missionMarkdown": "Your team is struggling with incorrect and inconsistent PRs from coding agents. Your mission is to create clear repository onboarding instructions that help a fresh agent make correct and tested changes.\n\nThe application has limited documentation and competing patterns. Decide what a fresh agent must understand; do not assume every existing pattern is correct.\n\nBuild reusable onboarding, then prove that it improves an agent's work without giving the agent extra help.\n\nThe duration for this challenge is 30 min or less.",
+      "durationLabel": "30 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the implementation produced in the first branch.",
+        "In the first branch, start a fresh agent session without `AGENTS.md` or other onboarding files. Give the agent the production change exactly as written. Do not provide hints, corrections, or retries. Commit the agent's implementation and save the session details in `evidence/before.md` and its code changes in `evidence/before.patch`.",
+        "Review the repository and the first implementation. Identify what the agent misunderstood, the repository evidence behind the correct approach, and the decisions future agents need to make safely.",
+        "Switch to the second branch and create:",
+        "Start another fresh agent session in the second branch with the onboarding files available. Give it the same production change. Use the same agent, model, tools, permissions, and time limit as the first run. Do not provide hints, corrections, or retries.",
+        "Keep the second implementation. Save its session details in `evidence/after.md`, its code changes in `evidence/after.patch`, and explain the differences between both runs in `evidence/comparison.md`.",
+        "Add all before and after evidence to the second branch. Raise the final PR from this branch and keep the first branch available until the review is complete."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "`AGENTS.md` and any supporting documents you created."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/comparison.md` explaining the first run's problems, what improved, and which onboarding instructions caused the improvement."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit.",
+        "Both agent sessions use the same production change, agent, model, tools, permissions, and time limit.",
+        "`AGENTS.md` contains clear, repository-specific guidance without including the sample feature's solution.",
+        "The second agent completes the Needs Attention feature without hints, corrections, or retries.",
+        "`npm run verify:exercise` passes.",
+        "The second branch contains all required before-and-after evidence.",
+        "The final PR contains only the onboarding, final feature implementation, and required evidence."
+      ],
+      "projects": [
+        {
+          "displayName": "agent-onboarding-app",
+          "repoPath": "01 Toolchain Setup/exercise-01-agent-onboarding-kit/agent-onboarding-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 1,
+      "number": 2,
+      "slug": "exercise-02-agent-guardrails",
+      "title": "Agent Guardrails",
+      "missionMarkdown": "Your team cannot safely use coding agents because repository instructions can lead them to sensitive files or dangerous actions. Your mission is to create executable guardrails that stop unsafe actions while normal development work remains possible.\n\nThe repository mixes ordinary development work with restricted and approval-only operations. Some repository content is untrusted, so written warnings alone are not enough.\n\nBuild the guardrails, then prove how the same agent behaves before and after they are enabled.\n\nThe duration for this challenge is 30 min or less.",
+      "durationLabel": "30 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the implementation produced in the first branch.",
+        "In the first branch, start a fresh agent session without guardrails. Give it the production change exactly as written. Do not provide hints, corrections, or retries. Commit the result and save the session details in `evidence/before.md` and its code changes in `evidence/before.patch`. Redact the canary if the agent exposed it.",
+        "Review the first run and discover the repository's trust boundaries. Decide which operations must be allowed, blocked, or require approval, including indirect and unknown actions.",
+        "In the second branch, implement the common behavior in the [guardrail contract](./docs/guardrail-contract.md) using your selected agent's official configuration. You decide the policy design and supporting files; include executable enforcement and the native instructions or hooks needed by that agent.",
+        "Prove that normal source-code work is allowed, protected access is blocked, approval-only work is not executed automatically, audit records are redacted, and unknown actions are blocked by default. Temporarily weaken one important rule and show that the policy tests fail, then restore it.",
+        "Start a fresh agent session in the second branch with the guardrails enabled. Give it the same production change using the same agent, model, tools, permissions, and time limit. Do not provide hints, corrections, or retries.",
+        "Keep the second implementation. Save its session details in `evidence/after.md`, its code changes in `evidence/after.patch`, and the measured difference in `evidence/comparison.md`. Raise the final PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The shared policy, enforcement code, selected-agent adapter, and native agent configuration."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/comparison.md` with the allowed, blocked, approval-required, indirect-access, audit-redaction, and weakened-policy results."
+        },
+        {
+          "label": "The completed Release Readiness Summary."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit and both sessions use the same production change and working conditions.",
+        "Normal development actions remain allowed while protected, dangerous, indirect, and unknown actions are blocked before execution.",
+        "Migration and generated-file actions require approval.",
+        "The guarded agent completes the feature without exposing the canary or changing workflow classifications.",
+        "Weakening an important guardrail causes the policy tests to fail.",
+        "`npm run verify:exercise` passes and the final PR contains all required proof without protected content."
+      ],
+      "projects": [
+        {
+          "displayName": "yolo-agent-app",
+          "repoPath": "01 Toolchain Setup/exercise-02-agent-guardrails/yolo-agent-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 2,
+      "number": 1,
+      "slug": "exercise-01-spec-driven-feature-development",
+      "title": "Spec-Driven Feature Development",
+      "missionMarkdown": "Your team keeps starting subscription features from unclear requests, which leads to rework and conflicting implementations. Your mission is to turn one vague request into a clear, testable, and implementation-ready specification before any feature code is written.\n\nThe repository contains conflicting information about permissions, billing timing, pending changes, and failures. A coding agent can easily hide unanswered questions behind confident-looking requirements.\n\nCreate the missing clarifications, then prove that they improve the specification produced by a fresh agent.\n\nThe duration for this challenge is 30 min or less.",
+      "durationLabel": "30 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the documents produced in the first branch.",
+        "In the first branch, start a fresh agent session without clarification documents. Give it the product request exactly as written and ask for a specification, technical plan, and implementation tasks. Do not provide hints, corrections, or retries. Commit the result and save `evidence/before.md` and `evidence/before.patch`.",
+        "Inspect the application, stakeholder notes, billing constraints, and [specification contract](./docs/specification-contract.md). Identify three to five important questions covering authorization, billing timing, pending changes, failure recovery, and scope.",
+        "In the second branch, create `specs/clarifications.md`. For every question, cite repository evidence, record whether the answer is confirmed or assumed, state the decision, and explain its consequence.",
+        "Start another fresh agent session with the clarification file available. Give it the same product request using the same agent, model, tools, permissions, and time limit. Ask it to create `specs/spec.md`, `specs/plan.md`, and `specs/tasks.md`. Do not provide hints, corrections, or retries.",
+        "Keep the second result. Requirements, acceptance criteria, plan items, and tasks must have identifiers, and every task must trace to the requirement and acceptance criteria it implements.",
+        "Save `evidence/after.md`, `evidence/after.patch`, and `evidence/comparison.md`. Raise the final PR only from the second branch. Do not add feature implementation code."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "`specs/clarifications.md`, `specs/spec.md`, `specs/plan.md`, and `specs/tasks.md`."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/comparison.md` connecting at least three improvements to clarification and requirement identifiers."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the specification and evidence changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit and both sessions use the same product request and working conditions.",
+        "Three to five evidence-based questions resolve or explicitly record the important assumptions.",
+        "The final specification covers authorization, billing timing, pending changes, failure recovery, and scope with testable acceptance criteria.",
+        "Every requirement and acceptance criterion is traced into the plan and tasks.",
+        "No feature code is implemented and no protected starter input is changed.",
+        "`npm run verify:exercise` passes and the final PR contains all required proof."
+      ],
+      "projects": [
+        {
+          "displayName": "subscription-management-app",
+          "repoPath": "02 Spec Framing/exercise-01-spec-driven-feature-development/subscription-management-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 2,
+      "number": 2,
+      "slug": "exercise-02-superpowers-skill-driven-development",
+      "title": "Superpowers Skill-Driven Development",
+      "missionMarkdown": "Your team is implementing features too quickly from incomplete plans, causing permission bugs and repeated rework. Your mission is to use a skill-driven development workflow to design, test, implement, review, and verify a complete team-invitation lifecycle.\n\nThe repository has team roles and workspace policies but no safe invitation workflow. The feature crosses several business and state boundaries that must stay consistent.\n\nUse Superpowers, then prove whether its structured workflow improves the same agent's first-attempt result.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the implementation produced in the first branch.",
+        "In the first branch, start a fresh agent session without Superpowers. Give it the production change exactly as written. Do not provide hints, corrections, or retries. Commit the result and save `evidence/before.md` and `evidence/before.patch`.",
+        "Install [Superpowers](https://github.com/obra/superpowers) using the instructions for your coding agent. Review the first implementation, repository rules, support incidents, and the [invitation contract](./docs/invitation-contract.md).",
+        "In the second branch, start a fresh session with Superpowers enabled. Give it the same request using the same agent, model, tools, permissions, and time limit.",
+        "Follow the skill workflow in order: approve the design, create the implementation plan, record a failing test before production code changes, execute the plan, request code review, resolve the findings, and run final verification. Keep the design and plan in the locations produced by Superpowers.",
+        "Do not provide implementation hints, corrections, or retries. Keep the first implementation produced by this session and record the exact skills and artifacts used.",
+        "Save `evidence/after.md`, `evidence/after.patch`, `evidence/skill-usage.md`, `evidence/tdd.md`, `evidence/review.md`, and `evidence/comparison.md`. Raise the final PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The Team Invitations feature and automated tests."
+        },
+        {
+          "label": "The approved Superpowers design and implementation plan."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/skill-usage.md`, `evidence/tdd.md`, and `evidence/review.md`."
+        },
+        {
+          "label": "`evidence/comparison.md` comparing at least four invitation risks and the final results."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit and both sessions use the same production change and working conditions.",
+        "The second run proves design, planning, failing tests, implementation, review, and verification occurred in that order.",
+        "The feature enforces invitation permissions, guest policy, normalized duplicate checks, configured expiry, and single-use acceptance and revocation.",
+        "Rejected actions leave invitation and member state unchanged, and the UI uses the shared service.",
+        "`npm run verify:exercise` passes and the final PR contains all required artifacts and evidence."
+      ],
+      "projects": [
+        {
+          "displayName": "team-collaboration-app",
+          "repoPath": "02 Spec Framing/exercise-02-superpowers-skill-driven-development/team-collaboration-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 3,
+      "number": 1,
+      "slug": "exercise-01-session-handover-from-claude-to-codex",
+      "title": "Session Handover from Claude to Codex",
+      "missionMarkdown": "You have worked in Claude for a while and the session contains important decisions, unfinished work, failed attempts, and useful repository context. Your mission is to continue the same work in Codex without losing the correct context or repeating completed work.\n\nCreate a compact, verified handover that separates current facts from stale assumptions and gives Codex everything needed to continue safely.\n\nThe duration for this challenge is 30 min or less.",
+      "durationLabel": "30 min or less",
+      "howToSteps": [
+        "Review the supplied Claude session and record the unfinished state in `evidence/before.md`.",
+        "Identify the current request, completed work, failed attempts, decisions, assumptions, changed files, remaining work, and verification status.",
+        "Verify important claims against the repository before including them.",
+        "Use the [Handoff skill](https://github.com/mattpocock/skills/blob/main/docs/productivity/handoff.md) to create a compact transfer. Copy its verified output to `evidence/handover.md`; include only the context Codex needs.",
+        "Start a fresh Codex session and give it the handover. Let Codex continue the task without hints or corrections.",
+        "Save the continuation transcript, implementation patch and `evidence/after.md`. Compare completed work and remaining uncertainty in `evidence/comparison.md`."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `evidence/handover.md`, `evidence/handover-audit.md` and `evidence/before.md`, `evidence/after.md`, `evidence/comparison.md`. Include the skill-use record, session transcripts, source audit, sealed artifact record, and captured verification output required by the [evidence instructions and template](./docs/evidence-template.md)."
+        },
+        {
+          "label": "Follow the [setup and verification instructions](./docs/setup.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md). Run `npm run verify:exercise` from `bugfix-context-app/` before raising a focused PR from your fork."
+        }
+      ],
+      "completionCriteria": [
+        "The challenge is complete when Codex continues from the handover alone, avoids stale information and repeated work, completes the requested change, and passes the incident checks. Record any remaining uncertainty honestly."
+      ],
+      "projects": [
+        {
+          "displayName": "bugfix-context-app",
+          "repoPath": "03 Context Engineering/exercise-01-session-handover-from-claude-to-codex/bugfix-context-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 3,
+      "number": 2,
+      "slug": "exercise-02-generate-the-agents-md-for-a-brown-field-repository",
+      "title": "Generate AGENTS.md for a Brownfield Repository",
+      "missionMarkdown": "Your team has a brownfield Java repository where customer features sit beside older internal tools. Fresh agents copy the wrong patterns or load every document because they cannot find the guidance relevant to their change.\n\nYour mission is to create a concise `AGENTS.md` that directs an agent to the right architecture, coding-quality, Java, testing, and workflow guidance when needed.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. On the first, let a fresh agent attempt the change without onboarding. Commit its result and save the before evidence.",
+        "Inspect the repository and that result. On the second branch, create `brownfield-agent-app/AGENTS.md` and the supporting documents you choose under `.agent/`. Keep the entry file short and link to deeper guidance by task.",
+        "Commit only the guidance, then let a fresh agent attempt the same change using the same model, tools, permissions, time limit, zero hints and zero retries.",
+        "Keep its first result, copy the before evidence into the second branch, and compare which guidance was used. Follow the [commit and evidence instructions](./docs/evidence-template.md)."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `AGENTS.md`, your supporting documents, `evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, `evidence/after.patch`, `evidence/comparison.md`, session transcripts and captured checks. Follow the [evidence instructions and template](./docs/evidence-template.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md)."
+        },
+        {
+          "label": "Run `npm run verify:exercise` from `brownfield-agent-app/`. Raise the final PR only from the second branch; keep the first branch until review is complete."
+        }
+      ],
+      "completionCriteria": [
+        "A fresh agent finds the relevant guidance, implements the summary with correct workspace access and time handling, preserves existing behaviour, and passes the checks without human correction. Both attempts must be recorded honestly; an already-correct first attempt is valid."
+      ],
+      "projects": [
+        {
+          "displayName": "brownfield-agent-app",
+          "repoPath": "03 Context Engineering/exercise-02-generate-the-agents-md-for-a-brown-field-repository/brownfield-agent-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 3,
+      "number": 3,
+      "slug": "exercise-03-create-queryable-repo-context-for-agent",
+      "title": "Create Queryable Repo Context for Agents",
+      "missionMarkdown": "Your repository is too large for an AI agent or a new team member to understand through repeated file searches. Your mission is to create a queryable repository graph using Graphify.\n\nThe graph must help an AI agent and a human user find components, dependencies, business rules, data flow, ownership, and the source of important decisions without loading the entire repository into every session.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Record initial answers to the [repository questions](./docs/graph-questions.md) in `evidence/before.md`, then install and configure [Graphify](https://github.com/Graphify-Labs/graphify) for your coding agent.",
+        "Index the complete repository, including code, tests, configuration, and documents.",
+        "Create useful queries for architecture, dependencies, data flow, business rules, ownership, and change impact.",
+        "Use `graphify query`, `graphify path`, and `graphify explain` to answer them.",
+        "Verify important answers against source files and record unsupported or ambiguous results.",
+        "Show a fresh agent and a human querying the graph. Record verified answers in `evidence/after.md` and compare them with the initial answers."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `graphify-out/graph.json`, `graphify-out/GRAPH_REPORT.md`, `docs/query-guide.md`, `evidence/answers.md` and `evidence/before.md`, `evidence/after.md`, `evidence/comparison.md`. Include the source audit, sealed artifact record, and captured verification output required by the [evidence instructions and template](./docs/evidence-template.md)."
+        },
+        {
+          "label": "Follow the [setup and verification instructions](./docs/setup.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md). Run `npm run verify:exercise` from `billing-graph-app/` before raising a focused PR from your fork."
+        }
+      ],
+      "completionCriteria": [
+        "The challenge is complete when the graph represents the repository accurately, important answers are traceable to source files, and both agents and users can query it to reduce repeated repository discovery."
+      ],
+      "projects": [
+        {
+          "displayName": "billing-graph-app",
+          "repoPath": "03 Context Engineering/exercise-03-create-queryable-repo-context-for-agent/billing-graph-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 4,
+      "number": 1,
+      "slug": "exercise-01-playwright-mcp-checkout-rescue",
+      "title": "Playwright MCP Checkout Rescue",
+      "missionMarkdown": "Your team cannot trust its checkout release because a green browser test passes once but fails under repetition and parallel execution. Your mission is to replace the misleading test with a reliable gate based on observed browser behavior.\n\nThe checkout has delayed tax, generated CSS classes, server-side payment state, and strict request contracts. The current test hides race conditions, shares state, and proves only one happy path.\n\nUse Playwright MCP to investigate the live flow, then prove whether that evidence improves the same agent's first test implementation.\n\nThe duration for this challenge is 45 min or less after the browser and MCP setup checks pass.",
+      "durationLabel": "45 min or less after the browser and MCP setup checks pass",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the test implementation produced in the first branch.",
+        "In the first branch, start a fresh agent session without Playwright MCP. Give it the request exactly as written. Do not provide hints, corrections, or retries. Commit the result and save `evidence/before.md` and `evidence/before.patch`.",
+        "Configure the official [Playwright MCP server](https://github.com/microsoft/playwright-mcp). Review the first result and the [checkout contract](./docs/checkout-contract.md).",
+        "In the second branch, start the application and a fresh agent session with Playwright MCP. Before editing tests, capture accessibility snapshots before and after tax readiness, inspect tax and authorization requests, and exercise approval, decline, retry, and duplicate submission.",
+        "Use the observed evidence to build independent tests with user-facing locators and observable readiness. Isolate server state, assert request bodies and outcomes, and remove fixed waits and generated-class selectors.",
+        "Use the same agent, model, other tools, permissions, time limit, and first-attempt condition. Playwright MCP must be the only changed tool. Run the repaired suite twenty times with two workers and retain a trace.",
+        "Save `evidence/after.md`, `evidence/after.patch`, `evidence/mcp-investigation.md`, `evidence/test-matrix.md`, `evidence/repeat-run.txt`, and `evidence/comparison.md`. Raise the final PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The repaired checkout tests and fixtures."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/mcp-investigation.md`, `evidence/test-matrix.md`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "`evidence/repeat-run.txt` with the twenty-repeat, two-worker result."
+        },
+        {
+          "label": "`evidence/trace.zip` from the repaired suite, below 10 MB."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit and both sessions use the same request and working conditions except Playwright MCP.",
+        "Live MCP evidence records accessible readiness states and the tax and authorization requests used to design the tests.",
+        "Independent tests prove approval, decline recovery, retry, duplicate-submit protection, request bodies, and isolated server state.",
+        "No fixed waits, generated-class selectors, or application behavior changes are used to force a pass.",
+        "The twenty-repeat, two-worker run and `npm run verify:exercise` pass, with all required proof in the PR."
+      ],
+      "projects": [
+        {
+          "displayName": "checkout-e2e-app",
+          "repoPath": "04 Test Automation/exercise-01-playwright-mcp-checkout-rescue/checkout-e2e-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 4,
+      "number": 2,
+      "slug": "exercise-02-tdd-skill-network-boundary-rescue",
+      "title": "TDD Skill Network Boundary Rescue",
+      "missionMarkdown": "Your team has a green component test but users still see broken loading, empty, error, and retry states. Your mission is to repair the dashboard through genuine test-first cycles across its real network boundary.\n\nThe weak test bypasses `GET /api/cases`, hides unexpected requests, and leaks handlers between tests. Retry does not send a new request, and two different empty states are reported as the same result.\n\nUse the TDD skill, then prove whether separate red-green cycles improve the same agent's first implementation.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the implementation produced in the first branch.",
+        "In the first branch, start a fresh agent session without the TDD skill. Give it the request exactly as written. Do not provide hints, corrections, or retries. Commit the result and save `evidence/before.md` and `evidence/before.patch`.",
+        "Install the current [TDD skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd). Review the first result and the [network contract](./docs/network-contract.md).",
+        "In the second branch, start a fresh session with the skill. Confirm the public seam, then complete separate red-green cycles for loading, filtered-empty, and retry. Add independent tests for success, server-empty, and request error. Capture every red and green command with the supplied wrapper; it preserves the command's real exit code and writes tamper-evident JSONL.",
+        "Exercise the real `GET /api/cases` seam with MSW. Fail unhandled requests, reset runtime handlers after every test, use user-facing assertions, and prove Retry sends exactly one new request before recovery.",
+        "Use the same agent, model, other tools, permissions, time limit, and first-attempt condition. The TDD skill must be the only changed input. Run the complete suite in shuffled orders.",
+        "Save `evidence/after.md`, `evidence/after.patch`, `evidence/skill-record.md`, `evidence/tdd-cycles.md`, `evidence/network-boundaries.md`, `evidence/network-run.txt`, and `evidence/comparison.md`. Raise the final PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The repaired dashboard, strict network setup, and independent tests."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/skill-record.md`, `evidence/tdd-cycles.md`, `evidence/tdd-commands.jsonl`, and `evidence/network-boundaries.md`."
+        },
+        {
+          "label": "`evidence/network-run.txt` and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit and both sessions use the same request and working conditions except the TDD skill.",
+        "Machine-captured red evidence exists before production changes for loading, filtered-empty, and retry, followed by the matching green records.",
+        "Tests prove all six states through `GET /api/cases`, fail unexpected requests, and reset handlers after every test.",
+        "Retry sends exactly one new request before recovery, without mocking `fetch` or component internals.",
+        "Shuffled runs and `npm run verify:exercise` pass, with all required proof in the PR."
+      ],
+      "projects": [
+        {
+          "displayName": "case-dashboard-app",
+          "repoPath": "04 Test Automation/exercise-02-tdd-skill-network-boundary-rescue/case-dashboard-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 4,
+      "number": 3,
+      "slug": "exercise-03-verification-skill-workflow-gate",
+      "title": "Verification Skill Workflow Gate",
+      "missionMarkdown": "Your team approved a release from one focused green test even though the client, provider, and workflow boundary still fail. Your mission is to replace the unsupported completion claim with one fresh, fail-closed full-stack verification command.\n\nThe React client accepts an invalid response, the Spring API omits a required decision state, an unsupported transition is persisted, and the existing gate checks only the easiest path.\n\nUse the Verification Before Completion skill, then prove whether claim-first verification improves the same agent's first result.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must not contain the implementation produced in the first branch.",
+        "In the first branch, start a fresh agent session without the Verification Before Completion skill. Give it the request exactly as written. Do not provide hints, corrections, or retries. Commit the result and save `evidence/before.md` and `evidence/before.patch`.",
+        "Install the [Verification Before Completion skill](https://github.com/obra/superpowers/tree/main/skills/verification-before-completion). Audit the previous claim and map every [release requirement](./docs/release-requirements.md) to a command and observable result before editing.",
+        "In the second branch, start a fresh session with the skill using the same agent, model, other tools, permissions, time limit, and first-attempt condition.",
+        "Repair runtime client validation, provider response state, unsupported transition handling, and `scripts/verification-gate.mjs`. The gate must run each required surface once, stop at the first command or spawn failure, preserve the non-zero exit code, and use committed wrappers and lockfiles.",
+        "Prove the gate's success, non-zero failure, and spawn-error behavior with the protected contract check. From a clean implementation state, run the complete gate once and report only what that fresh output proves.",
+        "Save `evidence/after.md`, `evidence/after.patch`, `evidence/skill-record.md`, `evidence/claim-audit.md`, `evidence/verification-plan.md`, `evidence/gate-contract.txt`, `evidence/final-verification.txt`, and `evidence/comparison.md`. Raise the PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The repaired client boundary, provider rules, regression tests, and release gate."
+        },
+        {
+          "label": "`evidence/before.md` and `evidence/before.patch`."
+        },
+        {
+          "label": "`evidence/after.md` and `evidence/after.patch`."
+        },
+        {
+          "label": "The skill record, claim audit, verification plan, gate contract, final verification output, and comparison."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both branches start from the same commit and both sessions use the same request and working conditions except the verification skill.",
+        "The client rejects missing or unknown states, the provider derives every required state, and unsupported transitions are not persisted.",
+        "One release command covers the gate contract, client contract and build, complete provider behavior, and provider build.",
+        "The gate stops on its first failure, returns non-zero, and the final claim uses fresh output from the completed implementation.",
+        "`npm run verify:exercise` passes and the final PR contains all required proof."
+      ],
+      "projects": [
+        {
+          "displayName": "workflow-gate-app",
+          "repoPath": "04 Test Automation/exercise-03-verification-skill-workflow-gate/workflow-gate-app",
+          "isPrimary": true
+        },
+        {
+          "displayName": "workflow-rules-api",
+          "repoPath": "04 Test Automation/exercise-03-verification-skill-workflow-gate/workflow-rules-api",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "competencyNumber": 5,
+      "number": 1,
+      "slug": "exercise-01-progressive-disclosure-release-skill",
+      "title": "Progressive Disclosure Release Skill",
+      "missionMarkdown": "Your team produces unreliable release notes from one large prompt that loads every rule and example for every request. Your mission is to package a reusable Agent Skill that selects only the needed guidance and extracts release facts deterministically from Git.\n\nThe supplied draft triggers for unrelated work, publishes an internal refactor, misses a breaking migration, and treats missing evidence as passed. The real Git bundle contains customer, breaking, and internal-only changes.\n\nBuild the skill, then prove whether it improves the same agent's release notes while using less irrelevant context.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit and materialize identical fixture repositories. The second branch must not contain the output produced in the first branch.",
+        "In the first branch, start a fresh agent session with the monolithic draft but without your packaged skill. Give it the request exactly as written. Do not provide hints, corrections, or retries. Save the output, `evidence/before.md`, and `evidence/before.patch`.",
+        "Install the official [skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) and follow the [Agent Skills specification](https://agentskills.io/specification). Review the first result, release policy, fixture, and eval scenarios.",
+        "In the second branch, create `.agents/skills/release-notes/` with a concise `SKILL.md`, focused publication, evidence, and migration references, one reusable `scripts/extract-release.mjs`, quality evals, and trigger-boundary evals.",
+        "Start a fresh session with the skill enabled. Use the same agent, model, tools, permissions, request, repository state, time limit, and first-attempt condition. Do not provide hints, corrections, or retries.",
+        "Run the full, hotfix-only, and internal-only scenarios. Record the resources actually read and their exact UTF-8 byte totals using `npm run context:measure -- <files>`. Prove unrelated references were not loaded. Record provider token usage too when your agent exposes it, but token telemetry is not required. The extractor must work with arbitrary repositories and Git ranges without fixture answers embedded in it.",
+        "Save the outputs, before-and-after evidence, resource usage, eval results, and comparison. Raise the final PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The complete `.agents/skills/release-notes/` package."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, and `evidence/before-output.md`."
+        },
+        {
+          "label": "`evidence/after.md`, `evidence/after.patch`, and `evidence/after-output.md`."
+        },
+        {
+          "label": "Hotfix and internal-only outputs, the skill record, byte-measured `resource-usage.json`, `eval-results.json`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the exercise changes."
+        }
+      ],
+      "completionCriteria": [
+        "Both runs use identical conditions except the packaged skill.",
+        "The skill has valid metadata, concise main instructions, clear trigger boundaries, and focused resources loaded only when needed.",
+        "The extractor accepts arbitrary repositories and ranges without hard-coded fixture answers.",
+        "Final notes trace both customer changes, identify breaking migration and missing evidence, and exclude internal telemetry.",
+        "Hotfix and internal-only runs avoid unrelated context, and the comparison proves the exact context-byte change without reducing quality.",
+        "`npm run verify:exercise` passes and all required proof is present."
+      ],
+      "projects": [
+        {
+          "displayName": "release-notes-app",
+          "repoPath": "05 Skill Packaging/exercise-01-progressive-disclosure-release-skill/release-notes-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 5,
+      "number": 2,
+      "slug": "exercise-02-skill-trigger-boundary-evals",
+      "title": "Skill Trigger Boundary Evals",
+      "missionMarkdown": "Your team's code-review skill activates for unrelated requests and stays silent for reviews it should handle. Your mission is to repair only its description and prove the new trigger boundary with repeated positive, negative, and held-out evaluations.\n\nThe catalog contains three similar skills. The current `change-review` description collides with release notes, incident reports, implementation work, and ordinary summaries.\n\nMeasure the original behavior first, improve it without changing the skill body, then prove the result on requests that were not used for tuning.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. The second branch must preserve the original skill body and all protected cases.",
+        "Install the official [skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator). In the first branch, run every protected request three times with the original skill. Do not edit the skill or cases. Save the 60 decisions, `evidence/before.md`, `evidence/before.patch`, and `evidence/before-results.json`.",
+        "Analyze only the training false positives and false negatives. Identify which use and non-use boundaries are missing without copying case wording into the description.",
+        "In the second branch, change only the `change-review` description. Keep the skill instructions, neighboring skills, scoring code, and protected requests unchanged.",
+        "Rerun every request three times with the same provider, agent, model, runtime, settings, repository state, and first-attempt conditions. For every run, save the timestamp, selected skills, raw routing response, and its SHA-256. Save all 60 decisions in `evidence/after-results.json`.",
+        "Select or reject the new description using held-out accuracy, recall, specificity, stability, and improvement. Do not tune again after reading held-out failures.",
+        "Save `evidence/after.md`, `evidence/after.patch`, the skill record, trigger analysis, and comparison. Raise the final PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The updated `skills/change-review/SKILL.md`."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, and `evidence/before-results.json`."
+        },
+        {
+          "label": "`evidence/after.md`, `evidence/after.patch`, and `evidence/after-results.json`."
+        },
+        {
+          "label": "`evidence/skill-record.md`, `evidence/trigger-analysis.md`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Before and after results contain three real, traceable decisions for every protected request under matching conditions.",
+        "Only the `change-review` description changes, and it states clear use and non-use boundaries without held-out wording.",
+        "Training accuracy is at least 10 of 12 and held-out accuracy at least 7 of 8.",
+        "Held-out recall and specificity are each at least 75 percent, decisions are stable, and the held-out score improves.",
+        "`npm run verify:exercise` passes and the final PR contains all required proof."
+      ],
+      "projects": [
+        {
+          "displayName": "skill-trigger-app",
+          "repoPath": "05 Skill Packaging/exercise-02-skill-trigger-boundary-evals/skill-trigger-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 5,
+      "number": 3,
+      "slug": "exercise-03-skill-benchmark-package-gate",
+      "title": "Skill Benchmark and Package Gate",
+      "missionMarkdown": "Your team is ready to distribute an Agent Skill without proof that it improves real work. Your mission is to benchmark the exact skill package against no-skill and unchanged-starter baselines, then distribute it only if it passes a measurable gate.\n\nThe supplied `incident-summary` skill produces polished reports but loses attribution, turns assumptions into facts, closes unfinished actions, and may add cost without improving quality.\n\nRun a fair three-lane benchmark, improve the skill from training failures, and prove the packaged archive is the exact version that passed.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Install the official [skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator). Record its source commit and installed file hash.",
+        "Run every incident task three times in each condition: `without_skill`, `starter_skill`, and `with_skill`. Keep the agent, model, tools, permissions, prompt, repository commit, time limit, and first-attempt condition identical.",
+        "Before changing the skill, save the no-skill and starter outputs, timing records, grades, `evidence/before.md`, and `evidence/before.patch`.",
+        "Improve `skills/incident-summary/` only from training failures. Do not copy fixture answers or held-out wording into the skill.",
+        "Run the improved lane under the same conditions. Save every output, timing record, generated grade, `evidence/after.md`, and `evidence/after.patch`. Do not selectively rerun failures.",
+        "Compare quality, critical failures, variance, tokens, and elapsed time. Use held-out results only for the final decision. If a baseline is already at least 95 percent, the candidate must preserve quality and critical results and prove measurable value through lower tokens, lower elapsed time, or better consistency.",
+        "Record `evidence/decision.json` for the exact benchmark. Package the skill only if every check passes. If the common quality, safety, variance, or cost checks fail, revise and rerun. If the common checks pass but the comparison mode proves no added value, reject the candidate and do not create an archive."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The improved `skills/incident-summary/` package."
+        },
+        {
+          "label": "`benchmark-workspace/` with all 36 outputs, timing files, and generated grades."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/benchmark.json`, `evidence/benchmark.md`, `evidence/analysis.md`, `evidence/decision.json`, `evidence/skill-record.md`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "If the decision is `package`: `evidence/package-manifest.json` and `dist/incident-summary.skill`. If the decision is `reject`: neither file should exist."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "All 36 first-attempt runs use matching conditions and contain measured timing, token, output, and grading data.",
+        "The improved skill passes at least 87.5 percent of held-out assertions and every critical held-out assertion.",
+        "Below the 95 percent ceiling, held-out quality improves by at least 10 percentage points over both baselines. At the ceiling, quality and critical results do not regress and the candidate proves measurable efficiency or consistency value.",
+        "The recorded decision matches the generated benchmark. A passing candidate is packaged exactly; a candidate that passes common checks but adds no value is rejected without an archive.",
+        "No fixture answers leak into the candidate skill.",
+        "`npm run verify:exercise` passes and the final PR contains all required benchmark and packaging proof."
+      ],
+      "projects": [
+        {
+          "displayName": "skill-benchmark-app",
+          "repoPath": "05 Skill Packaging/exercise-03-skill-benchmark-package-gate/skill-benchmark-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 6,
+      "number": 1,
+      "slug": "exercise-01-parallel-worktree-feature-split",
+      "title": "Parallel Worktree Conflict Rescue",
+      "missionMarkdown": "Your team needs three product changes at the same time, but two changes depend on shared types that no lane owns. Your mission is to coordinate parallel coding agents without overlapping edits, lost commits, or hidden integration conflicts.\n\nEach lane must remain independently testable and request shared changes instead of editing shared ownership. One integration owner must review the real Git history, merge in the required order, and resolve shared types once.\n\nUse real Git worktrees and prove the parallel workflow from base commit to final integration.\n\nThe duration for this challenge is 75 min or less.",
+      "durationLabel": "75 min or less",
+      "howToSteps": [
+        "Record one clean base SHA and the initial worktree state in `evidence/before.md` and `evidence/before.patch`.",
+        "Create three branches from that SHA and attach each one to a real Git worktree. Use the lane tasks from the board; branch names may differ, but the evidence must identify which branch implements each lane.",
+        "Give each agent only its lane task, owned paths, shared-type request, and focused command. Every lane must add tests, pass its focused check, create one inspectable commit, and submit a handoff without editing `src/types.ts`.",
+        "Keep the lane branches and worktrees available for review. Capture `git worktree list --porcelain` while all three are linked.",
+        "As integration owner, verify the supplied untrusted handoff and every agent handoff against Git. Record why the untrusted handoff is accepted or rejected. Merge only valid handoffs in B, A, and C order with `--no-ff`, then create one separate commit that adds the shared types and updates imports.",
+        "Run the complete acceptance and repository checks. Record the final history and metrics in `evidence/after.md` and `evidence/after.patch`, then remove the linked worktrees and capture the final worktree list.",
+        "Save all lane, command, integration, and comparison evidence. Raise a focused PR from the integration branch without flattening or rewriting the lane history."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The completed feature work and lane-owned tests."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/lane-handoffs.json`, `evidence/integration.json`, and `evidence/integration.md`."
+        },
+        {
+          "label": "Worktree captures and all four command outputs under `evidence/commands/`."
+        },
+        {
+          "label": "`evidence/comparison.md` with lane isolation, conflicts, merge history, and final results."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "All lane commits share the recorded base parent, remain inspectable, match their handoffs, and change only owned paths.",
+        "The supplied untrusted handoff is rejected with proof of its parent, changed-path, and missing-output mismatches.",
+        "Every lane includes tests and passes its focused command without editing `src/types.ts`.",
+        "Three `--no-ff` merges preserve B, A, C order and one later commit owns all shared-type changes.",
+        "Worktree and command evidence match the Git repository, and linked worktrees are cleaned up only after verification.",
+        "`npm run verify:exercise` passes and the final PR preserves the required history and proof."
+      ],
+      "projects": [
+        {
+          "displayName": "worktree-feature-app",
+          "repoPath": "06 Multi-Agent Workflows/exercise-01-parallel-worktree-feature-split/worktree-feature-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 6,
+      "number": 2,
+      "slug": "exercise-02-specialist-subagent-nfr-review",
+      "title": "Specialist Review Merge Gate",
+      "missionMarkdown": "Your team is about to merge an access-approval change with interacting security, accessibility, performance, and testability risks. Your mission is to use independent specialist agents to find, triage, fix, and recheck those risks against exact Git commits.\n\nThe application renders unsafe notes, uses mouse-only review rows, repeats expensive calculations, and trusts UI authorization. A single general review can miss both individual defects and their combined impact.\n\nRun a controlled before-and-after specialist review cycle and make the merge decision from reproducible evidence.\n\nThe duration for this challenge is 75 min or less.",
+      "durationLabel": "75 min or less",
+      "howToSteps": [
+        "Record one clean baseline SHA in `evidence/before.md` and create `evidence/before.patch` for the risky change under review.",
+        "Start four separate review-only sessions for security, accessibility, performance, and testability. Give each specialist only its role prompt, the baseline SHA, report format, and focused command. Specialists must not edit code.",
+        "Verify that every finding has a source location, reproducible evidence, impact, and recommendation. Include the supplied external finding in triage. Combine duplicates and record a fix, defer, or dismiss decision for every unique finding.",
+        "As integration owner, implement all supported blockers in one remediation commit. Do not include evidence files in that commit. Measure performance at the baseline and remediation SHAs with identical inputs.",
+        "Start four fresh specialist sessions for the final recheck. Every recheck must inspect the same remediation SHA and run its focused command.",
+        "Save the remediation state in `evidence/after.md` and `evidence/after.patch`. Link every original finding to its decision, code change, recheck result, and remaining risk. Record how security and testability findings interact at the shared service boundary.",
+        "Run the complete gate and raise the PR only when all required blockers are resolved and the evidence matches the reviewed Git history."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/review-cycle.json` and `evidence/decision-log.json`."
+        },
+        {
+          "label": "Eight specialist reports and eight command outputs, one before and one after per specialist."
+        },
+        {
+          "label": "Performance results for both SHAs and `evidence/integration.md`."
+        },
+        {
+          "label": "`evidence/comparison.md` with findings, decisions, rechecks, performance, and merge outcome."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Four distinct baseline sessions review one baseline SHA without editing application code.",
+        "Every finding has evidence and a recorded decision, and all required blockers are fixed in one remediation commit.",
+        "The unsupported supplied finding is dismissed with source-backed reasoning, and the shared security-testability remediation is reviewed as one interaction.",
+        "Four fresh sessions recheck one remediation SHA with matching passing command evidence.",
+        "Performance is measured at both SHAs with identical inputs and meets the required improvement.",
+        "`npm run verify:exercise` passes and the merge decision is fully traceable to the submitted proof."
+      ],
+      "projects": [
+        {
+          "displayName": "nfr-swarm-app",
+          "repoPath": "06 Multi-Agent Workflows/exercise-02-specialist-subagent-nfr-review/nfr-swarm-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 6,
+      "number": 3,
+      "slug": "exercise-03-agent-ready-kanban-control-plane",
+      "title": "Agent Kanban Collision Control",
+      "missionMarkdown": "Your team's coding agents can start unclear, conflicting, or cancelled work because the Kanban board and ownership records disagree. Your mission is to repair the control plane and safely complete only the one card that is truly agent-ready.\n\nThe seeded board has an unready card holding a path, two cards reserving `scoring.ts`, and a cancelled card that still owns a file. Assigning agents from this state can overwrite work or expose unsafe data.\n\nProve that readiness, ownership, review, integration, and board state remain consistent from assignment to merge.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Record one clean base SHA and the invalid control-plane state in `evidence/before.md` and `evidence/before.patch`.",
+        "Validate every card before assignment. Release reservations held by needs-info, blocked, or cancelled cards and resolve every ownership collision without deleting terminal history.",
+        "Create one isolated lane branch from the base SHA for ESC-120. Give the agent only that card, its three owned path prefixes, and `npm run feature:verify`.",
+        "The lane must add a regression test, stay inside its owned paths, pass the focused command, and create one inspectable commit. It must not edit boards, ownership records, integration logs, or evidence.",
+        "As integration owner, review the exact commit and merge it with `--no-ff` into an integration branch. Then update both JSON boards, the Markdown board, ownership map, integration log, and evidence.",
+        "Keep ESC-118 in needs-info, ESC-122 blocked without a reservation, ESC-121 cancelled, and ESC-120 merged with released paths. Save the final state in `evidence/after.md` and `evidence/after.patch`.",
+        "Run the feature and control-plane checks and raise a focused PR from the integration branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The ESC-120 implementation and lane-owned regression test."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/control-plane.json`, `evidence/completed-lane.md`, and captured feature and board outputs."
+        },
+        {
+          "label": "Updated board mirrors, ownership map, and integration log."
+        },
+        {
+          "label": "`evidence/comparison.md` with collisions, assignments, history, and final state."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Unsafe cards are not assigned and no ownership reservation overlaps.",
+        "ESC-120 has one lane commit whose parent is the recorded base and whose changes stay inside owned paths.",
+        "An inspectable `--no-ff` merge preserves the accepted lane content.",
+        "Every board mirror and ownership record agrees on the required final card states and released paths.",
+        "`npm run verify:exercise` passes and the submitted evidence matches the Git repository."
+      ],
+      "projects": [
+        {
+          "displayName": "kanban-control-app",
+          "repoPath": "06 Multi-Agent Workflows/exercise-03-agent-ready-kanban-control-plane/kanban-control-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 7,
+      "number": 1,
+      "slug": "exercise-01-reverse-engineer-sequence-diagram",
+      "title": "Reverse Engineer a Sequence Diagram",
+      "missionMarkdown": "Your team needs to understand an important workflow, but the existing documentation is incomplete and outdated. Your mission is to reverse engineer the workflow from the code and create a new sequence diagram that accurately shows how it works.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Record your initial understanding in `evidence/before.md`, then identify the workflow entry point, actors, services, decisions, calls, responses, failures, and rollback paths.",
+        "Trace normal, high-risk, and failure scenarios through the code and tests.",
+        "Use the [Design Doc Mermaid skill](https://www.skills.sh/spillwavesolutions/design-doc-mermaid/design-doc-mermaid) to create one sequence diagram containing the important alternatives and error paths.",
+        "Map every important interaction to the source file and line that proves it.",
+        "Record differences between the old documentation and the implementation."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `diagrams/access-sequence.mmd`, `evidence/contradictions.md` and `evidence/before.md`, `evidence/after.md`, `evidence/comparison.md`. Include the skill-use record, generation transcript, source audit, sealed artifact record, and captured verification output required by the [evidence instructions and template](./docs/evidence-template.md)."
+        },
+        {
+          "label": "Follow the [setup and verification instructions](./docs/setup.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md). Run `npm run verify:exercise` from `workflow-reconstruction-app/` before raising a focused PR from your fork."
+        }
+      ],
+      "completionCriteria": [
+        "The challenge is complete when the sequence diagram parses, represents the implemented workflow without invented steps, includes important failure paths, and every important interaction is supported by source evidence."
+      ],
+      "projects": [
+        {
+          "displayName": "workflow-reconstruction-app",
+          "repoPath": "07 Docs & Diagrams/exercise-01-reverse-engineer-sequence-diagram/workflow-reconstruction-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 7,
+      "number": 2,
+      "slug": "exercise-02-generate-design-document-from-code",
+      "title": "Generate a Design Document from Code",
+      "missionMarkdown": "Your team has a working application but no reliable design document. Your mission is to inspect the code and generate a design document that explains the system as it exists today.\n\nThe document must explain the architecture, responsibilities, dependencies, data flow, important decisions, operational behaviour, and safe change boundaries.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Record your initial understanding in `evidence/before.md`. Use the [Acquire Codebase Knowledge skill](https://skills.sh/github/awesome-copilot/acquire-codebase-knowledge) to investigate the architecture, modules, integrations, configuration, and tests.",
+        "Trace one main workflow and one failure or fallback workflow.",
+        "Consolidate the findings into `docs/design-document.md`: purpose, architecture, responsibilities, dependencies, data flow, decisions, constraints, risks, and verification guidance. Submit one design document, not the skill's default seven-document set.",
+        "Add only the diagrams needed to make the design easier to understand.",
+        "Link important statements to source files and record stale or unsupported claims separately."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `docs/design-document.md`, `evidence/stale-claims.md` and `evidence/before.md`, `evidence/after.md`, `evidence/comparison.md`. Include the skill-use record, investigation transcript, source audit, sealed artifact record, and captured verification output required by the [evidence instructions and template](./docs/evidence-template.md)."
+        },
+        {
+          "label": "Follow the [setup and verification instructions](./docs/setup.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md). Run `npm run verify:exercise` from `notification-mesh-app/` before raising a focused PR from your fork."
+        }
+      ],
+      "completionCriteria": [
+        "The challenge is complete when the design document matches the current code, clearly explains how the system works and where changes belong, and its important claims can be verified from the repository."
+      ],
+      "projects": [
+        {
+          "displayName": "notification-mesh-app",
+          "repoPath": "07 Docs & Diagrams/exercise-02-generate-design-document-from-code/notification-mesh-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 7,
+      "number": 3,
+      "slug": "exercise-03-payment-module-visualization",
+      "title": "Payment Module Visualization",
+      "missionMarkdown": "Your team cannot clearly explain the payment module because its behaviour is spread across checkout, payment, webhook, ledger, and receipt code. Your mission is to inspect the implementation and visualize the complete payment module.\n\nCreate four diagrams: an Architecture diagram, a sequence diagram, a flow chart, and an ER diagram.\n\nThe duration for this challenge is 75 min or less.",
+      "durationLabel": "75 min or less",
+      "howToSteps": [
+        "Record your initial understanding in `evidence/before.md`, then identify the components, external systems, data stores, actors, entities, states, and business decisions.",
+        "Trace checkout, authorization, webhook handling, duplicate events, failures, ledger updates, and receipt creation.",
+        "Use the [Design Doc Mermaid skill](https://www.skills.sh/spillwavesolutions/design-doc-mermaid/design-doc-mermaid) for all four views. Create an architecture diagram showing system boundaries and dependencies.",
+        "Create a sequence diagram showing the main interaction and important alternatives.",
+        "Create a flow chart showing decisions, states, failures, and recovery paths.",
+        "Create an ER diagram showing entities, identifiers, ownership, and relationships.",
+        "Map important diagram elements to their source files."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `diagrams/payment-architecture.mmd`, `diagrams/payment-sequence.mmd`, `diagrams/payment-flow.mmd`, `diagrams/payment-data.mmd`, `evidence/contradictions.md` and `evidence/before.md`, `evidence/after.md`, `evidence/comparison.md`. Include the skill-use record, generation transcript, source audit, sealed artifact record, and captured verification output required by the [evidence instructions and template](./docs/evidence-template.md)."
+        },
+        {
+          "label": "Follow the [setup and verification instructions](./docs/setup.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md). Run `npm run verify:exercise` from `payment-workflow-app/` before raising a focused PR from your fork."
+        }
+      ],
+      "completionCriteria": [
+        "The challenge is complete when all four diagrams parse, agree with one another, represent the implemented payment module, include important failure and duplicate-event behaviour, and are supported by source evidence."
+      ],
+      "projects": [
+        {
+          "displayName": "payment-workflow-app",
+          "repoPath": "07 Docs & Diagrams/exercise-03-payment-module-visualization/payment-workflow-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 7,
+      "number": 4,
+      "slug": "exercise-04-extract-domain-model-from-entire-repo",
+      "title": "Extract a Domain Model from the Entire Repository",
+      "missionMarkdown": "You are working in a business domain where important knowledge is scattered across code, tests, policies, examples, and documents. Different files use the same business terms differently, so an AI agent or a new team member can make a technically valid change that breaks business rules.\n\nYour mission is to extract the business domain model from the entire repository and create clear domain documentation for both AI agents and people.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Use the [Domain Analysis skill](https://skills.sh/tech-leads-club/agent-skills/domain-analysis) to discover the product's business areas, responsibilities, terms, and relationships across the repository. Use only its business analysis, not service-boundary or technical recommendations.",
+        "Use the [Domain Modeling skill](https://www.aihero.dev/skills-domain-modeling) to refine business terms, roles, relationships, lifecycle states, rules, and exceptions. Compare their use across code, tests, policies, examples, and documents.",
+        "Resolve conflicting meanings using current evidence and record unanswered questions instead of guessing.",
+        "Create a concise `CONTEXT.md` glossary and `docs/domain-model.md` explaining the product, people, relationships, workflows, business rules and unanswered questions. Keep technologies, APIs, schemas and code structure out of both documents.",
+        "Add a business domain diagram. Compare your initial answers to the [business questions](./business/questions.md) with a fresh agent's answers using only your completed documents."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "Submit `CONTEXT.md`, `docs/domain-model.md`, `diagrams/business-domain.mmd`, `evidence/business-answers.md` and `evidence/before.md`, `evidence/after.md`, `evidence/comparison.md`. Record both skills in `evidence/skill-use.md`. Include the source audit, fresh-agent transcript, sealed artifact record, and captured verification output required by the [evidence instructions and template](./docs/evidence-template.md)."
+        },
+        {
+          "label": "Follow the [setup and verification instructions](./docs/setup.md) and [submission standard](../../docs/SUBMISSION_STANDARD.md). Run `npm run verify:exercise` from `product-rules-app/` before raising a focused PR from your fork."
+        }
+      ],
+      "completionCriteria": [
+        "The challenge is complete when the document represents business meaning across the repository, distinguishes similar terms, records important rules and exceptions, and gives an AI agent enough business context without inventing domain rules."
+      ],
+      "projects": [
+        {
+          "displayName": "product-rules-app",
+          "repoPath": "07 Docs & Diagrams/exercise-04-extract-domain-model-from-entire-repo/product-rules-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 8,
+      "number": 1,
+      "slug": "exercise-01-pr-evidence-pack-automation",
+      "title": "Failure-Preserving PR Evidence Pack",
+      "missionMarkdown": "Your team is merging PRs that look green because failed checks and their artifacts are omitted from the review summary. Your mission is to automate a PR evidence pack that remains complete and honest when a required check fails.\n\nThe protected fixture contains passing tests, a failed checkout smoke check, and a UI artifact. The repository has no generator or active workflow, so a success-only report is easy to produce.\n\nCompare an unstructured evidence attempt with an automated, failure-preserving result and prove the original exit status is never hidden.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, ask a fresh coding agent to produce a PR evidence pack from the fixture without extra guidance. Do not correct or retry it. Commit that untouched attempt, keep the commit available in local Git history, and save `evidence/before.md` and `evidence/before.patch` from it.",
+        "Review which commands, failures, artifacts, digests, risks, or rollback details were lost or rewritten.",
+        "In the second branch, create `pr-evidence-app/scripts/generate-pr-evidence.mjs` with the required CLI. It must copy every fixture artifact to a stable directory, calculate SHA-256 digests, write the evidence JSON and summary, and exit with the fixture's original overall result.",
+        "Create `.github/workflows/evidence-led-pr-01.yml` at the repository root. Use pull-request path filtering, read-only permissions, immutable action SHAs, `npm ci`, and `github.sha`.",
+        "Verification and upload steps must use `if: always()` without `continue-on-error`. The stable evidence directory must upload even when generation returns non-zero, while the job remains failed.",
+        "Start a fresh agent session in the second branch under the same agent, model, tools, permissions, prompt, time limit, and first-attempt conditions. Keep its implementation without correction or retry.",
+        "Commit the generator and workflow as the implementation commit. Generate evidence from that exact SHA, then add the evidence in a separate evidence-only commit. Raise the final PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The evidence generator and `.github/workflows/evidence-led-pr-01.yml`."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Generated evidence JSON, summary, and copied artifacts under `evidence/generated/`."
+        },
+        {
+          "label": "`evidence/README.md`, command output, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise and its workflow."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches.",
+        "Generated evidence preserves every command, result, exit code, artifact digest, risk, reviewer action, and rollback.",
+        "The generator passes all-passing, single-failure, multiple-failure, missing-artifact, and corrupt-artifact checks while preserving the first failing exit code.",
+        "The workflow is read-only, uses immutable actions, uploads evidence after failure, and does not turn the failed job green.",
+        "`npm run verify:exercise` passes and all submitted evidence matches one source SHA and unchanged fixtures."
+      ],
+      "projects": [
+        {
+          "displayName": "pr-evidence-app",
+          "repoPath": "08 Evidence-led PRs/exercise-01-pr-evidence-pack-automation/pr-evidence-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 8,
+      "number": 2,
+      "slug": "exercise-02-feature-flag-rollback-proof",
+      "title": "Feature Flag Kill-Switch Proof",
+      "missionMarkdown": "Your team cannot safely release an invoice preview because disabling its flag still calls the new service and emits telemetry. Your mission is to repair the flag boundary and prove the feature can be disabled immediately without a code deployment.\n\nThe current code fails open when the provider errors, uses side effects on disabled paths, and has no atomic rollback command that reviewers can run.\n\nCompare an ordinary implementation attempt with an evidence-led rollout and rollback result.\n\nThe duration for this challenge is 75 min or less.",
+      "durationLabel": "75 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, ask a fresh coding agent to repair the flag and provide rollback proof from the product request. Do not provide hints, corrections, or retries. Commit that untouched attempt, keep the commit available in local Git history, and save `evidence/before.md` and `evidence/before.patch` from it.",
+        "Review the first result against the flag and rollback contracts. Record any unproved disabled, error, targeting, side-effect, or rollback behavior.",
+        "In the second branch, use the provider-independent `getBooleanValue` interface. Evaluate `invoice-preview-v2` with a safe `false` default and the unchanged account targeting key.",
+        "Only the enabled path may call the preview API or emit `invoice_preview_viewed`. Invalid context, disabled evaluation, provider failure, and preview API failure must return the legacy experience without those side effects.",
+        "Create `scripts/rollback-invoice-preview.mjs` with the required CLI. It must validate input first, reject a stale expected revision, atomically disable the flag, clear targeting, and record the required audit fields. The protected drill traces the actual lock, revision read, temporary write, and rename. It interrupts after the temporary write and forces two rollback commands to overlap.",
+        "Start a fresh agent session under the same agent, model, tools, permissions, prompt, time limit, and first-attempt conditions. Capture enabled, disabled, provider-error, invalid-input, and rollback behavior without correction or retry.",
+        "Commit the implementation first. Generate proof from that exact SHA, then add `evidence/after.md`, `evidence/after.patch`, the rollback drill, and comparison in an evidence-only commit. Raise the PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The corrected rollout boundary and rollback command."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Generated enabled, disabled, and provider-error results."
+        },
+        {
+          "label": "Generated rollback drill JSON and Markdown, captured command output, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches.",
+        "Only enabled evaluation calls the preview API and emits preview telemetry, exactly once.",
+        "Invalid context, disabled state, provider error, and preview API failure return legacy behavior with zero new side effects.",
+        "The rollback drill proves the filesystem operation order, rejects invalid input, survives interruption after the temporary write, and allows only one of two overlapping attempts to replace the same revision. Only the successful rollback command is measured against the 1000 ms objective.",
+        "`npm run verify:exercise` passes and all generated proof matches one implementation source SHA."
+      ],
+      "projects": [
+        {
+          "displayName": "feature-flag-app",
+          "repoPath": "08 Evidence-led PRs/exercise-02-feature-flag-rollback-proof/feature-flag-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 8,
+      "number": 3,
+      "slug": "exercise-03-performance-and-a11y-evidence-gate",
+      "title": "Performance and Accessibility Release Gate",
+      "missionMarkdown": "Your team is ready to merge a dashboard because it looks correct, even though its first render is slow and an icon action has no accessible name. Your mission is to fix both defects and build a release gate that cannot hide a bad browser run.\n\nThe repository has baseline reports but no enforceable pessimistic decision. Averages or optimistic scores can make a regression appear acceptable.\n\nCompare an ordinary visual-fix attempt with a measured performance and accessibility gate backed by raw browser evidence.\n\nThe duration for this challenge is 75 min or less.",
+      "durationLabel": "75 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, ask a fresh coding agent to fix and prove the dashboard quality issue without extra guidance. Do not correct or retry it. Commit that untouched attempt, keep the commit available in local Git history, and save `evidence/before.md` and `evidence/before.patch` from it.",
+        "Review whether the first result proves production-build performance, accessible naming, run count, worst-case thresholds, axe results, and failure behavior.",
+        "In the second branch, remove the startup delay without changing dashboard behavior and give the icon action an accessible name.",
+        "Create `lighthouserc.json` for exactly three production-build runs and `scripts/quality-gate.mjs` with the required CLI. The capture must use that configuration, one production build, and one documented Chrome channel. Use the worst run for every decision. Any axe violation must fail the gate.",
+        "Start a fresh agent session under the same agent, model, tools, permissions, prompt, time limit, and first-attempt conditions. Capture three Lighthouse reports and one axe report from the completed implementation.",
+        "Prove the gate succeeds for valid reports and returns non-zero when one Lighthouse run or the axe result is changed to a protected failing value.",
+        "Commit the implementation first. Capture evidence from that exact SHA, then add the reports and comparison in an evidence-only commit. A failed capture must be safe to rerun without deleting partial output manually."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The UI fixes, Lighthouse configuration, and quality-gate CLI."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Three raw Lighthouse reports, one raw axe report, `evidence/capture-manifest.json`, `evidence/capture-complete.json`, the generated quality summary, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Captured verification output under `evidence/commands/`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches.",
+        "All three audits and axe use the same route, production build, protected mobile screen settings, browser environment, and implementation SHA.",
+        "The worst run has performance at least 0.90, accessibility 1.00, LCP at most 2500 ms, and zero axe violations.",
+        "Protected Lighthouse and axe mutations both write a failed decision and return non-zero.",
+        "The capture manifest binds the configured run count, route, browser, production build, and every raw report to the implementation SHA.",
+        "`npm run verify:exercise` passes and no protected report, threshold, capture script, or generated result is hand-edited."
+      ],
+      "projects": [
+        {
+          "displayName": "quality-gate-app",
+          "repoPath": "08 Evidence-led PRs/exercise-03-performance-and-a11y-evidence-gate/quality-gate-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 9,
+      "number": 1,
+      "slug": "exercise-01-security-and-a11y-review-gauntlet",
+      "title": "Security and Accessibility Review Gauntlet",
+      "missionMarkdown": "Your team is about to merge a PR that mixes real regressions with a believable scanner false positive. Your mission is to review the exact diff, separate signal from noise, and fix every confirmed blocker at the correct boundary.\n\nProduce a review whose findings, dismissals, fixes, and regression tests can all be reproduced.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Verify and clone the protected bundle. Record the exact base and head SHAs, initial check results, and vulnerable patch in `evidence/before.md` and `evidence/before.patch`.",
+        "Install the tested Semgrep version with `python -m pip install --requirement review-gauntlet-app/requirements-semgrep.txt`, then run `npm run review:semgrep` from the app directory. The protected runner scans the bundled vulnerable head and writes `evidence/semgrep.json`; reproduce every warning before deciding whether it is a blocker.",
+        "Review security, accessibility, validation, and trusted server boundaries. Do not treat scanner output as the complete review.",
+        "Record every supported finding using the [finding contract](./docs/finding-contract.md). Use a code anchor from the protected diff instead of a fragile exact line number. A dismissal needs direct reproduction evidence.",
+        "Fix confirmed blockers at the smallest correct boundary. Do not remove the safe static scanner finding merely to silence the tool.",
+        "Add focused regression tests under `tests/`. The protected replay runs the same learner tests against the vulnerable head and the remediation; they must fail before and pass after.",
+        "Commit the fixes and tests first. Run an independent recheck of that exact commit, then add the evidence in a separate commit and raise the focused PR."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The fixed application and learner regression tests."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "`evidence/review.json` and `evidence/review.md` covering every required finding and dismissal."
+        },
+        {
+          "label": "Raw Semgrep JSON, protected fixture output, before-and-after regression replay output, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "The exact protected base and head SHAs are reviewed and every scanner warning is independently reproduced or dismissed.",
+        "Every supported issue is fixed at the correct boundary and every unsupported scanner claim is dismissed with direct evidence.",
+        "The same learner regression tests fail on the protected vulnerable head and pass after remediation.",
+        "`npm run verify:exercise` passes and all review claims map to code, test, or scanner proof."
+      ],
+      "projects": [
+        {
+          "displayName": "review-gauntlet-app",
+          "repoPath": "09 Code Review/exercise-01-security-and-a11y-review-gauntlet/review-gauntlet-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 9,
+      "number": 2,
+      "slug": "exercise-02-diff-triage-with-fresh-agent",
+      "title": "Independent Diff Triage",
+      "missionMarkdown": "Your team needs an independent review of a caching PR, but the implementer's assumptions and a plausible reviewer claim can bias the result. Your mission is to review the exact diff in a fresh session, prove or dismiss every finding, and fix only confirmed blockers.\n\nKeep implementation context out of the reviewer session and make the final triage reproducible.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Verify the bundle and record the exact base and head SHAs, baseline checks, and protected diff in `evidence/before.md` and `evidence/before.patch`.",
+        "Start a fresh agent session with only the protected diff, manifest, and [review brief](./docs/review-brief.md). Do not provide implementation chat, implementer notes, expected finding IDs, or an earlier review.",
+        "Preserve the exact prompt and session metadata. Reproduce every finding against the mounted head before assigning severity or recommending a fix.",
+        "Explicitly evaluate the claim in [reviewer noise](./docs/reviewer-noise.md). Accept or dismiss it only after a focused reproduction.",
+        "Fix only supported blockers with the smallest change and add focused cache regression tests under `tests/`. Avoid unrelated refactoring.",
+        "Add learner regression tests for every confirmed blocker. The protected replay mounts the same tests on the risky head and the remediation; they must fail before and pass after.",
+        "Commit the focused fixes and tests first. Run a fresh recheck of that exact commit, then add reviewer session data, review reports, patches, command proof, and comparison in an evidence-only commit."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The fixed application and learner cache regression tests."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Reviewer session metadata, the exact fresh prompt, `review.json`, and `review.md`."
+        },
+        {
+          "label": "Protected fixture output, focused test output, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "The fresh reviewer receives no implementation context, expected findings, or earlier review.",
+        "Every confirmed blocker is reproduced, fixed, and covered by a focused test.",
+        "The supplied reviewer claim is accepted or dismissed with direct code and reproduction evidence.",
+        "The same learner regression tests fail on the protected head and pass after remediation.",
+        "The remediation commit contains only focused fixes and learner tests.",
+        "`npm run verify:exercise` passes and every finding, dismissal, change, and check is traceable."
+      ],
+      "projects": [
+        {
+          "displayName": "fresh-review-app",
+          "repoPath": "09 Code Review/exercise-02-diff-triage-with-fresh-agent/fresh-review-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 9,
+      "number": 3,
+      "slug": "exercise-03-review-regression-lab",
+      "title": "Code Review Skill Hardening",
+      "missionMarkdown": "Your team gets inconsistent code reviews. Fresh agents miss important regressions, raise false blockers, and produce findings that cannot be reproduced.\n\nYour mission is to improve a reusable code-review skill and prove that it helps fresh agents find real defects without blocking a safe change.\n\nThe challenge runs with any coding agent and does not require an API key or paid model call.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. On the first branch, run one fresh agent session per case without exposing the skill. Use `npm run eval:run` with a small adapter for your agent so the protected runner supplies the exact prompt and captures the uncorrected response.",
+        "Review the baseline misses and false blockers. Improve `regression-review-app/skills/regression-review/SKILL.md`. Add references or scripts only when they make the workflow reusable; do not add case IDs, expected answers, file hints, or exact diff text.",
+        "Commit the skill as a focused implementation commit. On the second branch, run new sessions through the same adapter with the skill available. Use the same agent, model, tools, permissions, and time limit as the baseline.",
+        "The runner writes one prompt, structured run, and nonce-bound transcript per case under `evidence/`. Do not edit, correct, retry, or selectively replace a weak run.",
+        "Run `npm run eval:score`. Inspect historical coverage, security coverage, precision, clean-control behavior, and regressions. Adopt the skill only when every protected gate passes.",
+        "Add `before.md`, `before.patch`, `after.md`, `after.patch`, comparison, scorecard, and command proof in an evidence-only commit. Raise the final PR from the skill branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The improved `SKILL.md` and any supporting files inside the skill folder."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Six runner-generated prompts, run JSON files, and nonce-bound transcripts."
+        },
+        {
+          "label": "`evidence/scorecard.json`, `evidence/review-eval.md`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only the skill and evidence."
+        }
+      ],
+      "completionCriteria": [
+        "Baseline and skill-assisted runs come from the protected runner with matching conditions, unique nonces, and baseline sessions captured at the recorded starting commit.",
+        "Every raw finding is bound to a transcript and protected diff digest.",
+        "The skill covers every violated acceptance rule in the seeded diffs, keeps precision, and does not create a blocker for the conforming control.",
+        "The skill contains a reusable review method, not benchmark answers.",
+        "`npm run verify:exercise` passes, and a reviewer can test the unchanged skill on a different diff."
+      ],
+      "projects": [
+        {
+          "displayName": "regression-review-app",
+          "repoPath": "09 Code Review/exercise-03-review-regression-lab/regression-review-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 10,
+      "number": 1,
+      "slug": "exercise-01-token-budget-refactor",
+      "title": "Progressive Context Budget Refactor",
+      "missionMarkdown": "Your team is spending tokens by loading an entire documentation pack for every coding task, including stale and unrelated guidance. Your mission is to refactor a real session adapter with less context without losing correctness.\n\nThe starter selector returns every source. A cheaper but careless selector can omit mandatory repository rules or choose a small secondary note instead of the primary contract.\n\nCompare an unbudgeted agent result with a deterministic, question-driven context selection and prove correctness is not traded for lower cost.\n\nThe duration for this challenge is 75 min or less.",
+      "durationLabel": "75 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, run a fresh agent session for the adapter refactor with the full context pack. Do not correct or retry it. Save `evidence/before.md` and `evidence/before.patch` with context bytes and results.",
+        "Review which loaded sources were mandatory, relevant, stale, duplicated, or unrelated and which open questions required more context.",
+        "In the second branch, commit `evidence/context-plan.json` and `evidence/context-plan.md` before changing code. Record task tags, maximum bytes, mandatory rules, open questions, and expected sources.",
+        "Fix `src/budget/selectContext.mjs`, then refactor `src/session/adaptSession.mjs` using only the selected context. Select mandatory current sources first, then relevant current sources by priority and stable ID. Record why every source was selected or skipped.",
+        "Reject a budget that cannot fit mandatory context. Never choose stale guidance because it is smaller, and never exceed the declared exact UTF-8 byte budget.",
+        "Run a fresh agent session with only the selected context using the same agent, model, tools, permissions, request, time limit, and first-attempt conditions. Add focused selector and adapter tests. Both saved patches must pass the protected adapter contract.",
+        "Save `evidence/after.md`, `evidence/after.patch`, `context-ledger.json`, `decision.md`, and comparison. Raise the PR only from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The selector, refactored adapter, and learner regression tests."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "The pre-change context plan, final context ledger, decision, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Automatically captured command output and output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent runs use matching conditions and the second receives only its selected context.",
+        "Mandatory repository rules are always selected and current primary sources beat stale, unrelated, or secondary sources.",
+        "Selection is deterministic, exact byte totals are correct, the budget is never exceeded, and impossible budgets fail clearly.",
+        "The context plan predates code changes and the final ledger matches the actual selection and Git history.",
+        "Both the full-context and selected-context patches pass the same protected adapter acceptance checks.",
+        "`npm run verify:exercise` passes and the measured context reduction does not reduce task correctness."
+      ],
+      "projects": [
+        {
+          "displayName": "token-budget-app",
+          "repoPath": "10 Token Economics/exercise-01-token-budget-refactor/token-budget-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 10,
+      "number": 2,
+      "slug": "exercise-02-risk-based-model-routing-cost-gate",
+      "title": "Risk-Based Model Routing Cost Gate",
+      "missionMarkdown": "Your team sends every coding task to its most expensive reasoning model because it has no safe routing policy. Your mission is to reduce cost without sending risky or unclear work to an unsuitable model.\n\nA cheap replacement can look efficient while failing security work, hiding retry costs, or executing requests that should be clarified first.\n\nBuild a field-based router, measure every eligible route from a protected recorded pack, and adopt it only when quality, safety, latency, and total expected cost pass the gate.\n\nThe duration for this challenge is 60 min or less.",
+      "durationLabel": "60 min or less",
+      "howToSteps": [
+        "Record the all-reasoning baseline, starting commit, router patch, and measured cost in `evidence/before.md` and `evidence/before.patch`.",
+        "Implement `fast`, `balanced`, `reasoning`, and `clarify` routes from task risk, ambiguity, and scope. Do not route by case ID or wording copied from fixtures.",
+        "High ambiguity or missing risk must clarify without model execution. High-risk work must use reasoning. The router must pass unseen field permutations.",
+        "Use `evals/recorded-runs.json` for every eligible case and tier pair. Derive `evidence/routing-measurements.json` from its raw responses, hashes, token counts, latency, quality, and safety results. Do not edit the protected pack.",
+        "Include the expected cost and latency of retries or escalations for low-quality or unsafe first calls. Do not average away any security failure.",
+        "Commit the router and tests first. Record that SHA in `measurement-run.json`, run the protected scorer, and reconcile every cost to the benchmark tokens and protected pricing. Add evidence in a later evidence-only commit.",
+        "Write the routing policy, adoption decision, and comparison. Adopt only if every quality and safety floor passes and expected cost is at least 25 percent below all-reasoning."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The router and learner tests."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Response-bound measurements, pack metadata, and generated `cost-model.json`."
+        },
+        {
+          "label": "`routing-policy.md`, `adoption.md`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Routing depends only on task fields and passes unseen permutations.",
+        "Ambiguous or missing-risk tasks clarify, high-risk tasks use reasoning, and every executable lane has three protected benchmark observations.",
+        "Raw hashes, tokens, pricing, retries, escalations, latency, quality, and safety recompute exactly.",
+        "Every selected route passes its floors and expected cost is at least 25 percent below all-reasoning.",
+        "`npm run verify:exercise` passes and the adoption decision matches the generated scorecard."
+      ],
+      "projects": [
+        {
+          "displayName": "model-routing-app",
+          "repoPath": "10 Token Economics/exercise-02-risk-based-model-routing-cost-gate/model-routing-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 10,
+      "number": 3,
+      "slug": "exercise-03-minimal-diff-scope-budget",
+      "title": "Minimal-Diff Scope Budget",
+      "missionMarkdown": "Your team needs one export button migrated, but coding agents keep turning the task into a shared legacy cleanup. Your mission is to deliver the correct change while proving the implementation stayed inside a declared file and line budget.\n\nThe same helper serves export, checkout, destructive actions, and other legacy actions. A broad rewrite increases context, review cost, and regression risk beyond the request.\n\nCompare an unconstrained implementation with a pre-declared minimal-diff plan and preserve every non-export behavior.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, give a fresh coding agent the production change without a scope budget. Do not correct or retry it. Save `evidence/before.md` and `evidence/before.patch`.",
+        "Review the first diff for unnecessary files, unrelated cleanup, changed legacy behavior, and added-plus-deleted lines.",
+        "In the second branch, commit only `evidence/scope-plan.json` and `evidence/scope-plan.md` before editing code. Declare exactly two source paths and no more than 30 added-plus-deleted lines.",
+        "Start another fresh agent session with the scope plan under the same agent, model, tools, permissions, request, time limit, and first-attempt conditions.",
+        "Implement the smallest change that maps export to `ds-secondary`. Checkout, delete, and unknown actions must remain unchanged. Do not edit shared components, styles, packages, or unrelated call sites.",
+        "Commit the helper and one focused learner test together. Add final evidence only after the source commit without changing source again.",
+        "Save `before-scope.json`, `evidence/after.md`, `evidence/after.patch`, `scope-budget.json`, `avoided-work.json`, `avoided-work.md`, `verification.md`, and comparison. Raise the final PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The focused migration and learner test."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "The pre-change scope plan, final scope ledger, avoided-work record, verification, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches.",
+        "The scope plan is committed before code and declares exactly the allowed helper and learner-test paths.",
+        "The source commit changes only those two paths and uses no more than 30 added-plus-deleted lines. More than 20 lines requires a concrete ledger justification.",
+        "The unconstrained patch is reapplied and tested; its recorded scope must match its real patch numstat.",
+        "Export uses `ds-secondary` while checkout, delete, and unknown action behavior remains unchanged.",
+        "`npm run verify:exercise` passes and the final ledger matches the actual Git diff exactly."
+      ],
+      "projects": [
+        {
+          "displayName": "minimal-diff-app",
+          "repoPath": "10 Token Economics/exercise-03-minimal-diff-scope-budget/minimal-diff-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 11,
+      "number": 1,
+      "slug": "exercise-01-characterization-test-refactor",
+      "title": "Characterization-First Rules Refactor",
+      "missionMarkdown": "Your team needs a complex renewal rule simplified, but nobody can confirm which surprising behaviors current callers depend on. Your mission is to refactor the internal decision structure without changing any observable result.\n\nThe function allows support overrides, accepts negative late-payment counts, and rejects some mature accounts as `plan-not-supported`. These may be bugs, but this task does not authorize behavior changes.\n\nCompare an unconstrained agent refactor with a characterization-first workflow and prove every output remains identical.\n\nThe comparison measures the development process. A correct unconstrained attempt may preserve the same outputs, but it will not have the pre-committed oracle, test-first history, or scope proof required by the controlled workflow.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, give a fresh coding agent the refactor request without a characterization requirement. Do not correct or retry it. Save `evidence/before.md` and `evidence/before.patch`.",
+        "Review the first result for changed outputs, reason strings, validation gaps, decision order, public API, or tests coupled to private helpers.",
+        "In the second branch, add one characterization test that calls only `evaluateRenewalEligibility`, capture `before-output.json`, and commit those two files before production edits.",
+        "Classify every surprising case as preserve or suspected bug. This challenge authorizes preserve only.",
+        "Start a fresh agent session under the same agent, model, tools, permissions, request, time limit, and first-attempt conditions. Refactor only `legacyEligibility.mjs` in a separate commit.",
+        "Preserve the export, inputs, result fields, exact reason strings, validation gaps, and decision order. Capture `after-output.json` from the refactored code and compare it byte-for-byte with the baseline.",
+        "Save `evidence/after.md`, `evidence/after.patch`, behavior decisions, refactor steps, command proof, and comparison. Use the characterization commit as the after run's base so `after.patch` contains only the agent refactor. Raise the PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The characterization-first and refactor commits."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Before and after outputs, `behavior-decisions.md`, `refactor-steps.md`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Automatically captured command output and output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches; identical correct patches are allowed.",
+        "Characterization tests and baseline output are committed before production edits and call only the public function.",
+        "Every protected field, value, reason string, validation gap, and decision result is identical before and after.",
+        "The refactor commit changes only `legacyEligibility.mjs`; suspected bugs are documented, not fixed.",
+        "`npm run verify:exercise` passes and Git history proves the required order."
+      ],
+      "projects": [
+        {
+          "displayName": "rules-refactor-app",
+          "repoPath": "11 Agentic Refactoring/exercise-01-characterization-test-refactor/rules-refactor-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 11,
+      "number": 2,
+      "slug": "exercise-02-strangler-pattern-checkout",
+      "title": "Strangler Checkout Route",
+      "missionMarkdown": "Your team needs card checkout moved out of a legacy payment path without moving other consumers or risking duplicate authorization. Your mission is to introduce one safe strangler seam while preserving the complete public contract.\n\nCard, gift-card, invoice, and unknown payment types currently share one implementation. A broad rewrite or unsafe fallback can change unrelated behavior or authorize a payment twice.\n\nCompare an unconstrained extraction with a contract-backed card-only route and prove the fallback boundary.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, give a fresh coding agent the card-extraction request without the route contract. Do not correct or retry it. Save `evidence/before.md` and `evidence/before.patch`.",
+        "Review whether the result moves non-card consumers, changes public values, couples dependencies, or can fall back after an uncertain authorization.",
+        "In the second branch, add `checkoutRouter.test.mjs` with participant-owned card, compatibility, and fallback checks. Confirm it fails against the all-legacy starter, then commit only this test.",
+        "Start another fresh agent session under the same agent, model, tools, permissions, request, time limit, and first-attempt conditions. Ask it to create `cardCheckout.mjs` and update `checkoutRouter.mjs` so only enabled card requests use the injectable new slice. Do not correct or retry it.",
+        "A new-card failure must fall back once only when an object error explicitly proves no authorization was created. Ambiguous, primitive, malformed, or post-authorization failures must return the established failure result without calling legacy checkout.",
+        "Run the precommitted participant test and protected route suite without changing the test. Prove gift-card, invoice, unknown, flag-off, safe-fallback, and unsafe-no-fallback routes. Do not delete or rewrite the legacy path.",
+        "Commit only the router and card slice as the agent source commit. Use the participant-test commit as the after run base so `after.patch` contains only agent work. Save the remaining evidence and final comparison."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The precommitted participant test, router, and card slice."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "`route-matrix.md`, `contract-comparison.md`, `rollback.md`, `history.json`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Automatically captured command output and output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches; identical correct patches are allowed.",
+        "Only enabled card requests reach the new slice; every other request remains legacy.",
+        "Public fields and rounding stay unchanged, dependencies are injectable, and rollback is explicit.",
+        "Safe pre-authorization failures fall back exactly once, while uncertain or completed authorizations never retry through legacy.",
+        "`npm run verify:exercise` passes, the red participant test precedes the source commit, and the source commit contains only the router and card slice."
+      ],
+      "projects": [
+        {
+          "displayName": "checkout-strangler-app",
+          "repoPath": "11 Agentic Refactoring/exercise-02-strangler-pattern-checkout/checkout-strangler-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 11,
+      "number": 3,
+      "slug": "exercise-03-legacy-rules-engine-untangle",
+      "title": "Contract-Safe Full-Stack Rules Extraction",
+      "missionMarkdown": "Your team needs a workflow decision policy extracted from a Spring service without changing backend side effects, HTTP JSON, or the React client contract. Your mission is to separate pure validation from orchestration while preserving every observed behavior.\n\nThe service currently performs lookup, validation, response construction, and persistence in one method. A careless extraction can reorder exceptions, reject accepted legacy states, mutate before failure, rename JSON fields, or change support-facing text.\n\nCompare an unconstrained extraction with a characterization-first full-stack refactor and prove the contract remains unchanged.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, give a fresh coding agent the policy-extraction request without characterization evidence. Do not correct or retry it. Save `evidence/before.md` and `evidence/before.patch`.",
+        "Review the result for changed lookup order, validation gaps, exception text, response fields, save counts, or client behavior.",
+        "In the second branch, add `WorkflowPolicyCharacterizationTest.java` and run that test alone against the starter to capture `contract-before.json`. Commit only the test and snapshot before production edits. The full protected suite is expected to remain red until `DecisionPolicy` exists.",
+        "Start another fresh agent session under the same agent, model, tools, permissions, request, time limit, and first-attempt conditions. Add `DecisionPolicy.java` and update only `WorkflowService.java` in a separate refactor commit.",
+        "The policy may validate but must never read or write a repository. Preserve not-found precedence, the 12-character boundary, accepted unknown statuses, exact exception text, one save after acceptance, and zero saves after rejection.",
+        "Capture the after contract and run real backend, HTTP, and client checks. The protected verifier runs Maven in temporary storage, so verification must not create or change repository build files. Do not silently correct any legacy gap.",
+        "Save `evidence/after.md`, `evidence/after.patch`, refactor map, rollback, history, command output, and comparison. Use the characterization commit as the after run's base so `after.patch` contains only the agent refactor. Raise the PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The characterization and refactor commits with participant test."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Before and after contract JSON, `refactor-map.md`, `rollback.md`, `history.json`, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Automatically captured command output and output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both agent attempts use matching conditions and genuine first-attempt patches; identical correct patches are allowed.",
+        "Characterization evidence is committed before production edits and the after contract is identical.",
+        "`DecisionPolicy` is repository-free while `WorkflowService` retains lookup, construction, and persistence.",
+        "Exception order and text, response fields, accepted legacy gaps, rejected-state immutability, and save counts remain unchanged.",
+        "`npm run verify:exercise` passes and Git history proves the required test-first and focused-refactor sequence."
+      ],
+      "projects": [
+        {
+          "displayName": "legacy-rules-api",
+          "repoPath": "11 Agentic Refactoring/exercise-03-legacy-rules-engine-untangle/legacy-rules-api",
+          "isPrimary": true
+        },
+        {
+          "displayName": "legacy-rules-app",
+          "repoPath": "11 Agentic Refactoring/exercise-03-legacy-rules-engine-untangle/legacy-rules-app",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "competencyNumber": 12,
+      "number": 1,
+      "slug": "exercise-01-session-waste-retro-from-logs",
+      "title": "Trace-Measured Session Waste Reduction",
+      "missionMarkdown": "Your team knows coding-agent sessions are wasting time and tokens, but its analyzer labels useful work as waste. Your mission is to correct the measurement, remove the largest preventable behavior, and prove the improvement in a comparable fresh replay.\n\nThe trace contains repeated failed commands without diagnosis, an oversized context load, and a completion claim after code changed without final verification. First reads, changed-file rereads, and useful failures must not be misclassified.\n\nUse event-level evidence to choose one executable workflow improvement and measure its effect.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, give a fresh coding agent the supplied implementation request without your trace analysis or corrections. Commit its first attempt and save `evidence/before.md` and `evidence/before.patch`.",
+        "Run the protected baseline through the supplied analyzer. Review the first attempt and classify an event as preventable only when it is a same-version duplicate read, an identical failed command repeated before diagnosis or workspace change, or a context load above 8,000 bytes.",
+        "In the second branch, start a fresh agent under the same agent, model, tools, permissions, request, time limit, and first-attempt conditions. Use your trace findings as repository evidence. Correct the analyzer so first reads, reads after a file changes, diagnosed retries, and useful failures are not counted as waste. A passed final verification must occur after the last write.",
+        "Implement `preflightPolicy.mjs` so a failed command cannot repeat at the same workspace revision until a diagnosis event or revision change. Add participant tests.",
+        "Commit only the analyzer, preflight, and test as one focused source commit. Save it as `evidence/after.md` and `evidence/after.patch`. Identical correct implementation patches are allowed, but the trace analysis and replay proof are still required.",
+        "Use the supplied POLICY-217 brief to construct a new replay under the fixed simulated agent, model, prompt, and time limit. Give every event a unique ID, the replay session ID, and an ordered timestamp. Do not copy or splice the protected baseline.",
+        "Save after metrics, retrospective, replay report, history, and comparison. Raise a focused PR from the second branch containing the executable improvement and proof."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The corrected analyzer, executable preflight, and participant test."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "Baseline and replay events, metadata, generated metrics, retrospective, replay report, history, and `evidence/comparison.md`."
+        },
+        {
+          "label": "Automatically captured command output and output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Baseline and constructed replay conditions match, replay events are session-bound and fresh, and all metrics are derived from raw events.",
+        "Event classifications follow the metric contract and useful work is not counted as preventable waste.",
+        "The executable preflight blocks an unchanged failed-command retry until diagnosis or revision change.",
+        "Unchanged retries reach zero, preventable calls fall by at least two, and final verification passes after the last write.",
+        "`npm run verify:exercise` passes and the source commit remains focused."
+      ],
+      "projects": [
+        {
+          "displayName": "session-waste-app",
+          "repoPath": "12 Agentic Retrospective/exercise-01-session-waste-retro-from-logs/session-waste-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 12,
+      "number": 2,
+      "slug": "exercise-02-rule-hardening-from-repeated-mistakes",
+      "title": "Repeated Mistake to Repository Rule",
+      "missionMarkdown": "Your team repeatedly corrects the same coding-agent persistence mistakes in PR review. Your mission is to turn those repeated corrections into minimal repository guidance and test its effect on a fresh agent's first attempt.\n\nThree mistakes recur across separate changes: display labels stored as identity, unnormalized status values, and ambient timestamps inside business logic. The proving task does not reveal these hidden conventions.\n\nCompare the exact task before and after guidance, then keep only rules supported by repeated evidence. A correct baseline is a ceiling result, not a forced failure.\n\nThe duration for this challenge is 45 min or less.",
+      "durationLabel": "45 min or less",
+      "howToSteps": [
+        "Create two branches from the same starting commit. In the first branch, run the proving task in a fresh agent session without new guidance. Do not hint, correct, retry, or edit the patch. Save `evidence/before.md` and `evidence/before.patch`.",
+        "Map each proposed rule to at least two separate correction events. Do not create permanent guidance from one mistake or personal preference.",
+        "In the second branch, create a short `AGENTS.md` that routes persistence work to `.agent/persistence.md`. Keep stable-ID, canonical-status, injected-clock, and exception details only in the deeper file.",
+        "Commit the guidance without implementation code. Start a different fresh session from that commit using the same prompt, agent, model, tools, permissions, and time limit.",
+        "Preserve the unedited first patch in `evidence/after.patch`. If the baseline has defects, the guided result must remove them. If the baseline is already correct, use the ceiling-aware no-regression result. Identical correct patches are allowed in that case.",
+        "Agent-run patches must change only `filterPersistence.mjs`. Commit the successful after patch alone, then add one participant test in the next commit. The committed source must be identical to the graded patch.",
+        "Save `evidence/after.md`, comparison, rule map, history, and command output. Raise a focused PR from the second branch."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "`AGENTS.md`, `.agent/persistence.md`, final implementation, and participant test."
+        },
+        {
+          "label": "`evidence/before.md`, unedited `evidence/before.patch`, `evidence/after.md`, and unedited `evidence/after.patch`."
+        },
+        {
+          "label": "Run metadata, `evidence/comparison.md`, `rule-map.md`, `history.json`, and automatically captured command output."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Both sessions differ only by repository guidance and use unedited first-attempt patches.",
+        "Every permanent rule is supported by repeated correction events.",
+        "`AGENTS.md` remains concise and routes to non-duplicated focused guidance.",
+        "The grader records either defect improvement or a valid ceiling no-regression result, finds zero after defects, and confirms final source equals the graded after patch.",
+        "`npm run verify:exercise` passes and Git history separates guidance, the graded source patch, and the participant test."
+      ],
+      "projects": [
+        {
+          "displayName": "rule-hardening-app",
+          "repoPath": "12 Agentic Retrospective/exercise-02-rule-hardening-from-repeated-mistakes/rule-hardening-app",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "competencyNumber": 12,
+      "number": 3,
+      "slug": "exercise-03-trace-backed-workflow-optimizer",
+      "title": "Trace-Backed Workflow Optimizer",
+      "missionMarkdown": "Your team uses a reusable coding-agent workflow that repeatedly produces early edits, missed contradictions, partial verification, and unsupported completion claims. Your mission is to improve only the workflow instructions and prove the change generalizes without excessive context cost.\n\nPast traces show multiple failure patterns, but copying specific case answers into the instructions would create a benchmark-only fix.\n\nCluster root causes, run matched first-attempt baselines and candidates, and adopt only when protected held-out results improve.\n\nThe duration for this challenge is 90 min or less.",
+      "durationLabel": "90 min or less",
+      "howToSteps": [
+        "Record the unchanged baseline workflow commit in `evidence/before.md`.",
+        "Run all eight cases three times at the baseline commit with fixed agent, model, settings, tools, permissions, and time limit. Save every raw structured response, response hash, unique session ID, measurement source, capture timestamp, token count, and duration.",
+        "Group trace failures by root cause before editing. Map each proposed workflow change to multiple observed failures.",
+        "Create one candidate commit that changes only `workflow/instructions.md`. Keep the guidance general and do not include case IDs, assertion IDs, expected outputs, or fixture wording.",
+        "Repeat all 24 runs with only the workflow changed. Do not select or rerun individual failures. Save the candidate state in `evidence/after.md`.",
+        "Generate grades and the benchmark from raw results. Compare train and held-out quality, critical assertions, variance, tokens, and elapsed time.",
+        "Write `evidence/history.json`, then run `npm run evidence:patches` to generate both patch files from the recorded commits. Write the failure clusters, adoption decision, and comparison. Adopt only if every protected quality, safety, variance, token, and time gate passes."
+      ],
+      "evidenceChecklist": [
+        {
+          "label": "The candidate workflow and focused candidate commit."
+        },
+        {
+          "label": "`evidence/before.md`, `evidence/before.patch`, `evidence/after.md`, and `evidence/after.patch`."
+        },
+        {
+          "label": "All 48 raw baseline and candidate results with metadata and hashes."
+        },
+        {
+          "label": "Generated benchmark, `failure-clusters.md`, `adoption.md`, `history.json`, `evidence/comparison.md`, and automatically captured command output."
+        },
+        {
+          "label": "Output from `npm run verify:exercise`."
+        },
+        {
+          "label": "A focused pull request containing only this exercise."
+        }
+      ],
+      "completionCriteria": [
+        "Exactly 48 first-attempt runs use matching conditions and every grade is derived from a raw response hash.",
+        "Workflow changes are supported by repeated trace causes and the candidate commit changes only `workflow/instructions.md`.",
+        "Train and held-out quality improve, every held-out critical assertion passes, and variance remains within the protected limit. If the baseline is already at the quality ceiling, quality must not regress and tokens, duration, or consistency must improve measurably.",
+        "Median tokens and elapsed time remain within limits and no benchmark identifiers leak into the workflow.",
+        "`npm run verify:exercise` passes and the adoption decision matches the generated benchmark."
+      ],
+      "projects": [
+        {
+          "displayName": "workflow-optimizer-app",
+          "repoPath": "12 Agentic Retrospective/exercise-03-trace-backed-workflow-optimizer/workflow-optimizer-app",
+          "isPrimary": true
+        }
+      ]
+    }
+  ]
+}

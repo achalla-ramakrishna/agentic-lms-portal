@@ -67,6 +67,14 @@ export default function LandingPage() {
         &ldquo;Agents replace typing, not thinking.&rdquo; — from the
         guidebook
       </p>
+
+      <a
+        href="/competencies"
+        className="text-xs text-neutral-400 underline hover:text-neutral-600"
+      >
+        Preview competency content without logging in (dev-only, until auth
+        lands in chunk 3) →
+      </a>
     </main>
   );
 }

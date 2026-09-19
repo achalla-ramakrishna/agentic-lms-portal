@@ -27,3 +27,18 @@ the request to build this as an MVP.
   no data-model rewrite.
 - SQLite is single-writer; fine for one facilitator + a small cohort, not
   a concern this ADR needs to solve for.
+
+## Known accepted risk: pinned at Prisma 6, not 7
+
+`npm audit` flags a high-severity stack-exhaustion advisory
+(GHSA-ggr8-5vv4-36mx, `deepmerge-ts` < 8.0.0) reachable only through the
+`prisma` CLI's `@prisma/config` dependency. Verified via `npm ls
+deepmerge-ts` / `npm ls @prisma/client`: `@prisma/client` — the package
+actually imported by app code and bundled into the deployed app — has no
+dependency on it at all. The chain exists solely in `prisma`, a
+devDependency invoked at `generate`/`migrate`/`db seed` time, never at
+request time. Accepted as-is rather than forcing a Prisma 7 upgrade, which
+is a breaking architecture change (drops schema-file `datasource.url` in
+favor of `prisma.config.ts` + an explicit driver adapter per database) that
+deserves its own ADR and migration pass, not a reflexive `audit fix
+--force` mid-chunk. Revisit when Prisma 6 stops receiving fixes.

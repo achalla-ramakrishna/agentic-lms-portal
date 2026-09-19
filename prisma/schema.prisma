@@ -1,0 +1,109 @@
+// See docs/SPEC.md §6 for the field-level rationale and docs/architecture.md
+// for why SQLite (Postgres-portable schema, no SQLite-only types).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Competency {
+  id                    Int        @id @default(autoincrement())
+  number                Int        @unique
+  title                 String
+  subtitle              String
+  shiftMarkdown         String
+  masteryBullets        String // JSON-encoded string[]
+  commonMistakeMarkdown String
+  toolkitTags           String // JSON-encoded string[]
+  exercises             Exercise[]
+}
+
+model Exercise {
+  id                Int               @id @default(autoincrement())
+  competencyId      Int
+  competency        Competency        @relation(fields: [competencyId], references: [id])
+  number            Int
+  slug              String            @unique
+  title             String
+  missionMarkdown   String
+  durationLabel     String
+  howToSteps        String // JSON-encoded string[]
+  evidenceChecklist String // JSON-encoded {label: string}[]
+  completionCriteria String // JSON-encoded string[]
+  projects          ExerciseProject[]
+  submissions       Submission[]
+
+  @@unique([competencyId, number])
+}
+
+model ExerciseProject {
+  id          Int      @id @default(autoincrement())
+  exerciseId  Int
+  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+  repoPath    String
+  displayName String
+  isPrimary   Boolean  @default(false)
+}
+
+enum Role {
+  learner
+  facilitator
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(learner)
+  submissions  Submission[] @relation("SubmissionsByUser")
+  decisions    Submission[] @relation("DecisionsByFacilitator")
+}
+
+enum SubmissionStatus {
+  not_started
+  in_progress
+  submitted
+  needs_rework
+  passed
+}
+
+model Submission {
+  id                 Int                @id @default(autoincrement())
+  userId             Int
+  user               User               @relation("SubmissionsByUser", fields: [userId], references: [id])
+  exerciseId         Int
+  exercise           Exercise           @relation(fields: [exerciseId], references: [id])
+  status             SubmissionStatus   @default(not_started)
+  startedAt          DateTime?
+  submittedAt        DateTime?
+  decidedAt          DateTime?
+  decidedById        Int?
+  decidedBy          User?              @relation("DecisionsByFacilitator", fields: [decidedById], references: [id])
+  facilitatorComment String?
+  prLink             String?
+  learnerNote        String?
+  evidenceArtifacts  EvidenceArtifact[]
+
+  @@unique([userId, exerciseId])
+}
+
+enum EvidenceKind {
+  link
+  note
+}
+
+model EvidenceArtifact {
+  id              Int          @id @default(autoincrement())
+  submissionId    Int
+  submission      Submission   @relation(fields: [submissionId], references: [id])
+  checklistLabel  String
+  kind            EvidenceKind
+  url             String
+  note            String?
+  createdAt       DateTime     @default(now())
+}
