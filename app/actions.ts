@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getOrCreateSubmission } from "@/lib/submissions";
 import { evidenceChecklist } from "@/lib/content";
+import { canStart, canSubmitEvidence, canDecide, isValidDecision } from "@/lib/status";
 
 async function requireUserId(): Promise<number> {
   const session = await getServerSession(authOptions);
@@ -38,7 +39,7 @@ export async function startExercise(
   const userId = await requireUserId();
 
   const submission = await getOrCreateSubmission(userId, exerciseId);
-  if (submission.status === "not_started") {
+  if (canStart(submission.status)) {
     await prisma.submission.update({
       where: { id: submission.id },
       data: { status: "in_progress", startedAt: new Date() },
@@ -62,6 +63,11 @@ export async function saveSubmission(formData: FormData) {
   });
 
   const submission = await getOrCreateSubmission(userId, exerciseId);
+  if (submission.status !== "not_started" && !canSubmitEvidence(submission.status)) {
+    // e.g. already passed — don't let a stale form resubmit over a
+    // closed-out exercise (docs/features/0006-polish.md).
+    forbidden();
+  }
 
   const artifacts: {
     checklistLabel: string;
@@ -110,7 +116,7 @@ export async function decideSubmission(formData: FormData) {
     formData.get("facilitatorComment") || "",
   ).trim();
 
-  if (decision !== "passed" && decision !== "needs_rework") {
+  if (!isValidDecision(decision)) {
     throw new Error("Invalid decision");
   }
 
@@ -118,6 +124,11 @@ export async function decideSubmission(formData: FormData) {
     where: { id: submissionId },
     include: { exercise: { include: { competency: true } } },
   });
+  if (!canDecide(submission.status)) {
+    // Already decided, or not submitted yet — don't let a stale form
+    // double-apply a decision (docs/features/0006-polish.md).
+    forbidden();
+  }
 
   await prisma.submission.update({
     where: { id: submissionId },

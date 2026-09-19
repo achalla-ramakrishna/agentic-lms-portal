@@ -46,5 +46,10 @@ Neither source is vendored into this repo. Then re-run `npm run db:seed`
 
 ## Status
 
-Chunk 2 (content model + real seed data + read-only browsing) — see
-`docs/SPEC.md` §7 for the full build plan.
+v1 MVP complete — all 6 build-plan chunks done (toolchain, content model,
+auth/roles, learner flow, facilitator flow, polish). See `docs/SPEC.md`
+§7 for the full build plan and `docs/adr/` for the decisions behind it.
+
+```bash
+npm test  # 19 tests: seed parser, status transitions, roster aggregation
+```

@@ -17,13 +17,13 @@ export default async function AdminLayout({
 
   return (
     <div>
-      <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-3">
-        <span className="font-serif text-sm font-semibold">
+      <header className="flex items-center justify-between border-b border-line bg-canvas-subtle px-6 py-3">
+        <span className="text-sm font-semibold text-fg">
           Agentic Engineering — Admin
         </span>
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-neutral-500">{session.user.email}</span>
-          <a href="/competencies" className="font-medium hover:underline">
+          <span className="text-fg-muted">{session.user.email}</span>
+          <a href="/competencies" className="font-medium text-fg hover:text-accent">
             Learner view
           </a>
           <SignOutButton />

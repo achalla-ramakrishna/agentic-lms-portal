@@ -218,8 +218,18 @@ Chunked so each commit lands a coherent, working slice.
   check is server-side and unconditional (`requireFacilitatorId` calls
   `forbidden()` regardless of caller), verified by code inspection rather
   than a forged raw request — noted honestly rather than overclaimed.
-- [ ] **Chunk 6 — Polish**: profile page, empty/error states, basic tests
-  for status transitions and roster aggregation.
+- [x] **Chunk 6 — Polish** (this commit): `/profile`, branded 404/error
+  boundaries, a real GitHub-dark theme (ADR 0003) applied across every
+  page, and a test suite (19 tests: seed-parser prose-fallback case,
+  status-transition rules, roster aggregation) — vitest was deliberately
+  not installed until now (chunk 1) specifically so its version could be
+  checked for a clean `npm audit` at the moment it's actually needed
+  (5.0.1, confirmed 0 vulnerabilities). Also closed two gaps surfaced
+  while extracting the pure status-transition rules: a learner could
+  resubmit evidence over an already-passed exercise, and a facilitator
+  could double-decide a submission — both now rejected server-side
+  (`lib/status.ts`'s `canSubmitEvidence`/`canDecide`), verified live.
+  This completes the v1 MVP build plan.
 
 Phase 2+ (explicitly deferred, not built here): cohorts and the
 "quiet for 7+ days" signal, Stage 2 CI verification integration, email

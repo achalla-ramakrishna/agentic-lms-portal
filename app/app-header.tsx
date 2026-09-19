@@ -9,17 +9,20 @@ export async function AppHeader() {
   const session = await getServerSession(authOptions);
 
   return (
-    <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-3">
-      <a href="/dashboard" className="font-serif text-sm font-semibold">
+    <header className="flex items-center justify-between border-b border-line bg-canvas-subtle px-6 py-3">
+      <a href="/dashboard" className="text-sm font-semibold text-fg">
         Agentic Engineering
       </a>
       <div className="flex items-center gap-4 text-sm">
-        <a href="/dashboard" className="font-medium hover:underline">
+        <a href="/dashboard" className="font-medium text-fg hover:text-accent">
           Dashboard
         </a>
-        <span className="text-neutral-500">{session?.user?.email}</span>
+        <a href="/profile" className="font-medium text-fg hover:text-accent">
+          Profile
+        </a>
+        <span className="text-fg-muted">{session?.user?.email}</span>
         {session?.user?.role === "facilitator" && (
-          <a href="/admin" className="font-medium hover:underline">
+          <a href="/admin" className="font-medium text-fg hover:text-accent">
             Admin
           </a>
         )}

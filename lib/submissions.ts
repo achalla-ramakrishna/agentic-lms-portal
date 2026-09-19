@@ -33,3 +33,19 @@ export const STATUS_LABEL: Record<Submission["status"], string> = {
   needs_rework: "Needs rework",
   passed: "Passed",
 };
+
+// GitHub label-pill colors (ADR 0003): muted gray / accent blue / done
+// purple / attention yellow / success green — one source of truth so the
+// same status always reads the same color everywhere it's shown
+// (dashboard, competency/exercise pages, profile, roster, submissions).
+// A tinted-fill-only pill barely read as a pill against the card
+// background it sits on (same low luminance) — GitHub's real label chips
+// use a colored border for definition, so these do too.
+export const STATUS_BADGE_CLASS: Record<Submission["status"], string> = {
+  not_started: "border border-line text-fg-muted",
+  in_progress: "border border-accent/40 bg-accent/10 text-accent",
+  submitted: "border border-done-fg/40 bg-done-fg/10 text-done-fg",
+  needs_rework:
+    "border border-attention-fg/40 bg-attention-fg/10 text-attention-fg",
+  passed: "border border-success-fg/40 bg-success-fg/10 text-success-fg",
+};

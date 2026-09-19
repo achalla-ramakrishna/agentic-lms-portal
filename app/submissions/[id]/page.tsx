@@ -3,7 +3,7 @@ import { notFound, forbidden } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { STATUS_LABEL } from "@/lib/submissions";
+import { StatusBadge } from "@/app/status-badge";
 import { evidenceChecklist } from "@/lib/content";
 import { decideSubmission } from "@/app/actions";
 
@@ -43,43 +43,41 @@ export default async function SubmissionDetailPage({
     <main className="mx-auto max-w-2xl px-6 py-12">
       <Link
         href={`/competencies/${exercise.competency.number}/exercises/${exercise.number}`}
-        className="text-sm font-medium"
+        className="text-sm font-medium text-accent hover:underline"
       >
         ← {String(exercise.number).padStart(2, "0")} {exercise.title}
       </Link>
 
       <div className="mt-4 flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold tracking-tight">
+        <h1 className="text-xl font-semibold tracking-tight text-fg">
           Submission · {exercise.title}
         </h1>
-        <span className="rounded-md bg-neutral-100 px-3 py-1 text-xs font-medium">
-          {STATUS_LABEL[submission.status]}
-        </span>
+        <StatusBadge status={submission.status} />
       </div>
 
-      <section className="mt-6 rounded-xl border border-neutral-200 bg-white p-7">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+      <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
           PR / Branch link
         </h2>
         <p className="mt-2 text-sm">
           {submission.prLink ? (
             <a
               href={submission.prLink}
-              className="text-orange-700 underline"
+              className="text-accent underline"
               target="_blank"
               rel="noreferrer"
             >
               {submission.prLink}
             </a>
           ) : (
-            <span className="text-neutral-400">None provided</span>
+            <span className="text-fg-subtle">None provided</span>
           )}
         </p>
       </section>
 
       {isFacilitator && (
-        <section className="mt-6 rounded-xl border border-neutral-200 bg-white p-7">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Evidence checklist (from the exercise)
           </h2>
           <ul className="mt-2 space-y-1 text-sm">
@@ -89,8 +87,8 @@ export default async function SubmissionDetailPage({
                 <span
                   className={
                     coveredLabels.has(item.label)
-                      ? "text-neutral-700"
-                      : "text-neutral-400"
+                      ? "text-fg"
+                      : "text-fg-subtle"
                   }
                 >
                   {item.label}
@@ -101,30 +99,30 @@ export default async function SubmissionDetailPage({
         </section>
       )}
 
-      <section className="mt-6 rounded-xl border border-neutral-200 bg-white p-7">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+      <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Evidence
         </h2>
         {submission.evidenceArtifacts.length === 0 ? (
-          <p className="mt-2 text-sm text-neutral-400">
+          <p className="mt-2 text-sm text-fg-subtle">
             No evidence attached yet.
           </p>
         ) : (
           <ul className="mt-2 space-y-2 text-sm">
             {submission.evidenceArtifacts.map((a) => (
               <li key={a.id}>
-                <span className="text-neutral-500">{a.checklistLabel}:</span>{" "}
+                <span className="text-fg-muted">{a.checklistLabel}:</span>{" "}
                 {a.url.startsWith("http") ? (
                   <a
                     href={a.url}
-                    className="text-orange-700 underline"
+                    className="text-accent underline"
                     target="_blank"
                     rel="noreferrer"
                   >
                     {a.url}
                   </a>
                 ) : (
-                  a.url
+                  <span className="text-fg">{a.url}</span>
                 )}
               </li>
             ))}
@@ -133,22 +131,22 @@ export default async function SubmissionDetailPage({
       </section>
 
       {submission.learnerNote && (
-        <section className="mt-6 rounded-xl border border-neutral-200 bg-white p-7">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Note to reviewer
           </h2>
-          <p className="mt-2 text-sm text-neutral-700">
+          <p className="mt-2 text-sm text-fg">
             {submission.learnerNote}
           </p>
         </section>
       )}
 
       {submission.facilitatorComment && (
-        <section className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-7">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-amber-800">
+        <section className="mt-6 rounded-xl border border-attention-fg/40 bg-attention-subtle p-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-attention-fg">
             Facilitator comment
           </h2>
-          <p className="mt-2 text-sm text-amber-900">
+          <p className="mt-2 text-sm text-fg">
             {submission.facilitatorComment}
           </p>
         </section>
@@ -159,7 +157,7 @@ export default async function SubmissionDetailPage({
         isOwner && (
           <Link
             href={`/submissions/new?exercise=${exercise.id}`}
-            className="mt-6 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+            className="mt-6 inline-block rounded-md bg-success-emphasis px-4 py-2 text-sm font-medium text-white hover:bg-success-emphasis-hover"
           >
             Edit submission
           </Link>
@@ -168,11 +166,11 @@ export default async function SubmissionDetailPage({
       {isFacilitator && submission.status === "submitted" && (
         <form
           action={decideSubmission}
-          className="mt-6 flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-7"
+          className="mt-6 flex flex-col gap-4 rounded-xl border border-line bg-canvas-subtle p-7"
         >
           <input type="hidden" name="submissionId" value={submission.id} />
-          <p className="text-sm font-medium">Decision</p>
-          <div className="flex gap-6 text-sm">
+          <p className="text-sm font-medium text-fg">Decision</p>
+          <div className="flex gap-6 text-sm text-fg">
             <label className="flex items-center gap-2">
               <input type="radio" name="decision" value="passed" required />
               Passed
@@ -183,19 +181,19 @@ export default async function SubmissionDetailPage({
             </label>
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="facilitatorComment" className="text-sm font-medium">
+            <label htmlFor="facilitatorComment" className="text-sm font-medium text-fg">
               Comment (optional)
             </label>
             <textarea
               id="facilitatorComment"
               name="facilitatorComment"
               rows={3}
-              className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+              className="rounded-md border border-line bg-canvas-inset px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none"
             />
           </div>
           <button
             type="submit"
-            className="self-end rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+            className="self-end rounded-md bg-success-emphasis px-4 py-2 text-sm font-medium text-white hover:bg-success-emphasis-hover"
           >
             Submit Decision
           </button>

@@ -15,9 +15,15 @@
 //
 // Idempotent by construction: re-running with updated sources just
 // regenerates the same file; prisma/seed.ts upserts by slug/number.
-import { readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname, posix } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  section,
+  bulletLines,
+  numberedLines,
+  decodePathSegment,
+} from "./lib/parse-readme.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -34,47 +40,6 @@ if (!exerciseSetPath || !guidebookHtmlPath) {
     "Usage: node scripts/generate-seed.mjs --exercise-set <path> --guidebook-html <path>",
   );
   process.exit(1);
-}
-
-// ---------- helpers ----------
-
-function section(markdown, heading, nextHeadingRegex = /^## /m) {
-  const startIdx = markdown.indexOf(`## ${heading}`);
-  if (startIdx === -1) return "";
-  const afterHeading = markdown.slice(startIdx + `## ${heading}`.length);
-  const nextMatch = afterHeading.match(nextHeadingRegex);
-  const body = nextMatch
-    ? afterHeading.slice(0, nextMatch.index)
-    : afterHeading;
-  return body.trim();
-}
-
-function bulletLines(text) {
-  const bullets = text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith("- "))
-    .map((l) => l.slice(2).trim());
-  if (bullets.length > 0) return bullets;
-  // A handful of exercises (e.g. 3.1–3.3, 7.1–7.4) state evidence/criteria
-  // as prose paragraphs instead of a bulleted list. Fall back to one item
-  // per paragraph rather than losing the content.
-  return text
-    .split(/\n\s*\n/)
-    .map((p) => p.replace(/\n/g, " ").trim())
-    .filter(Boolean);
-}
-
-function numberedLines(text) {
-  return text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => /^\d+\.\s/.test(l))
-    .map((l) => l.replace(/^\d+\.\s/, "").trim());
-}
-
-function decodePathSegment(s) {
-  return decodeURIComponent(s.replace(/^\.\//, ""));
 }
 
 // ---------- 1. parse root README.md index table ----------

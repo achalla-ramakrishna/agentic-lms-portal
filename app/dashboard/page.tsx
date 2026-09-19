@@ -40,21 +40,21 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-semibold tracking-tight text-fg">
           Welcome back, {session!.user.name}
         </h1>
-        <span className="text-sm text-neutral-500">Overall: {overallPct}%</span>
+        <span className="text-sm text-fg-muted">Overall: {overallPct}%</span>
       </div>
 
       {mostRecentInProgress && (
         <Link
           href={`/competencies/${mostRecentInProgress.exercise.competency.number}/exercises/${mostRecentInProgress.exercise.number}`}
-          className="mt-6 block rounded-xl border border-neutral-200 bg-white p-5 hover:border-neutral-400"
+          className="mt-6 block rounded-xl border border-line bg-canvas-subtle p-5 hover:border-fg-subtle"
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Continue where you left off
           </p>
-          <p className="mt-2 font-medium">
+          <p className="mt-2 font-medium text-fg">
             {String(mostRecentInProgress.exercise.competency.number).padStart(2, "0")}{" "}
             · {mostRecentInProgress.exercise.competency.title} → Ex{" "}
             {String(mostRecentInProgress.exercise.number).padStart(2, "0")}{" "}
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
       )}
 
       <section className="mt-8">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Competencies
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -76,13 +76,13 @@ export default async function DashboardPage() {
               <Link
                 key={c.id}
                 href={`/competencies/${c.number}`}
-                className="rounded-lg border border-neutral-200 bg-white p-4 hover:border-neutral-400"
+                className="rounded-lg border border-line bg-canvas-subtle p-4 hover:border-fg-subtle"
               >
-                <div className="font-mono text-xs text-neutral-400">
+                <div className="font-mono text-xs text-fg-subtle">
                   {String(c.number).padStart(2, "0")}
                 </div>
-                <div className="mt-1 text-sm font-medium">{c.title}</div>
-                <div className="mt-2 text-xs text-neutral-500">
+                <div className="mt-1 text-sm font-medium text-fg">{c.title}</div>
+                <div className="mt-2 text-xs text-fg-muted">
                   {passed}/{c.exercises.length}
                 </div>
               </Link>

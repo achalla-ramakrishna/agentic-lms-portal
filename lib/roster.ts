@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import type { SubmissionStatus } from "@prisma/client";
 
 export type RosterRow = {
   userId: number;
@@ -11,34 +12,33 @@ export type RosterRow = {
   lastActivity: Date | null;
 };
 
-// Same "passed/total per competency" shape as app/dashboard/page.tsx,
-// generalized across every learner instead of one — see
-// docs/features/0005-facilitator-flow.md's acceptance criterion that
-// these two must agree exactly.
-export async function buildRoster(): Promise<RosterRow[]> {
-  const [learners, competencies, submissions] = await Promise.all([
-    prisma.user.findMany({ where: { role: "learner" } }),
-    prisma.competency.findMany({
-      orderBy: { number: "asc" },
-      include: { exercises: { select: { id: true } } },
-    }),
-    prisma.submission.findMany({
-      include: { exercise: { select: { competencyId: true } } },
-    }),
-  ]);
+export type RosterLearnerInput = { id: number; name: string; email: string };
+export type RosterCompetencyInput = { number: number; exerciseCount: number };
+export type RosterSubmissionInput = {
+  userId: number;
+  competencyNumber: number;
+  status: SubmissionStatus;
+  submittedAt: Date | null;
+  startedAt: Date | null;
+};
 
-  const competencyNumberByExerciseCompetencyId = new Map(
-    competencies.map((c) => [c.id, c.number]),
-  );
-  const totalByCompetencyNumber = new Map(
-    competencies.map((c) => [c.number, c.exercises.length]),
-  );
+// Pure aggregation — no Prisma, no I/O, so it's directly testable
+// (__tests__/roster.test.ts) against synthetic multi-learner input. Same
+// "passed/total per competency" shape app/dashboard/page.tsx uses for one
+// learner, generalized across all of them — see
+// docs/features/0005-facilitator-flow.md's acceptance criterion that the
+// two must agree exactly.
+export function aggregateRoster(
+  learners: RosterLearnerInput[],
+  competencies: RosterCompetencyInput[],
+  submissions: RosterSubmissionInput[],
+): RosterRow[] {
   const totalExercises = competencies.reduce(
-    (sum, c) => sum + c.exercises.length,
+    (sum, c) => sum + c.exerciseCount,
     0,
   );
 
-  const submissionsByUser = new Map<number, typeof submissions>();
+  const submissionsByUser = new Map<number, RosterSubmissionInput[]>();
   for (const s of submissions) {
     const list = submissionsByUser.get(s.userId) ?? [];
     list.push(s);
@@ -50,24 +50,18 @@ export async function buildRoster(): Promise<RosterRow[]> {
 
     const perCompetency = new Map<number, { passed: number; total: number }>();
     for (const c of competencies) {
-      perCompetency.set(c.number, {
-        passed: 0,
-        total: totalByCompetencyNumber.get(c.number) ?? 0,
-      });
+      perCompetency.set(c.number, { passed: 0, total: c.exerciseCount });
     }
+
     let passedCount = 0;
     let pendingCount = 0;
     let lastActivity: Date | null = null;
 
     for (const s of userSubmissions) {
-      const competencyNumber = competencyNumberByExerciseCompetencyId.get(
-        s.exercise.competencyId,
-      );
       if (s.status === "passed") {
         passedCount++;
-        if (competencyNumber !== undefined) {
-          perCompetency.get(competencyNumber)!.passed++;
-        }
+        const cell = perCompetency.get(s.competencyNumber);
+        if (cell) cell.passed++;
       }
       if (s.status === "submitted") pendingCount++;
 
@@ -93,6 +87,39 @@ export async function buildRoster(): Promise<RosterRow[]> {
   rows.sort((a, b) => b.pendingCount - a.pendingCount);
 
   return rows;
+}
+
+export async function buildRoster(): Promise<RosterRow[]> {
+  const [learners, competencies, submissions] = await Promise.all([
+    prisma.user.findMany({ where: { role: "learner" } }),
+    prisma.competency.findMany({
+      orderBy: { number: "asc" },
+      include: { exercises: { select: { id: true } } },
+    }),
+    prisma.submission.findMany({
+      include: { exercise: { select: { competencyId: true } } },
+    }),
+  ]);
+
+  const competencyNumberByCompetencyId = new Map(
+    competencies.map((c) => [c.id, c.number]),
+  );
+
+  return aggregateRoster(
+    learners,
+    competencies.map((c) => ({
+      number: c.number,
+      exerciseCount: c.exercises.length,
+    })),
+    submissions.map((s) => ({
+      userId: s.userId,
+      competencyNumber:
+        competencyNumberByCompetencyId.get(s.exercise.competencyId) ?? -1,
+      status: s.status,
+      submittedAt: s.submittedAt,
+      startedAt: s.startedAt,
+    })),
+  );
 }
 
 export type PendingSubmission = {

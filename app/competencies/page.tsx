@@ -14,10 +14,10 @@ export default async function CompetenciesPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/" className="text-sm font-medium">
+      <Link href="/" className="text-sm font-medium text-accent hover:underline">
         ← Home
       </Link>
-      <h1 className="mt-4 mb-8 text-2xl font-semibold tracking-tight">
+      <h1 className="mt-4 mb-8 text-2xl font-semibold tracking-tight text-fg">
         Competencies
       </h1>
       <ol className="flex flex-col gap-3">
@@ -25,15 +25,15 @@ export default async function CompetenciesPage() {
           <li key={c.id}>
             <Link
               href={`/competencies/${c.number}`}
-              className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white px-5 py-4 hover:border-neutral-400"
+              className="flex items-center justify-between rounded-lg border border-line bg-canvas-subtle px-5 py-4 hover:border-fg-subtle"
             >
               <span className="flex items-center gap-4">
-                <span className="font-mono text-sm text-neutral-400">
+                <span className="font-mono text-sm text-fg-subtle">
                   {String(c.number).padStart(2, "0")}
                 </span>
-                <span className="font-medium">{c.title}</span>
+                <span className="font-medium text-fg">{c.title}</span>
               </span>
-              <span className="text-sm text-neutral-500">
+              <span className="text-sm text-fg-muted">
                 {c._count.exercises} exercises
               </span>
             </Link>
