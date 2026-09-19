@@ -11,6 +11,10 @@ import {
   evidenceChecklist,
   howToSteps,
 } from "@/lib/content";
+import { competencyStyle } from "@/lib/competency-style";
+import { competencyArtifacts } from "@/lib/competency-artifacts";
+import { ActivityFlow } from "../../ActivityFlow";
+import { HowToFlow } from "../../HowToFlow";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +40,9 @@ export default async function ExercisePage({
   });
   if (!exercise) notFound();
 
+  const artifacts = competencyArtifacts([exercise]);
+  const color = competencyStyle(competency.number).border;
+
   const session = await getServerSession(authOptions);
   const submission = await getSubmission(Number(session!.user.id), exercise.id);
   const status = submission?.status ?? "not_started";
@@ -47,7 +54,7 @@ export default async function ExercisePage({
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main className="mx-auto max-w-5xl px-6 py-12">
       <Link
         href={`/competencies/${competency.number}`}
         className="text-sm font-medium text-accent hover:underline"
@@ -75,6 +82,19 @@ export default async function ExercisePage({
       </section>
 
       <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
+        <h2 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
+          How This Exercise Flows
+        </h2>
+        <ActivityFlow
+          competencyNumber={competency.number}
+          title={exercise.title}
+          inputs={artifacts.inputs}
+          outputs={artifacts.outputs}
+          outputsTruncatedCount={artifacts.outputsTruncatedCount}
+        />
+      </section>
+
+      <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Project
         </h2>
@@ -97,11 +117,9 @@ export default async function ExercisePage({
         <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
           How To Go About It
         </h2>
-        <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-fg">
-          {howToSteps(exercise).map((step, i) => (
-            <li key={i}>{step}</li>
-          ))}
-        </ol>
+        <div className="mt-4">
+          <HowToFlow steps={howToSteps(exercise)} color={color} />
+        </div>
       </section>
 
       <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
