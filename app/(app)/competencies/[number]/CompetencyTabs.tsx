@@ -17,6 +17,9 @@ type ExerciseTabData = {
   durationLabel: string;
   howToSteps: string[];
   status: SubmissionStatus;
+  missionMarkdown: string;
+  projectNames: string[];
+  evidenceCount: number;
 };
 
 type Props = {
@@ -50,6 +53,7 @@ export function CompetencyTabs({
   exercises,
 }: Props) {
   const [tab, setTab] = useState<Tab>("Learn");
+  const [openExerciseId, setOpenExerciseId] = useState<number | null>(null);
   const color = competencyStyle(competencyNumber).border;
 
   return (
@@ -151,26 +155,73 @@ export function CompetencyTabs({
 
       {tab === "Exercises" && (
         <section className="mt-6">
+          <p className="mb-3 text-sm text-fg-muted">
+            Click the <span aria-hidden="true">ⓘ</span> to preview an
+            exercise&apos;s mission, real project, and evidence count before
+            opening it.
+          </p>
           <ol className="flex flex-col gap-2">
-            {exercises.map((ex) => (
-              <li key={ex.id}>
-                <Link
-                  href={`/competencies/${competencyNumber}/exercises/${ex.number}`}
-                  className="flex items-center justify-between rounded-lg border border-line bg-canvas-subtle px-5 py-3 hover:border-fg-subtle"
+            {exercises.map((ex) => {
+              const isOpen = openExerciseId === ex.id;
+              return (
+                <li
+                  key={ex.id}
+                  className="overflow-hidden rounded-lg border border-line bg-canvas-subtle"
                 >
-                  <span className="flex items-center gap-4">
-                    <span className="font-mono text-sm text-accent">
-                      {String(ex.number).padStart(2, "0")}
+                  <div className="flex items-center justify-between gap-3 px-5 py-3">
+                    <Link
+                      href={`/competencies/${competencyNumber}/exercises/${ex.number}`}
+                      className="flex min-w-0 flex-1 items-center gap-4 hover:opacity-90"
+                    >
+                      <span className="font-mono text-sm text-accent">
+                        {String(ex.number).padStart(2, "0")}
+                      </span>
+                      <span className="truncate font-medium text-fg">
+                        {ex.title}
+                      </span>
+                    </Link>
+                    <span className="flex shrink-0 items-center gap-3 text-sm text-fg-muted">
+                      {ex.durationLabel}
+                      <StatusBadge status={ex.status} />
+                      <button
+                        type="button"
+                        onClick={() => setOpenExerciseId(isOpen ? null : ex.id)}
+                        title="Preview this exercise"
+                        className={`rounded-full px-1.5 text-base ${
+                          isOpen ? "text-accent" : "text-fg-subtle hover:text-fg"
+                        }`}
+                      >
+                        <span aria-hidden="true">ⓘ</span>
+                      </button>
                     </span>
-                    <span className="font-medium text-fg">{ex.title}</span>
-                  </span>
-                  <span className="flex items-center gap-3 text-sm text-fg-muted">
-                    {ex.durationLabel}
-                    <StatusBadge status={ex.status} />
-                  </span>
-                </Link>
-              </li>
-            ))}
+                  </div>
+                  {isOpen && (
+                    <div
+                      className="border-t border-line px-5 py-4 text-sm"
+                      style={{ borderColor: color }}
+                    >
+                      <p className="whitespace-pre-line leading-relaxed text-fg">
+                        {ex.missionMarkdown}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-fg-muted">
+                        {ex.projectNames.length > 0 && (
+                          <span>
+                            📁 Real project:{" "}
+                            <code className="font-mono text-fg">
+                              {ex.projectNames.join(", ")}
+                            </code>
+                          </span>
+                        )}
+                        <span>
+                          ☑ {ex.evidenceCount} evidence item
+                          {ex.evidenceCount === 1 ? "" : "s"} required
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ol>
         </section>
       )}

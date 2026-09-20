@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { masteryBullets, toolkitTags, howToSteps } from "@/lib/content";
+import {
+  masteryBullets,
+  toolkitTags,
+  howToSteps,
+  evidenceChecklist,
+} from "@/lib/content";
 import { COMPETENCY_ICON, competencyStyle } from "@/lib/competency-style";
 import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { CompetencyTabs } from "./CompetencyTabs";
@@ -85,6 +90,9 @@ export default async function CompetencyPage({
             durationLabel: ex.durationLabel,
             howToSteps: howToSteps(ex),
             status: statusByExercise.get(ex.id) ?? "not_started",
+            missionMarkdown: ex.missionMarkdown,
+            projectNames: ex.projects.map((p) => p.displayName),
+            evidenceCount: evidenceChecklist(ex).length,
           }))}
         />
       </div>
