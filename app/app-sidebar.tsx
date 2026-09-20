@@ -43,12 +43,20 @@ export async function AppSidebar() {
           Profile
         </Link>
         {session?.user.role === "facilitator" && (
-          <Link
-            href="/admin/roster"
-            className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
-          >
-            Roster
-          </Link>
+          <>
+            <Link
+              href="/admin/roster"
+              className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
+            >
+              Roster
+            </Link>
+            <Link
+              href="/admin/users"
+              className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
+            >
+              Users
+            </Link>
+          </>
         )}
       </nav>
 

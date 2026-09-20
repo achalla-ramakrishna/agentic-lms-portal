@@ -1,5 +1,6 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { redirect, forbidden } from "next/navigation";
@@ -8,6 +9,7 @@ import { prisma } from "@/lib/db";
 import { getOrCreateSubmission } from "@/lib/submissions";
 import { evidenceChecklist } from "@/lib/content";
 import { canStart, canSubmitEvidence, canDecide, isValidDecision } from "@/lib/status";
+import type { Role } from "@prisma/client";
 
 async function requireUserId(): Promise<number> {
   const session = await getServerSession(authOptions);
@@ -146,4 +148,40 @@ export async function decideSubmission(formData: FormData) {
   );
   revalidatePath("/admin/roster");
   redirect("/admin/roster");
+}
+
+// The only way an account gets made — no self-signup (docs/SPEC.md §1
+// out-of-scope, resolved by adding this instead). The facilitator sets a
+// temporary password directly rather than the app emailing one, matching
+// this app's existing no-email-integration stance (ADR 0002 Q4/Q6) —
+// they share it with the new user out of band.
+export async function createUser(formData: FormData) {
+  await requireFacilitatorId();
+
+  const name = String(formData.get("name") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const password = String(formData.get("password") || "");
+  const role = formData.get("role");
+
+  if (
+    !name ||
+    !email ||
+    password.length < 8 ||
+    (role !== "learner" && role !== "facilitator")
+  ) {
+    redirect("/admin/users?error=invalid");
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    redirect("/admin/users?error=email_taken");
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.create({
+    data: { name, email, passwordHash, role: role as Role },
+  });
+
+  revalidatePath("/admin/users");
+  redirect("/admin/users?created=1");
 }
