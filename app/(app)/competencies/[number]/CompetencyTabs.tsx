@@ -133,23 +133,64 @@ export function CompetencyTabs({
           <p className="text-sm text-fg-muted">
             Each exercise&apos;s own steps, collected here so you can see the
             competency&apos;s whole method at a glance before picking one.
+            Click the <span aria-hidden="true">ⓘ</span> for its mission, real
+            project, and evidence count.
           </p>
-          {exercises.map((ex) => (
-            <div
-              key={ex.id}
-              className="rounded-xl border border-line bg-canvas-subtle p-6"
-            >
-              <Link
-                href={`/competencies/${competencyNumber}/exercises/${ex.number}`}
-                className="text-sm font-medium text-accent hover:underline"
+          {exercises.map((ex) => {
+            const isOpen = openExerciseId === ex.id;
+            return (
+              <div
+                key={ex.id}
+                className="rounded-xl border border-line bg-canvas-subtle p-6"
               >
-                {String(ex.number).padStart(2, "0")} {ex.title}
-              </Link>
-              <div className="mt-4">
-                <HowToFlow steps={ex.howToSteps} color={color} />
+                <div className="flex items-center justify-between gap-3">
+                  <Link
+                    href={`/competencies/${competencyNumber}/exercises/${ex.number}`}
+                    className="text-sm font-medium text-accent hover:underline"
+                  >
+                    {String(ex.number).padStart(2, "0")} {ex.title}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setOpenExerciseId(isOpen ? null : ex.id)}
+                    title="Preview this exercise"
+                    className={`rounded-full px-1.5 text-base ${
+                      isOpen ? "text-accent" : "text-fg-subtle hover:text-fg"
+                    }`}
+                  >
+                    <span aria-hidden="true">ⓘ</span>
+                  </button>
+                </div>
+                {isOpen && (
+                  <div
+                    className="mt-3 rounded-lg border-t px-4 py-3 text-sm"
+                    style={{ borderColor: color }}
+                  >
+                    <p className="whitespace-pre-line leading-relaxed text-fg">
+                      {ex.missionMarkdown}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-fg-muted">
+                      {ex.projectNames.length > 0 && (
+                        <span>
+                          📁 Real project:{" "}
+                          <code className="font-mono text-fg">
+                            {ex.projectNames.join(", ")}
+                          </code>
+                        </span>
+                      )}
+                      <span>
+                        ☑ {ex.evidenceCount} evidence item
+                        {ex.evidenceCount === 1 ? "" : "s"} required
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="mt-4">
+                  <HowToFlow steps={ex.howToSteps} color={color} />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
       )}
 
