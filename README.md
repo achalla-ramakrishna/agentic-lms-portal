@@ -49,27 +49,27 @@ Neither source is vendored into this repo. Then re-run `npm run db:seed`
 SQLite is a file on disk (see ADR 0001), so it needs a host with a
 persistent volume — Vercel's serverless filesystem won't keep writes
 across requests. `railway.json` in this repo already sets the build and
-start commands (`prisma migrate deploy` runs automatically on every
-start), so the manual steps are just the account-level pieces Railway
-requires through its own UI:
+start commands (`prisma migrate deploy` and `db:seed` both run
+automatically on every start — `db:seed` is a pure upsert by
+competency number / exercise slug / user email, see prisma/seed.ts, so
+re-running it never touches or resets learner submissions), so the
+manual steps are just the account-level pieces Railway requires
+through its own UI:
 
 1. [railway.app](https://railway.app) → sign in with GitHub → **New
    Project → Deploy from GitHub repo** → this repo, `main` branch.
 2. Service → Settings → **Volumes** → add one, mount path `/data`.
-3. Service → **Variables**:
+3. Service → Settings → Networking → **Generate Domain** (confirm the
+   target port matches whatever the Deploy Log shows Next.js listening
+   on, e.g. `8080` — Railway assigns it via `$PORT`).
+4. Service → **Variables**:
    ```
    DATABASE_URL=file:/data/prod.db
    NEXTAUTH_SECRET=<openssl rand -base64 32>
-   NEXTAUTH_URL=https://<filled in after step 4>
+   NEXTAUTH_URL=https://<the domain from step 3>
    ```
-4. Service → Settings → Networking → **Generate Domain**, then paste
-   that URL into `NEXTAUTH_URL` above and redeploy.
-5. Seed once (not on every deploy, so later submissions/roster data
-   aren't wiped by a redeploy):
-   ```bash
-   npm i -g @railway/cli && railway login && railway link
-   railway run npm run db:seed
-   ```
+5. Save — Railway redeploys automatically. Watch **Deploy Logs** for
+   "Ready" with no errors.
 
 The generated domain is the link to share. Demo accounts are the same
 ones listed above — fine for an internal walkthrough, not something to
