@@ -10,6 +10,7 @@ import {
 } from "@/lib/artifact-icons";
 import { matchToolkitTagDocs, type ToolkitDoc } from "@/lib/toolkit-doc-links";
 import { artifactGlossaryEntry } from "@/lib/artifact-glossary";
+import { artifactTemplateEntry } from "@/lib/artifact-templates";
 import { GuidanceDocs } from "./GuidanceDocs";
 
 // Swimlane rendering of a competency's toolkitTags: each lane is a real
@@ -18,14 +19,17 @@ import { GuidanceDocs } from "./GuidanceDocs";
 // like the RUP reference's "Analysis"/"Design" — grouping by the type of
 // thing the tag actually is (a guardrail, a test tool, a doc, ...).
 //
-// Every tag is clickable, but what it opens is honest about its source:
-// - A tag with a real ingested file (docs/*.md, or a real SKILL.md found
-//   anywhere in the exercise tree — scripts/generate-seed.mjs) opens that
-//   actual file, styled in accent color with "↗" — a genuine example.
-// - Every other tag opens a short, general "what is this" explanation
-//   (lib/artifact-glossary.ts — real, established terminology, not
-//   invented for this exercise) styled plainly with "ⓘ" — never dressed
-//   up to look like it came from the learner's own repo.
+// Every tag is clickable, but what it opens is honest about its source —
+// three tiers, checked in order:
+// 1. A real ingested file (docs/*.md, or a real SKILL.md found anywhere
+//    in the exercise tree) — opens that actual file. Accent color, "↗".
+// 2. A reference template (lib/artifact-templates.ts) — a real, usable
+//    template plus a worked example, in the RUP sense: authored
+//    reference material for a well-established convention (MADR, EARS,
+//    the AGENTS.md spec, ...), never claimed to be pulled from the
+//    learner's own repo. Distinct color, "📋".
+// 3. Otherwise, a short "what is this" glossary explanation. Plain
+//    color, "ⓘ".
 export function ToolkitHub({
   competencyNumber,
   tags,
@@ -42,7 +46,12 @@ export function ToolkitHub({
   const palette = competencyStyle(competencyNumber);
   const lanes = groupToolkitTags(tags);
   const openMatches = openTag ? matchToolkitTagDocs(openTag, docs) : [];
-  const openGlossary = openTag && openMatches.length === 0 ? artifactGlossaryEntry(openTag) : undefined;
+  const openTemplate =
+    openTag && openMatches.length === 0 ? artifactTemplateEntry(openTag) : undefined;
+  const openGlossary =
+    openTag && openMatches.length === 0 && !openTemplate
+      ? artifactGlossaryEntry(openTag)
+      : undefined;
 
   return (
     <div className="flex flex-col gap-3">
@@ -64,8 +73,9 @@ export function ToolkitHub({
             {lane.tags.map((tag) => {
               const matches = matchToolkitTagDocs(tag, docs);
               const hasMatch = matches.length > 0;
-              const glossary = artifactGlossaryEntry(tag);
-              const clickable = hasMatch || !!glossary;
+              const template = hasMatch ? undefined : artifactTemplateEntry(tag);
+              const glossary = hasMatch || template ? undefined : artifactGlossaryEntry(tag);
+              const clickable = hasMatch || !!template || !!glossary;
               const isOpen = openTag === tag;
               return (
                 <button
@@ -76,9 +86,11 @@ export function ToolkitHub({
                   title={
                     hasMatch
                       ? `See ${matches.length} real ${tag} example${matches.length > 1 ? "s" : ""} from this competency's exercises`
-                      : glossary
-                        ? `What is ${tag}?`
-                        : undefined
+                      : template
+                        ? `See a reference template + worked example for ${tag}`
+                        : glossary
+                          ? `What is ${tag}?`
+                          : undefined
                   }
                   className={`flex w-20 flex-col items-center gap-1.5 rounded-xl ${
                     clickable ? "cursor-pointer" : "cursor-default"
@@ -98,12 +110,18 @@ export function ToolkitHub({
                   </span>
                   <span
                     className={`text-center text-[10px] leading-tight ${
-                      hasMatch ? "font-semibold text-accent" : "font-medium text-fg"
+                      hasMatch
+                        ? "font-semibold text-accent"
+                        : template
+                          ? "font-semibold"
+                          : "font-medium text-fg"
                     }`}
+                    style={template ? { color: palette.text } : undefined}
                   >
                     {tag}
                     {hasMatch && <span aria-hidden="true"> ↗</span>}
-                    {!hasMatch && glossary && <span aria-hidden="true"> ⓘ</span>}
+                    {!hasMatch && template && <span aria-hidden="true"> 📋</span>}
+                    {!hasMatch && !template && glossary && <span aria-hidden="true"> ⓘ</span>}
                   </span>
                 </button>
               );
@@ -131,6 +149,32 @@ export function ToolkitHub({
             </button>
           </div>
           <GuidanceDocs docs={openMatches} />
+        </div>
+      )}
+
+      {openTag && openTemplate && (
+        <div className="rounded-2xl border-2 p-4" style={{ borderColor: palette.border }}>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h4
+              className="text-xs font-semibold uppercase tracking-wide"
+              style={{ color: palette.text }}
+            >
+              Reference Template: {openTag}
+            </h4>
+            <button
+              type="button"
+              onClick={() => setOpenTag(null)}
+              className="shrink-0 text-xs text-fg-subtle hover:text-fg"
+            >
+              ✕ Close
+            </button>
+          </div>
+          <p className="mb-3 text-sm leading-relaxed text-fg-muted">{openTemplate.intro}</p>
+          <p className="mb-3 text-xs text-fg-subtle">
+            A reusable template you can adapt to your own project — not a file from your
+            specific exercise repo.
+          </p>
+          <GuidanceDocs docs={openTemplate.docs} />
         </div>
       )}
 

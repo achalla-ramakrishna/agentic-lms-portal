@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 type GuidanceDoc = {
-  id: number;
+  id: number | string;
   filename: string;
   title: string;
   content: string;
@@ -17,7 +17,7 @@ type GuidanceDoc = {
 // (tables, headings) since several of these are literally fill-in-the-blank
 // evidence templates with real tables the learner needs to read as tables.
 export function GuidanceDocs({ docs }: { docs: GuidanceDoc[] }) {
-  const [openId, setOpenId] = useState<number | null>(docs[0]?.id ?? null);
+  const [openId, setOpenId] = useState<number | string | null>(docs[0]?.id ?? null);
 
   if (docs.length === 0) return null;
 
