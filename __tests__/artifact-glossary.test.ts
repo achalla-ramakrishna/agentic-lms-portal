@@ -28,4 +28,12 @@ describe("artifactGlossaryEntry", () => {
       expect(text.length, `entry for "${tag}" is too short`).toBeGreaterThan(20);
     }
   });
+
+  it("covers the recurring before/after evidence-protocol artifacts", () => {
+    expect(artifactGlossaryEntry("evidence/before.md")).toBeDefined();
+    expect(artifactGlossaryEntry("evidence/after.md")).toBeDefined();
+    expect(artifactGlossaryEntry("evidence/before.patch")).toBeDefined();
+    expect(artifactGlossaryEntry("evidence/after.patch")).toBeDefined();
+    expect(artifactGlossaryEntry("evidence/comparison.md")).toBeDefined();
+  });
 });

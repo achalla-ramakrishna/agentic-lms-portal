@@ -8,9 +8,8 @@ import {
   artifactCategory,
   groupToolkitTags,
 } from "@/lib/artifact-icons";
-import { matchToolkitTagDocs, type ToolkitDoc } from "@/lib/toolkit-doc-links";
-import { artifactGlossaryEntry } from "@/lib/artifact-glossary";
-import { artifactTemplateEntry } from "@/lib/artifact-templates";
+import type { ToolkitDoc } from "@/lib/toolkit-doc-links";
+import { resolveArtifactTag } from "@/lib/artifact-lookup";
 import { GuidanceDocs } from "./GuidanceDocs";
 
 // Swimlane rendering of a competency's toolkitTags: each lane is a real
@@ -45,13 +44,10 @@ export function ToolkitHub({
 
   const palette = competencyStyle(competencyNumber);
   const lanes = groupToolkitTags(tags);
-  const openMatches = openTag ? matchToolkitTagDocs(openTag, docs) : [];
-  const openTemplate =
-    openTag && openMatches.length === 0 ? artifactTemplateEntry(openTag) : undefined;
-  const openGlossary =
-    openTag && openMatches.length === 0 && !openTemplate
-      ? artifactGlossaryEntry(openTag)
-      : undefined;
+  const openResolution = openTag ? resolveArtifactTag(openTag, docs) : undefined;
+  const openMatches = openResolution?.matches ?? [];
+  const openTemplate = openResolution?.template;
+  const openGlossary = openResolution?.glossary;
 
   return (
     <div className="flex flex-col gap-3">
@@ -71,11 +67,8 @@ export function ToolkitHub({
           </div>
           <div className="flex flex-1 flex-wrap gap-4">
             {lane.tags.map((tag) => {
-              const matches = matchToolkitTagDocs(tag, docs);
+              const { matches, template, glossary, clickable } = resolveArtifactTag(tag, docs);
               const hasMatch = matches.length > 0;
-              const template = hasMatch ? undefined : artifactTemplateEntry(tag);
-              const glossary = hasMatch || template ? undefined : artifactGlossaryEntry(tag);
-              const clickable = hasMatch || !!template || !!glossary;
               const isOpen = openTag === tag;
               return (
                 <button

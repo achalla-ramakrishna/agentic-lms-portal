@@ -95,6 +95,7 @@ export default async function ExercisePage({
           inputs={artifacts.inputs}
           outputs={artifacts.outputs}
           outputsTruncatedCount={artifacts.outputsTruncatedCount}
+          docs={exercise.guidanceDocs}
         />
       </section>
 

@@ -58,6 +58,18 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "strangler pattern": "A migration strategy that routes traffic to a new implementation incrementally, piece by piece, while the old system keeps running underneath, until it can be fully retired.",
   "session logs": "The recorded transcript of an agent session — every prompt, tool call, and result — used afterward to review what the agent actually did.",
   agenttrace: "A named tool referenced in this competency's guidebook for capturing and analyzing agent session traces.",
+
+  // The recurring before/after evidence protocol: nearly every exercise
+  // in this curriculum (29-35 of 35, per content/seed.json's evidence
+  // checklists) asks for this same five-file pattern — run once without
+  // the change, capture it as "before", run again with it, capture
+  // "after", then write up what the comparison shows. Real, established
+  // structure of this exercise set, not invented per-exercise.
+  "evidence/before.md": "The write-up of the first, unmodified run — what you gave the agent, what it produced, and what was wrong with it. The baseline every later improvement is measured against.",
+  "evidence/after.md": "The write-up of the second run, made after your change (a new AGENTS.md, a guardrail, a skill, a fix) — what the agent produced this time, under the same conditions as the \"before\" run.",
+  "evidence/before.patch": "The actual code diff produced by the first, unmodified run — the raw evidence behind evidence/before.md's write-up, not just a description of it.",
+  "evidence/after.patch": "The actual code diff produced by the second run, after your change — the raw evidence behind evidence/after.md's write-up.",
+  "evidence/comparison.md": "The write-up connecting the before and after runs — which specific problems improved, which didn't, and why, tying the comparison back to what you actually changed.",
 };
 
 export function artifactGlossaryEntry(tag: string): string | undefined {

@@ -112,6 +112,7 @@ export function CompetencyTabs({
               inputs={inputArtifacts}
               outputs={outputArtifacts}
               outputsTruncatedCount={outputArtifactsTruncatedCount}
+              docs={toolkitDocs}
             />
           </div>
 
