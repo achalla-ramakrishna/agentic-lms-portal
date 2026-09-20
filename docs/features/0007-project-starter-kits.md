@@ -100,19 +100,37 @@ learner copy a template today.
    Security, Kafka; Node/Express: Express, Prisma, PostgreSQL, Redis,
    BullMQ, JWT auth). Mirrors start.spring.io's own dependency-picker UX,
    minus the "generate zip" step.
-4. **Step 3 — Domain / rigor tier**: Simple / Standard / Regulated (the
-   "todo app vs. banking app" distinction from the request). Affects
-   which guardrail rules and which extra ADRs get included (e.g.
-   Regulated adds an audit-trail ADR and stricter blocked-command
-   defaults; Simple keeps the guardrail policy minimal).
-5. On submit: renders the generated kit using the same `GuidanceDocs`
+4. **Step 3 — External integrations**: multi-select from a stack-agnostic
+   list (payment gateway, SSO/legacy identity provider, third-party API,
+   file/object storage, messaging/notifications). Each selection is a
+   real, known integration pattern with its own concerns — not free
+   text, so it composes the same deterministic way dependencies do.
+5. **Step 4 — NFRs & constraints**: multi-select (high availability, low
+   latency, GDPR, HIPAA, PCI-DSS, high throughput). This is the "todo app
+   vs. banking app" distinction made concrete and selectable rather than
+   a single vague rigor label — a compliance selection here adds its own
+   dedicated ADR and guardrails regardless of the rigor tier chosen next.
+6. **Step 5 — Testing strategy**: multi-select (TDD, contract testing for
+   the integrations picked in Step 3, end-to-end via Playwright/Cypress,
+   a minimum coverage gate, characterization tests for brownfield work).
+   Grounded in content this app already has and has already verified —
+   `lib/artifact-glossary.ts` has real entries for "characterization
+   tests," "role locators," Playwright, and API mocks from Competency 04
+   (Test Automation) — this step reuses that understanding rather than
+   inventing a parallel definition of what good testing looks like.
+7. **Step 6 — Domain / rigor tier**: Simple / Standard / Regulated. Acts
+   as the overall strictness dial layered on top of Steps 3–5's specific
+   selections — e.g. Regulated tightens default blocked-command lists
+   and adds an audit-trail ADR on top of whatever integrations/NFRs/
+   testing choices already added, rather than overlapping with them.
+8. On submit: renders the generated kit using the same `GuidanceDocs`
    collapsible/copy component already used for every other template in
    this app — no new rendering component needed.
-6. Each generated doc is composed from small, reusable, stack/dependency-
-   tagged fragments (see Data model) rather than one giant per-stack
-   template — this is what makes "grows slowly" actually true: adding a
-   new dependency later means adding a fragment, not rewriting a
-   monolithic template per stack.
+9. Each generated doc is composed from small, reusable fragments tagged
+   by stack, dependency, integration, NFR, or testing choice (see Data
+   model) rather than one giant per-stack template — this is what makes
+   "grows slowly" actually true: adding a new fragment later means
+   adding data, not rewriting a monolithic template.
 
 ## Data model
 
@@ -141,15 +159,45 @@ content/stack-catalog.json
       "guardrailRules": { "approvalCommands": ["kafka-topics.sh --delete"], ... }
     },
     ...
+  ],
+  "integrations": [
+    {
+      "id": "payment-gateway",
+      "label": "Payment gateway (Stripe/Adyen/etc.)",
+      "architectureConcerns": "Idempotent charge processing (dedupe via idempotency keys), webhook signature verification, retry/reconciliation for failed charges, PCI-DSS scope minimization — never store raw card data.",
+      "guardrailRules": { "blockedPaths": ["direct writes to a payments/transactions table outside the payment service layer"] }
+    },
+    { "id": "sso-identity", "label": "SSO / legacy identity provider (SAML/OIDC/LDAP)", "architectureConcerns": "Token validation, session fixation, clock-skew tolerance, mapping external claims to internal roles safely — never trust an external \"isAdmin\" claim without an internal allowlist." },
+    { "id": "third-party-api", "label": "Third-party API dependency", "architectureConcerns": "Rate-limit/backoff, timeout budgets, circuit breaking so a dependency outage doesn't cascade, versioning/contract drift from the vendor." },
+    { "id": "file-storage", "label": "File/object storage (S3/Blob/GCS)", "architectureConcerns": "Presigned-URL expiry, no public-by-default bucket ACLs, malware scanning for user uploads, lifecycle policies." },
+    { "id": "messaging-notifications", "label": "Messaging/notifications (email/SMS/push)", "architectureConcerns": "Delivery is at-most/at-least-once, never exactly-once — downstream logic must tolerate re-sends; consent/opt-out tracking." }
+  ],
+  "nfrs": [
+    { "id": "high-availability", "label": "High availability (99.9%+)", "architectureConcerns": "No single point of failure, health checks + graceful degradation, backward-compatible migrations for zero-downtime deploys." },
+    { "id": "low-latency", "label": "Low latency (sub-200ms)", "architectureConcerns": "N+1 query avoidance, cache-invalidation correctness, no synchronous blocking calls in the hot path." },
+    { "id": "gdpr", "label": "GDPR compliance", "architectureConcerns": "Real right-to-erasure (not a soft-delete flag), data minimization, consent tracking, EU data residency.", "extraAdr": "data-retention-erasure" },
+    { "id": "hipaa", "label": "HIPAA compliance (health data)", "architectureConcerns": "PHI encrypted at rest/in transit, audit log on every PHI access, minimum-necessary access.", "extraAdr": "phi-audit-logging" },
+    { "id": "pci-dss", "label": "PCI-DSS compliance (card payments)", "architectureConcerns": "Never store full card numbers/CVV, cardholder-data-environment network segmentation.", "extraAdr": "cardholder-data-handling" },
+    { "id": "high-throughput", "label": "High throughput (>10k req/s)", "architectureConcerns": "Horizontal scalability of stateless services, backpressure handling, avoiding a single-writer bottleneck." }
+  ],
+  "testingStrategies": [
+    { "id": "tdd", "label": "Test-Driven Development", "architectureConcerns": "Red-green-refactor documented in conventions.md; guardrail requires test-file changes alongside implementation changes." },
+    { "id": "contract-testing", "label": "Contract testing for integrations", "architectureConcerns": "Verifies the real request/response shape expected from each selected external integration, catching breaking changes at the boundary." },
+    { "id": "e2e-playwright", "label": "End-to-end testing (Playwright/Cypress)", "architectureConcerns": "Critical-path coverage through the real UI; role-locator convention (see this app's own artifact-glossary.ts \"role locators\" entry)." },
+    { "id": "coverage-gate", "label": "Minimum coverage gate", "architectureConcerns": "A real, chosen threshold recorded in its own ADR, enforced in CI — not an aspirational number." },
+    { "id": "characterization-tests", "label": "Characterization tests (brownfield/legacy)", "architectureConcerns": "Locks in existing undocumented behavior before refactoring (see this app's own artifact-glossary.ts \"characterization tests\" entry, from Competency 11)." }
   ]
 }
 ```
 
 `lib/artifact-templates.ts`'s doc-building functions become parameterized
-(take a stack + selected dependencies + rigor tier, interpolate the
-stack's real test/build commands and each dependency's real concerns)
-instead of returning fixed strings — an extension of the existing module,
-not a parallel one.
+(take a stack + selected dependencies + integrations + NFRs + testing
+strategies + rigor tier, interpolate each selection's real concerns and
+guardrail rules) instead of returning fixed strings — an extension of the
+existing module, not a parallel one. A compliance NFR's `extraAdr` field
+means "always add this ADR, regardless of rigor tier" — e.g. picking GDPR
+adds a data-retention ADR even at the Simple tier, because compliance
+isn't optional just because the rest of the project is simple.
 
 ## Implementation
 
@@ -158,9 +206,10 @@ not a parallel one.
   fragment must be non-trivial length) — same test discipline as
   `artifact-templates.test.ts`.
 - `lib/stack-kit.ts` (new): `buildStarterKit(stackId, dependencyIds,
-  rigorTier)` → the same `ArtifactTemplateDoc[]` shape `GuidanceDocs`
-  already renders, so no new UI component is needed.
-- `app/starter-kit/page.tsx` + a small client wizard component (3 steps,
+  integrationIds, nfrIds, testingIds, rigorTier)` → the same
+  `ArtifactTemplateDoc[]` shape `GuidanceDocs` already renders, so no new
+  UI component is needed.
+- `app/starter-kit/page.tsx` + a small client wizard component (6 steps,
   local component state — no new server state needed since nothing is
   persisted in v1).
 - No schema changes — v1 generates and displays; it doesn't save
@@ -169,19 +218,26 @@ not a parallel one.
 
 ## Acceptance criteria
 
-- [ ] Every dependency listed under a stack in the catalog has a
-  corresponding fragment — no dead references (mirrors the existing
-  `artifact-templates.test.ts` no-dead-keys pattern).
+- [ ] Every dependency/integration/NFR/testing strategy listed under a
+  stack in the catalog has a corresponding fragment — no dead references
+  (mirrors the existing `artifact-templates.test.ts` no-dead-keys
+  pattern), across all four catalogs, not just dependencies.
 - [ ] Every stack's `ADR-0001-stack-choice.md` output is genuinely filled
   in with that stack's real name/build/test commands, not a blank
   template — it's recording the decision the wizard just made.
 - [ ] Choosing the Regulated rigor tier visibly changes the generated
   guardrail policy (more blocked/approval commands) and adds at least
   one extra ADR compared to Simple, for the same stack/dependencies.
+- [ ] Choosing a compliance NFR (GDPR/HIPAA/PCI-DSS) adds its `extraAdr`
+  regardless of rigor tier — verified at the Simple tier specifically,
+  since that's the case most likely to be silently dropped by mistake.
+- [ ] Choosing an integration in Step 3 and "Contract testing" in Step 5
+  produces a contract-testing fragment that actually names that specific
+  integration, not a generic "add contract tests" placeholder.
 - [ ] The generated kit renders through the existing `GuidanceDocs`
   component with working Copy buttons — no new rendering component.
-- [ ] `npm run build` succeeds; `npm test` covers the catalog's
-  integrity (no dead dependency references, no empty fragments).
+- [ ] `npm run build` succeeds; `npm test` covers all four catalogs'
+  integrity (no dead references, no empty fragments).
 
 ## v2 — LLM-assisted drafting from uploaded context
 
@@ -200,9 +256,10 @@ the deploy env vars got debugged one variable at a time, not all at
 once).
 
 **Flow:**
-1. Same Step 1–3 wizard as v1 (stack, dependencies, rigor tier), plus a
-   free-text questionnaire (a handful of open questions: what problem
-   this solves, who the users are, known constraints/deadlines, existing
+1. Same Step 1–6 wizard as v1 (stack, dependencies, integrations, NFRs/
+   constraints, testing strategy, rigor tier), plus a free-text
+   questionnaire (a handful of open questions: what problem this solves,
+   who the users are, known constraints/deadlines, existing
    team conventions if any) and an optional upload of existing documents
    (a requirements doc, an existing architecture doc, anything they have
    — pasted text or a small file, not a full document-management system).
@@ -284,3 +341,20 @@ once).
 - **D5 — Persistence**: v1 stays stateless (regenerate-on-demand, no
   schema change); v2 needs the `StarterKitDraft` table described above
   — deferred to v2 by construction, not a separate decision to make now.
+- **D6 — v1 starting integrations catalog (proposed)**: payment gateway,
+  SSO/legacy identity provider, third-party API, file/object storage,
+  messaging/notifications — five, stack-agnostic (they compose with any
+  of the four stacks the same way), each with a real architecture
+  concern and at least one concrete guardrail rule.
+- **D7 — v1 starting NFRs/constraints catalog (proposed)**: high
+  availability, low latency, GDPR, HIPAA, PCI-DSS, high throughput — six,
+  covering both performance NFRs and the three compliance regimes most
+  likely to come up. Each compliance one carries an `extraAdr` that's
+  added regardless of rigor tier (D2's "todo app vs. banking app" point
+  made literal: compliance isn't optional at the Simple tier).
+- **D8 — v1 starting testing-strategy catalog (proposed)**: TDD, contract
+  testing, end-to-end (Playwright/Cypress), a minimum coverage gate,
+  characterization tests — five, deliberately reusing the real content
+  already verified in `lib/artifact-glossary.ts` (role locators from
+  Competency 04, characterization tests from Competency 11) rather than
+  defining testing concepts a second, possibly inconsistent way.
