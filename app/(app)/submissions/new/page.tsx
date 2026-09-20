@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -5,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { getSubmission } from "@/lib/submissions";
 import { evidenceChecklist } from "@/lib/content";
 import { saveSubmission } from "@/app/actions";
+import { canSubmitEvidence } from "@/lib/status";
 import { competencyArtifacts } from "@/lib/competency-artifacts";
 import { ActivityFlow } from "../../competencies/[number]/ActivityFlow";
 import { GuidanceDocs } from "../../competencies/[number]/GuidanceDocs";
@@ -34,6 +36,36 @@ export default async function NewSubmissionPage({
 
   const session = await getServerSession(authOptions);
   const existing = await getSubmission(Number(session!.user.id), exercise.id);
+
+  // Locked once it's out of the learner's hands (submitted, awaiting
+  // review) or already decided (passed) — canSubmitEvidence is the same
+  // rule saveSubmission enforces server-side, so this page can never show
+  // an editable form the action would then reject. Checked here, before
+  // rendering anything, rather than letting the learner fill the whole
+  // form out and discover it on submit.
+  if (existing && !canSubmitEvidence(existing.status)) {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-24 text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-fg">
+          {existing.status === "passed"
+            ? "Already passed"
+            : "Already submitted"}
+        </h1>
+        <p className="mt-3 text-fg-muted">
+          {existing.status === "passed"
+            ? "You've already passed this exercise, so there's nothing left to submit."
+            : "This exercise is already submitted and waiting on a facilitator's review — it can't be edited until they decide on it."}
+        </p>
+        <Link
+          href={`/submissions/${existing.id}`}
+          className="mt-6 inline-block text-sm font-medium text-accent hover:underline"
+        >
+          View submission →
+        </Link>
+      </main>
+    );
+  }
+
   const existingArtifacts = existing
     ? await prisma.evidenceArtifact.findMany({
         where: { submissionId: existing.id },
