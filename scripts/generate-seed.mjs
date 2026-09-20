@@ -84,19 +84,51 @@ function readGuidanceDocs(exerciseDir) {
     }
   }
 
-  return mdFiles
-    .map((relPath) => {
-      const content = readFileSync(join(docsDir, relPath), "utf8").trim();
-      return { filename: relPath, title: deriveDocTitle(relPath, content), content };
-    })
-    .sort((a, b) => {
-      // evidence-template.md first (the one every exercise has, most
-      // directly tied to the required evidence artifacts), then A-Z.
-      const aFirst = a.filename.toLowerCase() === "evidence-template.md";
-      const bFirst = b.filename.toLowerCase() === "evidence-template.md";
-      if (aFirst !== bFirst) return aFirst ? -1 : 1;
-      return a.filename.localeCompare(b.filename);
-    });
+  const docsResults = mdFiles.map((relPath) => {
+    const content = readFileSync(join(docsDir, relPath), "utf8").trim();
+    return { filename: relPath, title: deriveDocTitle(relPath, content), content };
+  });
+
+  // Real SKILL.md files live inside each exercise's actual skill packages
+  // (e.g. .agents/skills/release-notes-skill-factory/SKILL.md,
+  // skill-trigger-app/skills/change-review/SKILL.md) — not under docs/, but
+  // exactly the kind of real artifact the "SKILL.md" toolkit tag should be
+  // able to point to. Walks the whole exercise folder (skipping
+  // node_modules/dotfiles) since these paths vary per exercise.
+  const skillPaths = [];
+  findFilesNamed(exerciseDir, "skill.md", exerciseDir, skillPaths);
+  const skillResults = skillPaths.map((relPath) => {
+    const content = readFileSync(join(exerciseDir, relPath), "utf8").trim();
+    return { filename: relPath, title: deriveDocTitle(relPath, content), content };
+  });
+
+  return [...docsResults, ...skillResults].sort((a, b) => {
+    // evidence-template.md first (the one every exercise has, most
+    // directly tied to the required evidence artifacts), then A-Z.
+    const aFirst = a.filename.toLowerCase() === "evidence-template.md";
+    const bFirst = b.filename.toLowerCase() === "evidence-template.md";
+    if (aFirst !== bFirst) return aFirst ? -1 : 1;
+    return a.filename.localeCompare(b.filename);
+  });
+}
+
+function findFilesNamed(dir, lowerFilename, rootDir, results) {
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    if (entry.name === "node_modules" || entry.name.startsWith(".git")) continue;
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      findFilesNamed(fullPath, lowerFilename, rootDir, results);
+    } else if (entry.isFile() && entry.name.toLowerCase() === lowerFilename) {
+      const relPath = posix.relative(rootDir.replaceAll("\\", "/"), fullPath.replaceAll("\\", "/"));
+      results.push(relPath);
+    }
+  }
 }
 
 // ---------- 1. parse root README.md index table ----------

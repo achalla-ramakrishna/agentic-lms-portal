@@ -60,7 +60,7 @@ model ExerciseGuidanceDoc {
   id         Int      @id @default(autoincrement())
   exerciseId Int
   exercise   Exercise @relation(fields: [exerciseId], references: [id])
-  filename   String // relative to the exercise's docs/ folder, e.g. "context-sources/AGENTS.md"
+  filename   String // relative to the exercise's docs/ folder for most docs (e.g. "context-sources/AGENTS.md"), or relative to the exercise root for real SKILL.md files found elsewhere in its tree (e.g. ".agents/skills/release-notes/SKILL.md")
   title      String
   content    String
   sortOrder  Int

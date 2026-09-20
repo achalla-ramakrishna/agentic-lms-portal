@@ -7,6 +7,7 @@ import { ToolkitHub } from "./ToolkitHub";
 import { HowToFlow } from "./HowToFlow";
 import { ActivityFlow } from "./ActivityFlow";
 import { competencyStyle } from "@/lib/competency-style";
+import type { ToolkitDoc } from "@/lib/toolkit-doc-links";
 import type { SubmissionStatus } from "@prisma/client";
 
 type ExerciseTabData = {
@@ -25,6 +26,7 @@ type Props = {
   masteryBullets: string[];
   commonMistakeMarkdown: string;
   toolkitTags: string[];
+  toolkitDocs: ToolkitDoc[];
   inputArtifacts: string[];
   outputArtifacts: string[];
   outputArtifactsTruncatedCount: number;
@@ -41,6 +43,7 @@ export function CompetencyTabs({
   masteryBullets,
   commonMistakeMarkdown,
   toolkitTags,
+  toolkitDocs,
   inputArtifacts,
   outputArtifacts,
   outputArtifactsTruncatedCount,
@@ -112,7 +115,11 @@ export function CompetencyTabs({
             <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted">
               Toolkit
             </h3>
-            <ToolkitHub competencyNumber={competencyNumber} tags={toolkitTags} />
+            <ToolkitHub
+              competencyNumber={competencyNumber}
+              tags={toolkitTags}
+              docs={toolkitDocs}
+            />
           </div>
         </section>
       )}

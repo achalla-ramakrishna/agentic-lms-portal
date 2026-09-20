@@ -918,6 +918,11 @@
           "content": "# Progressive Disclosure Release Skill Evidence\n\nReplace every prompt with observed information. Do not infer resource access or verification results.\n\n## before.md and after.md\n\n- Agent: [name]\n- Model: [model and version]\n- Other tools: [enabled tools]\n- Permissions: [permission mode]\n- Time limit: [time limit]\n- Prompt: Create customer release notes for `exercise-base..origin/exercise-head`. Trace every published item to Git, identify breaking and migration impact, report missing verification evidence, and exclude internal-only work.\n- Repository commit: [40-character SHA]\n- Attempt: 1\n- Release-notes skill: [disabled or enabled]\n- Input context: [exact files or skill path provided]\n- Context bytes: [exact UTF-8 byte total from npm run context:measure]\n- Output: [before-output.md or after-output.md]\n\nRecord files read, commands executed, decisions, verification results, and exit codes.\n\n## skill-record.md\n\n- Source: https://github.com/anthropics/skills/tree/main/skills/skill-creator\n- Source commit: [40-character commit SHA]\n- Installed path: [path ending in skill-creator/SKILL.md]\n- SKILL.md SHA-256: [64-character hash]\n\n## resource-usage.json\n\nCreate one object for each scenario in `docs/eval-scenarios.md`:\n\n```json\n{\n  \"scenarios\": [\n    {\n      \"id\": \"full-release\",\n      \"prompt\": \"exact scenario prompt\",\n      \"resources_read\": [\"references/publication-policy.md\"],\n      \"context_files\": [\"SKILL.md\", \"references/publication-policy.md\"],\n      \"context_bytes\": {\n        \"SKILL.md\": 1000,\n        \"references/publication-policy.md\": 500\n      },\n      \"total_context_bytes\": 1500,\n      \"scripts_run\": [\"scripts/extract-release.mjs\"],\n      \"reason\": \"why each loaded resource was needed\",\n      \"output\": \"path to the saved output\"\n    }\n  ]\n}\n```\n\nUse skill-relative paths. Record only resources actually read or executed. Generate the byte values with `npm run context:measure -- <files>`; do not estimate them. Scripts are not context unless the agent read their source.\n\n## eval-results.json\n\nFor every case in `evals/evals.json`, record the configuration, expectations passed, expectations total, output path, and observed evidence. Include trigger results for every query in `evals/trigger-evals.json`.\n\n## comparison.md\n\nCompare trigger decision, Git range selection, customer-item accuracy, breaking and evidence handling, internal exclusions, resources loaded, script reuse, verification score, and total skill context. Explain why the two primary runs were fair.\n\n## Required Run Files\n\n- `evidence/before.md` records the monolithic-prompt session, exact output path, resources read, commands, exit codes, and measured context bytes.\n- `evidence/before.patch` contains the genuine Git diff for the first output and its evidence.\n- `evidence/after.md` records the matching packaged-skill session and the full-release measured context bytes.\n- `evidence/after.patch` contains the genuine Git diff for the skill-backed result.\n- `evidence/comparison.md` compares accuracy, selective loading, extractor reuse, eval results, and context cost."
         },
         {
+          "filename": ".agents/skills/release-notes-skill-factory/SKILL.md",
+          "title": "Release Notes Skill Factory",
+          "content": "---\nname: release-notes-skill-factory\ndescription: Use when practicing the Release Notes Skill Factory workflow for Product release dashboard.\n---\n\n# Release Notes Skill Factory\n\n## Use When\n\n- Turning commits, PR summaries, and evidence notes into customer-facing release notes.\n- The task asks to group changes by customer impact, flag missing evidence, or identify breaking changes.\n- A team needs repeatable release-note output from the same source data.\n\n## Do Not Use When\n\n- The learner has not yet read the exercise README.\n- The task is a code review, migration, or implementation task with no release communication output.\n- The requested output is outside this exercise folder.\n\n## Workflow\n\n1. Read `references/release-note-taxonomy.md`.\n2. Parse commit and PR fixtures before summarizing.\n3. Group changes into Added, Changed, Fixed, Deprecated, Removed, Security, and Internal.\n4. Mark customer-facing impact, breaking changes, rollout flags, missing evidence, and owner.\n5. Exclude purely internal refactors unless they affect customers or operations.\n6. Run trigger evals and update examples when the skill over-includes or misses risk.\n\n## Output Contract\n\n- One concise release note per customer-facing change.\n- Evidence link or command for each item.\n- Explicit breaking-change and rollback notes.\n- Missing-evidence section for changes that should not ship yet."
+        },
+        {
           "filename": "ci-evidence.md",
           "title": "Partial CI Evidence",
           "content": "# Partial CI Evidence\n\n| Change | Check | Result | Evidence ID |\n|---|---|---|---|\n| Checkout retry | unit tests | passed | CI-881-unit |\n| Checkout retry | browser test | passed | CI-881-e2e |\n| Billing export rename | provider contract | passed | CI-884-pact |\n| Billing export rename | migration dry run | missing | none |\n| Telemetry cleanup | unit tests | passed | CI-886-unit |\n\nMissing evidence must be called out. It must not be invented or treated as passing."
@@ -1004,6 +1009,26 @@
           "filename": "catalog-boundaries.md",
           "title": "Skill Catalog Boundaries",
           "content": "# Skill Catalog Boundaries\n\nRoute by the user's primary requested action:\n\n- Use `change-review` when the user wants an existing diff, branch, commit, or pull request inspected for defects or merge risk. Its output is evidence-backed findings tied to code locations.\n- Use `release-notes` when the user wants customer-facing release communication from merged changes and verification evidence.\n- Use `incident-summary` when the user wants an operational incident report from timeline, impact, remediation, and follow-up evidence.\n\nDo not use `change-review` to implement fixes, debug a failure without a supplied change, write a pull-request description, summarize an approved diff, review a design document, explain review practices, publish release notes, or report an incident.\n\nDo not force a request containing multiple independent workflows into one skill. Split the work or ask the user which workflow should run first."
+        },
+        {
+          "filename": "skill-trigger-app/fixtures/change-review-baseline/SKILL.md",
+          "title": "Change Review",
+          "content": "---\nname: change-review\ndescription: Review and summarize changes when someone wants feedback.\n---\n\n# Change Review\n\nInspect the supplied code change and report actionable findings with file and line evidence."
+        },
+        {
+          "filename": "skill-trigger-app/skills/change-review/SKILL.md",
+          "title": "Change Review",
+          "content": "---\nname: change-review\ndescription: Review and summarize changes when someone wants feedback.\n---\n\n# Change Review\n\nInspect the supplied code change and report actionable findings with file and line evidence."
+        },
+        {
+          "filename": "skill-trigger-app/skills/incident-summary/SKILL.md",
+          "title": "Incident Summary",
+          "content": "---\nname: incident-summary\ndescription: Produce an operational incident summary from a timeline, customer impact, remediation, and follow-up evidence. Do not use for routine pull-request review or release notes.\n---\n\n# Incident Summary\n\nSeparate verified incident facts from assumptions and cite the supplied evidence."
+        },
+        {
+          "filename": "skill-trigger-app/skills/release-notes/SKILL.md",
+          "title": "Release Notes",
+          "content": "---\nname: release-notes\ndescription: Generate customer-facing release notes from a Git comparison and verification evidence. Use for publishing a release summary; do not use for code review or incident reporting.\n---\n\n# Release Notes\n\nTrace published claims to the supplied release range and evidence."
         }
       ]
     },
@@ -1081,6 +1106,16 @@
           "filename": "incident-sources.md",
           "title": "Incident Source Rules",
           "content": "# Incident Source Rules\n\n- Use only supplied timelines, impact records, remediation diffs, and follow-up records.\n- Cite source identifiers in square brackets for timeline, impact, cause, resolution, and follow-up claims.\n- Separate confirmed facts, hypotheses, and unresolved conflicts.\n- Do not claim recovery before the final healthy signal.\n- Do not turn a proposed follow-up into completed work.\n- Do not invent customer counts, durations, owners, causes, or completion states.\n- State uncertainty when sources conflict.\n\nThe current skill sounds polished but does not reliably enforce these rules."
+        },
+        {
+          "filename": "skill-benchmark-app/fixtures/incident-summary-starter/SKILL.md",
+          "title": "Incident Summary",
+          "content": "---\nname: incident-summary\ndescription: Create a polished incident summary from operational notes for technical or leadership readers. Use for incidents and postmortems; do not use for release notes.\n---\n\n# Incident Summary\n\nRead the supplied material and write a clear timeline, impact, cause, resolution, and follow-up section.\n\nKeep the output concise and professional."
+        },
+        {
+          "filename": "skill-benchmark-app/skills/incident-summary/SKILL.md",
+          "title": "Incident Summary",
+          "content": "---\nname: incident-summary\ndescription: Create a polished incident summary from operational notes for technical or leadership readers. Use for incidents and postmortems; do not use for release notes.\n---\n\n# Incident Summary\n\nRead the supplied material and write a clear timeline, impact, cause, resolution, and follow-up section.\n\nKeep the output concise and professional."
         }
       ]
     },
@@ -2031,6 +2066,11 @@
           "filename": "evaluation-contract.md",
           "title": "Local Evaluation Contract",
           "content": "# Local Evaluation Contract\n\nRun each protected case once without the skill and once with the skill in a new session. Use the same agent, model, tools, permissions, prompt, and time limit. Do not retry or correct a response.\n\nCreate an adapter that reads the prompt from standard input and writes one JSON object to standard output. The object must contain `runNonce`, a unique session ID, merge decision, and findings. Run it only through:\n\n```text\nnpm run eval:run -- --lane <before|after> --case <case-id> --agent <name> --model <name> --tools <description> --permissions <description> --time-limit <minutes> --adapter <path>\n```\n\nThe runner writes `evidence/runs/<lane>/<case-id>.json` and records:\n\n- `schemaVersion: 3`, lane, case ID, session ID, agent, model, start time, duration, command result, nonce, and actual Git source SHA.\n- SHA-256 of the protected runner, adapter, canonical prompt, diff, transcript, and skill when used.\n- Transcript path relative to `evidence/`.\n- Merge decision and a `findings` array.\n\nEach finding contains an arbitrary unique `id`, severity, changed file, an exact added-line code anchor, the acceptance rule it evaluates, observed behavior, impact, reproduction, recommendation, and `blocking`. The nonce-bound adapter response must exactly match the stored run. Reusing published IDs or merely reaching a target count is not part of scoring.\n\nThe local scorer requires every violated acceptance rule to be covered by a distinct blocker, at least 80 percent precision, no blocker on the conforming control, and no metric more than five percentage points below the baseline. It reconstructs the canonical prompt, validates exact anchors and adapter provenance, and derives the decision from runner-produced files; it never calls a model."
+        },
+        {
+          "filename": "regression-review-app/skills/regression-review/SKILL.md",
+          "title": "Regression Review",
+          "content": "---\nname: regression-review\ndescription: Review a code diff for regressions and provide actionable findings. Use when asked to review a pull request or assess whether a change is safe to merge.\n---\n\n# Regression Review\n\nRead the request and diff. Report important problems with a file, code location, impact, and suggested fix. Avoid comments about style unless they affect correctness."
         },
         {
           "filename": "regression-seeds.md",
