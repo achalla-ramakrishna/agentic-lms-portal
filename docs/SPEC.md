@@ -37,6 +37,11 @@ reading 35 folders of evidence by hand.
 - Multi-tenant / multi-organization support.
 - In-app authoring UI for competencies/exercises (seeded from the repo).
 - Cohorts, gated exercise progression, file-upload evidence storage.
+- In-app user management — every account (including the two demo ones)
+  exists only because `prisma/seed.ts` put it there; no signup or admin
+  "add learner/facilitator" screen. Fine for one seeded cohort, a real
+  gap identified during a live QA pass before onboarding a second one
+  (see §7 Roadmap).
 
 ## 2. Roles
 
@@ -230,10 +235,23 @@ Chunked so each commit lands a coherent, working slice.
   could double-decide a submission — both now rejected server-side
   (`lib/status.ts`'s `canSubmitEvidence`/`canDecide`), verified live.
   This completes the v1 MVP build plan.
+- [x] **Chunk 7 — Post-MVP hardening** (this commit): click-to-learn
+  Toolkit tags, Exercises/How To listing previews, and exercise-page
+  artifact chips (real file match → reference template → glossary,
+  reusing one shared resolver); a live QA pass (fresh learner +
+  facilitator accounts run through the full start→submit→review→
+  rework→resubmit→pass loop) that fixed three real gaps — 403 pages
+  claiming "facilitators only" for non-role reasons, resubmitting a
+  locked exercise with no warning until the form was already filled
+  out, and a plain login skipping the real `/dashboard` page; and a
+  Railway deployment (persistent volume for SQLite, auto-seed on every
+  start) giving the app a real shareable URL.
 
 Phase 2+ (explicitly deferred, not built here): cohorts and the
 "quiet for 7+ days" signal, Stage 2 CI verification integration, email
-notifications, toolkit-tag search/filter.
+notifications, toolkit-tag search/filter, in-app user management (no
+signup or admin "add user" screen exists yet — see §1's out-of-scope
+list).
 
 ## 8. Evidence & Review Standard
 
