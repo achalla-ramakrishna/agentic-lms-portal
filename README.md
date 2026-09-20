@@ -44,6 +44,38 @@ npm run seed:generate -- \
 Neither source is vendored into this repo. Then re-run `npm run db:seed`
 (idempotent — upserts by number/slug).
 
+## Deploying (Railway)
+
+SQLite is a file on disk (see ADR 0001), so it needs a host with a
+persistent volume — Vercel's serverless filesystem won't keep writes
+across requests. `railway.json` in this repo already sets the build and
+start commands (`prisma migrate deploy` runs automatically on every
+start), so the manual steps are just the account-level pieces Railway
+requires through its own UI:
+
+1. [railway.app](https://railway.app) → sign in with GitHub → **New
+   Project → Deploy from GitHub repo** → this repo, `main` branch.
+2. Service → Settings → **Volumes** → add one, mount path `/data`.
+3. Service → **Variables**:
+   ```
+   DATABASE_URL=file:/data/prod.db
+   NEXTAUTH_SECRET=<openssl rand -base64 32>
+   NEXTAUTH_URL=https://<filled in after step 4>
+   ```
+4. Service → Settings → Networking → **Generate Domain**, then paste
+   that URL into `NEXTAUTH_URL` above and redeploy.
+5. Seed once (not on every deploy, so later submissions/roster data
+   aren't wiped by a redeploy):
+   ```bash
+   npm i -g @railway/cli && railway login && railway link
+   railway run npm run db:seed
+   ```
+
+The generated domain is the link to share. Demo accounts are the same
+ones listed above — fine for an internal walkthrough, not something to
+leave linked publicly long-term (no rate limiting or production
+hardening yet).
+
 ## Status
 
 v1 MVP complete — all 6 build-plan chunks done (toolchain, content model,
