@@ -145,6 +145,27 @@ misfiled the tag into a "Metrics" lane. Fixed with an
 other existing tags that rely on it. `lib/artifact-glossary.ts` gained
 a `backlog.md` entry.
 
+## Competency 08 — Evidence-led PRs
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 19–20. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 8 `inPracticeBullets` (3
+bold), a real pull-quote, and a bespoke diagram
+(`EvidenceLadderDiagram.tsx`) — the "evidence ladder" as five ascending
+gates (pre-commit → pre-push → PR → CI/CD → release), each with its own
+evidence callout and increasing bar height, again reusing this app's
+existing color tokens. The booklet staggers its evidence callouts
+diagonally above a staircase; here each sits directly above its own
+step in a plain column instead of positioned diagonal SVG.
+`CompetencyDiagram.tsx` gained a `case 8`.
+
+`toolkitTags` reconciled once more (booklet's 7 vs. the seed's
+previous 4: added `PR Document Writer skill`, `Allure Reports`,
+`Playwright Traces`). `Allure Reports` needed an `EXACT_OVERRIDES`
+entry (`"review"`, grouping it with `CI artifacts`/`Coverage Report`
+as PR evidence rather than generic test tooling — this app's existing
+classifier already groups `Coverage Report` under `review` the same
+way). All three tags needed new `lib/artifact-glossary.ts` entries.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

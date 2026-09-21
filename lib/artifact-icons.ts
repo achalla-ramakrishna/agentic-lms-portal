@@ -62,6 +62,7 @@ const EXACT_OVERRIDES: Record<string, ArtifactCategory> = {
   fixtures: "test",
   "background agents": "agent",
   "backlog.md": "spec", // would otherwise false-match the "log" substring in the metric check below
+  "allure reports": "review", // groups with ci artifacts/coverage report as PR review evidence, not generic "test" tooling
 };
 
 // Order matters: more specific/exclusive checks first, so e.g. "excalidraw

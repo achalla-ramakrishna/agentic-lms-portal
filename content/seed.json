@@ -226,7 +226,7 @@
       "number": 8,
       "title": "Evidence-led PRs",
       "subtitle": "PR Gate Evidence & Handoff",
-      "shiftMarkdown": "\"Trust me, it works\" used to carry more weight, back when a PR was small enough to read in one sitting. Now a PR can be a thousand lines an agent wrote in minutes — treat quality gates as deliverables and make the PR answer the reviewer's questions before they ask them.",
+      "shiftMarkdown": "\"Trust me, it works\" used to carry more weight. The reviewer knew you, knew you had tested it, and the change was small enough to read in one sitting.\n\nNow a PR can be a thousand lines an agent wrote in minutes. Nobody should trust that on faith. Reviewers lose time reconstructing intent, test coverage, and risk. Merge confidence now comes from evidence.\n\nTreat quality gates as deliverables. A good PR shows what changed, why it changed, what ran, what passed, and what risk remains. Make the PR answer the reviewer's questions before they ask them.",
       "masteryBullets": [
         "Reviewers stop asking \"did you test this\"",
         "the PR evidence pack is mostly automated",
@@ -237,10 +237,24 @@
         "gh CLI",
         "CI artifacts",
         "PR template",
-        "Coverage Report"
+        "PR Document Writer skill",
+        "Allure Reports",
+        "Coverage Report",
+        "Playwright Traces"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Treat quality gates as deliverables: show what ran, what is risky, and who approved",
+        "Write the PR so a reviewer understands intent before reading the diff",
+        "Attach proof: test results, coverage, screenshots, outputs, and profiles",
+        "Let **CI produce the evidence pack** automatically; leave humans the judgment calls",
+        "Climb the **evidence ladder**: pre-commit -> before-push -> PR -> CI -> review",
+        "Confirm boundaries explicitly: no secrets/PII, flags wired, rollback documented",
+        "Pass diffs and issue lists into review, not whole files",
+        "**Make the evidence reproducible**: include the exact command, seed, or fixture so a reviewer can re-run them"
+      ],
+      "tagline": "Do not ask reviewers to trust agent-written code. Put the proof in the PR.",
+      "quoteMarkdown": "Accelerate with proof. Every PR should carry inline evidence and pass the gate ladder, and review becomes approve-or-redirect.",
+      "quoteAttribution": "Ben SE, CTO, CodeWalnut"
     },
     {
       "number": 9,
