@@ -25,6 +25,7 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "repo-maps": "A generated overview of a codebase's structure and key files, given to an agent as compact context instead of the whole repo — much cheaper than reading everything.",
   adrs: "Architecture Decision Records — short documents that record a significant technical decision, the alternatives considered, and why this one was chosen, so the reasoning survives past the original conversation.",
   "adr / madr": "ADR (Architecture Decision Record) in the MADR (Markdown ADR) template format — a standardized structure for writing decision records.",
+  "backlog.md": "A file listing planned work items outside the current task — captured so a good idea or known gap isn't lost, without derailing the spec in front of you.",
   "architecture.md": "A file describing a system's high-level structure and data flow — the map an agent (or new engineer) reads before making a change that crosses multiple parts of the codebase.",
   "conventions.md": "A file documenting a team's specific coding conventions (naming, structure, patterns) an agent should follow but that aren't enforced by a linter.",
   skills: "Packaged, reusable instructions an agent can load for a specific job (interviewing a ticket, writing a spec, generating a diagram) instead of relying on the same ad-hoc prompt every time.",

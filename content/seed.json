@@ -195,7 +195,7 @@
       "number": 7,
       "title": "Docs & Diagrams",
       "subtitle": "Diagrams & Arch. Decision Records",
-      "shiftMarkdown": "Documentation was often the first thing to go because it took time to write well. Agents reduce that cost — they can read a repo, draft an ADR, and turn a design into a diagram quickly. Capture decisions while the context is fresh, then verify the diagram against the code.",
+      "shiftMarkdown": "Documentation was often the first thing to go. ADRs, sequence diagrams, and the \"why\" behind a hard decision were valuable, but they took time. So the knowledge stayed in your head and left when you moved on.\n\nAgents reduce that cost. They can read a repo, draft an ADR, and turn a design into a Mermaid or C4 diagram quickly. Work that used to feel hard to justify can now fit inside the normal PR flow.\n\nYour job is to decide what is worth recording and keep it honest. Capture decisions while the context is fresh. Generate the diagram, then verify it matches the code. Future teammates and future agents will use what you leave behind.",
       "masteryBullets": [
         "The why behind decisions is written down and committed",
         "docs and diagrams stay updated as code evolves",
@@ -206,10 +206,21 @@
         "ADR / MADR",
         "Mermaid",
         "C4",
-        "excalidraw skill"
+        "excalidraw skill",
+        "spec.md",
+        "backlog.md"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Record decisions as **ADRs** while context is intact: what, why, alternatives, and trade-offs",
+        "Have the agent generate diagrams from code: flowcharts, sequence, state, and **C4**",
+        "Make **\"ADR on architecture change\"** a standing rule so docs stay current",
+        "**Generate, then verify**; agent diagrams can drift from reality, so check them against code",
+        "Keep docs close to code, in-repo and in the PR, so they are versioned and discoverable",
+        "Write for two audiences now: humans and the next agent that reads your repo",
+        "Do not over-document; record decisions and the non-obvious and skip the self-evident",
+        "**Supersede, don't overwrite:** when a decision changes, write a new ADR that retires the old one so the trail of why survives, not just the latest answer"
+      ],
+      "tagline": "Use agents to capture decisions while the context is still fresh."
     },
     {
       "number": 8,

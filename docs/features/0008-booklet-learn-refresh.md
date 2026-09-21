@@ -121,6 +121,30 @@ needed a new `EXACT_OVERRIDES` entry in `lib/artifact-icons.ts` (its
 keyword checks require "agent team", not just "agents") and both tags
 needed new `lib/artifact-glossary.ts` entries.
 
+## Competency 07 — Docs & Diagrams
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 17–18. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 8 `inPracticeBullets` (5
+bold), and a bespoke diagram (`AdrSequenceDiagram.tsx`) — the same
+feature shown two ways, an ADR document mock and a sequence-diagram
+message list, plus the booklet's own caption. No pull-quote on this
+page. The booklet renders the sequence as a real UML lifeline diagram
+with crossing arrows; here it's a plain ordered list of messages
+grouped by actor color instead of fragile positioned-arrow SVG, same
+approach as every other diagram in this app. `CompetencyDiagram.tsx`
+gained a `case 7`.
+
+`toolkitTags` reconciled once more (booklet's 6 vs. the seed's
+previous 4: added `spec.md`, `backlog.md`). Adding `backlog.md`
+surfaced a real classifier bug in `lib/artifact-icons.ts`: its
+"metric" keyword check (`t.includes("log")`) was meant for words like
+"session log" but also matches inside "back**log**.md", so it silently
+misfiled the tag into a "Metrics" lane. Fixed with an
+`EXACT_OVERRIDES` entry (`"backlog.md": "spec"`, grouping it with
+`spec.md`) rather than tightening the substring check and risking
+other existing tags that rely on it. `lib/artifact-glossary.ts` gained
+a `backlog.md` entry.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

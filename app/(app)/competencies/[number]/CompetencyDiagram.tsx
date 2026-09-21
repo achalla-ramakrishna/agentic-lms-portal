@@ -4,6 +4,7 @@ import { ContextLayerDiagram } from "./ContextLayerDiagram";
 import { TestPyramidDiagram } from "./TestPyramidDiagram";
 import { SkillPackageDiagram } from "./SkillPackageDiagram";
 import { ParallelLanesDiagram } from "./ParallelLanesDiagram";
+import { AdrSequenceDiagram } from "./AdrSequenceDiagram";
 
 // Each competency's booklet diagram is structurally bespoke (radial setup
 // diagram, two-column comparison, ...), so this dispatches to a hardcoded
@@ -26,6 +27,8 @@ export function CompetencyDiagram({ competencyNumber }: { competencyNumber: numb
       return <SkillPackageDiagram />;
     case 6:
       return <ParallelLanesDiagram />;
+    case 7:
+      return <AdrSequenceDiagram />;
     default:
       return null;
   }
