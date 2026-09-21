@@ -34,6 +34,7 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "api mocks": "Fake API responses substituted for real network calls in a test, so tests run fast and deterministically without depending on a live backend.",
   "role locators": "Finding elements in a UI test by their accessibility role (button, link, heading) rather than a CSS class or test-id — more resilient to markup changes and more accessible by construction.",
   "trace viewer": "Playwright's tool for replaying a recorded test run step-by-step with screenshots and network activity, used to debug why a test failed.",
+  fixtures: "Reusable setup (a logged-in session, seeded data, a configured page object) that a test framework injects into each test, so tests stay independent without repeating boilerplate.",
   "skill.md": "The manifest file of an Agent Skill — a folder an agent can load on demand, describing when to use it, its step-by-step workflow, and the expected output.",
   ".agents/skills": "A conventional folder location for packaging Agent Skills inside a repository so they ship with the code they apply to.",
   ".claude/skills/": "Claude Code's specific folder convention for skills scoped to a project, auto-discovered without extra configuration.",

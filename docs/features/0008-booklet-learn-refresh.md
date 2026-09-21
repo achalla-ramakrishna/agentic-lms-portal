@@ -65,6 +65,24 @@ generic keyword match. Both tags, plus `superpowers skill`/`spec-kit
 skill` from competency 2, needed new `lib/artifact-glossary.ts`
 entries so the existing full-coverage test keeps passing.
 
+## Competency 04 — Test Automation
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 11–12. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 6 `inPracticeBullets` (3
+bold), a real pull-quote (reusing the `quoteMarkdown`/
+`quoteAttribution` fields added for competency 3), and a bespoke
+diagram (`TestPyramidDiagram.tsx`) — a numbered vertical timeline
+(End-to-End/3 → Integration/2 → Unit Tests/1) plus a "Pro Tip" callout
+about mutation testing, again using this app's existing color tokens
+(accent, done, success, attention) to match the booklet's grouping.
+`CompetencyDiagram.tsx` gained a `case 4`.
+
+`toolkitTags` reconciled once more (booklet's 6 vs. the seed's
+previous 5: added `Fixtures`). `Fixtures` needed both a new
+`EXACT_OVERRIDES` entry in `lib/artifact-icons.ts` (no generic keyword
+match, classifies as `test`) and a new `lib/artifact-glossary.ts`
+entry.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

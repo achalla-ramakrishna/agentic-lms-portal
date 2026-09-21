@@ -102,7 +102,7 @@
       "number": 4,
       "title": "Test Automation",
       "subtitle": "Reliable E2E Test Generation",
-      "shiftMarkdown": "Under deadline, tests were always the first thing to slip. Agents change the cost — they can generate a whole suite in seconds, but cheap tests are often bad tests: flaky, brittle, or checking nothing users see. Direct the agent toward tests you can trust; you decide what \"working\" means.",
+      "shiftMarkdown": "Tests were always the first thing to slip. Under deadline, you shipped the feature and promised to \"add tests later.\" Later rarely came. Writing good E2E tests was slow work.\n\nAgents change the cost. They can generate a whole suite in seconds. The risk is that cheap tests are often bad tests: flaky, tied to brittle selectors, or checking details users never see. A green test suite means little if it never fails when it should.\n\nYour job now is to direct the agent toward tests you can trust: reliable locators, independent cases, web-first assertions, and real user flows. You decide what \"working\" means. The agent gives you speed, but you decide whether the net is strong enough.",
       "masteryBullets": [
         "Tests fail for real regressions, not timing",
         "the suite stays green across repeated CI runs",
@@ -114,10 +114,20 @@
         "Testing Library",
         "API Mocks",
         "Role Locators",
-        "Trace Viewer"
+        "Trace Viewer",
+        "Fixtures"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Test real user flows and behavior users notice, not implementation details",
+        "Use **role-based locators**, not brittle CSS/XPath; this is the biggest fix for flakiness",
+        "Make every test independent so they run in parallel without cascading failures",
+        "Use **auto-waiting assertions** that retry until the UI is ready; never fixed sleep timers",
+        "**Record then refine**: capture the flow with codegen, then let the agent harden it",
+        "**Mock flaky boundaries** like third-party APIs, payments, and the clock so tests stay deterministic; never mock away what you are testing"
+      ],
+      "tagline": "Agents can write tests quickly. Your job is to make those tests reliable.",
+      "quoteMarkdown": "You should be able to walk in, see the test, and know exactly what behavior this is testing and exactly what the validation for that behavior is.",
+      "quoteAttribution": "Ben SE, CTO, CodeWalnut"
     },
     {
       "number": 5,
