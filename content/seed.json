@@ -68,7 +68,7 @@
       "number": 3,
       "title": "Context Engineering",
       "subtitle": "Agent Working-Context Curation",
-      "shiftMarkdown": "You used to carry the project map in your head — how the system is shaped, why a hard decision was made. An agent does not arrive with that map; it needs a shared context layer of repo overview, architecture, conventions, and ADRs. Put that knowledge where the agent can find it, before the chat starts.",
+      "shiftMarkdown": "You used to carry the project map in your head: how the system is shaped, which module owns what, why a hard decision was made, and the convention nobody wrote down. That mental model helped you move safely, even when the docs were thin.\n\nAn agent does not arrive with that map. It needs shared project context: repo overview, architecture notes, module boundaries, domain terms, coding conventions, build/test commands, API contracts, data flows, ADRs, and safe paths to inspect more. Without that, it still writes code, but it guesses the shape of the system.\n\nSo context engineering starts before the chat. Put the stable project knowledge where the agent can find it, keep it short enough to load, and link out to deeper docs only when needed. Then, during the task, let the agent retrieve files and evidence from that map.",
       "masteryBullets": [
         "New sessions understand the repo shape without a long briefing",
         "architecture, conventions, and commands live in versioned files",
@@ -77,13 +77,26 @@
       "commonMistakeMarkdown": "Treating context as chat paste. If architecture, rules, and repo maps live only in prompts, every session starts from zero.",
       "toolkitTags": [
         "AGENTS.md",
+        "CLAUDE.md",
         "repo-maps",
         "ADRs",
         "architecture.md",
-        "conventions.md"
+        "conventions.md",
+        "Skills",
+        "Flow Diagrams"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Create a **project context** file: overview, architecture, module map, commands, conventions, and do-not-touch areas",
+        "Keep AGENTS.md / CLAUDE.md lean; link deeper docs for architecture, APIs, data flows, and ADRs",
+        "Write a **repo map** the agent can navigate: folders, owners, entry points, tests, and common change paths",
+        "Capture project-specific rules: naming, errors, logging, auth, feature flags, migrations, and deployment checks",
+        "Keep task state in spec.md, plan.md, todos, or scratchpad files so it survives compaction and handoff",
+        "Refresh the context layer when the agent repeats a mistake, asks the same question, or misses a rule",
+        "**Prune as much as you add:** stale architecture notes and dead conventions mislead the agent just as badly as a missing one"
+      ],
+      "tagline": "Build the project context layer the agent needs before it starts changing code.",
+      "quoteMarkdown": "An agent walking into a codebase needs the same things a new engineer does: how to run it, what the architecture is, what not to touch, and where the failure modes are. One set of files serves both.",
+      "quoteAttribution": "Ben SE, CTO, CodeWalnut"
     },
     {
       "number": 4,

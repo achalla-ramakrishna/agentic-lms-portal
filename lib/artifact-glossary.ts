@@ -27,6 +27,8 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "adr / madr": "ADR (Architecture Decision Record) in the MADR (Markdown ADR) template format — a standardized structure for writing decision records.",
   "architecture.md": "A file describing a system's high-level structure and data flow — the map an agent (or new engineer) reads before making a change that crosses multiple parts of the codebase.",
   "conventions.md": "A file documenting a team's specific coding conventions (naming, structure, patterns) an agent should follow but that aren't enforced by a linter.",
+  skills: "Packaged, reusable instructions an agent can load for a specific job (interviewing a ticket, writing a spec, generating a diagram) instead of relying on the same ad-hoc prompt every time.",
+  "flow diagrams": "A visual map of how data or control moves through a system — handed to an agent (or a new engineer) so it doesn't have to reconstruct the flow by reading every file first.",
   playwright: "A browser-automation framework used to write and run end-to-end tests that actually click through a real UI, the way a user would.",
   "testing library": "A testing utility (most often Testing Library for React) that encourages tests to query the UI the way a user perceives it — by visible text and role — rather than internal implementation details.",
   "api mocks": "Fake API responses substituted for real network calls in a test, so tests run fast and deterministically without depending on a live backend.",

@@ -21,6 +21,8 @@ model Competency {
   commonMistakeMarkdown String
   toolkitTags           String // JSON-encoded string[]
   inPracticeBullets     String     @default("[]") // JSON-encoded string[] — empty until authored for a competency (docs/features/0008-booklet-learn-refresh.md)
+  quoteMarkdown         String     @default("") // real booklet pull-quote, empty until a competency's page has one
+  quoteAttribution      String     @default("") // e.g. "Ben SE, CTO, CodeWalnut" — empty alongside quoteMarkdown
   exercises             Exercise[]
 }
 

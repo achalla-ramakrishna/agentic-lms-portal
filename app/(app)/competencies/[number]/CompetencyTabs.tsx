@@ -27,6 +27,8 @@ type Props = {
   competencyNumber: number;
   competencyTitle: string;
   tagline: string;
+  quoteMarkdown: string;
+  quoteAttribution: string;
   shiftMarkdown: string;
   masteryBullets: string[];
   commonMistakeMarkdown: string;
@@ -46,6 +48,8 @@ export function CompetencyTabs({
   competencyNumber,
   competencyTitle,
   tagline,
+  quoteMarkdown,
+  quoteAttribution,
   shiftMarkdown,
   masteryBullets,
   commonMistakeMarkdown,
@@ -113,6 +117,19 @@ export function CompetencyTabs({
                 ))}
               </ul>
             </div>
+          )}
+
+          {quoteMarkdown && (
+            <blockquote className="rounded-xl border-l-4 bg-canvas-inset p-5" style={{ borderColor: color }}>
+              <p className="text-sm italic leading-relaxed text-fg">
+                &ldquo;{quoteMarkdown}&rdquo;
+              </p>
+              {quoteAttribution && (
+                <footer className="mt-2 text-xs text-fg-muted">
+                  — {quoteAttribution}
+                </footer>
+              )}
+            </blockquote>
           )}
 
           <div className="grid grid-cols-1 gap-6 border-t border-line pt-5 sm:grid-cols-2">

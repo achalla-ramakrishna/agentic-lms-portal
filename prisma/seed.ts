@@ -38,6 +38,8 @@ type SeedCompetency = {
   commonMistakeMarkdown: string;
   toolkitTags: string[];
   inPracticeBullets: string[];
+  quoteMarkdown?: string;
+  quoteAttribution?: string;
 };
 type Seed = { competencies: SeedCompetency[]; exercises: SeedExercise[] };
 
@@ -57,6 +59,8 @@ async function main() {
         commonMistakeMarkdown: c.commonMistakeMarkdown,
         toolkitTags: JSON.stringify(c.toolkitTags),
         inPracticeBullets: JSON.stringify(c.inPracticeBullets),
+        quoteMarkdown: c.quoteMarkdown ?? "",
+        quoteAttribution: c.quoteAttribution ?? "",
       },
       create: {
         number: c.number,
@@ -68,6 +72,8 @@ async function main() {
         commonMistakeMarkdown: c.commonMistakeMarkdown,
         toolkitTags: JSON.stringify(c.toolkitTags),
         inPracticeBullets: JSON.stringify(c.inPracticeBullets),
+        quoteMarkdown: c.quoteMarkdown ?? "",
+        quoteAttribution: c.quoteAttribution ?? "",
       },
     });
   }

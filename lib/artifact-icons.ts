@@ -58,6 +58,7 @@ const EXACT_OVERRIDES: Record<string, ArtifactCategory> = {
   "strangler pattern": "guardrail", // a safe-migration technique, same spirit as feature flags
   c4: "diagram",
   ears: "spec",
+  "flow diagrams": "diagram",
 };
 
 // Order matters: more specific/exclusive checks first, so e.g. "excalidraw

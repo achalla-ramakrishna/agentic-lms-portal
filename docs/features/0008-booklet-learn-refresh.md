@@ -36,6 +36,35 @@ rest) replaces `CompetencyTabs.tsx`'s previous hardcoded
 `AgentCoreDiagram` import, since the diagram is no longer
 competency-1-only.
 
+## Competency 03 — Context Engineering
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 9–10. Same treatment
+again: `tagline`, full 3-paragraph `shiftMarkdown`, 7
+`inPracticeBullets` (3 bold), and a bespoke diagram
+(`ContextLayerDiagram.tsx`) — a 7-card grid (Repo overview,
+Architecture, Conventions, Module map, Data flows · APIs, ADRs,
+Commands) using this app's named color tokens (`success`, `accent`,
+`attention`, `done`) to match the booklet's own color grouping, no new
+colors invented. `CompetencyDiagram.tsx` gained a `case 3`.
+
+This page also has a real pull-quote (Ben SE, CTO, CodeWalnut) — the
+first competency with one. Rather than hardcode it into the diagram
+component, added two new generic `Competency` fields,
+`quoteMarkdown`/`quoteAttribution` (both `@default("")`, migration
+`20260921112958_add_quote_fields`), and a conditional blockquote block
+in `CompetencyTabs.tsx` between "In Practice" and the mastery/mistake
+grid — reusable by any future competency that has a quote, empty
+everywhere else.
+
+`toolkitTags` reconciled again (booklet's 8 vs. the seed's previous 5:
+added `CLAUDE.md`, `Skills`, `Flow Diagrams`). `Skills` already
+classifies correctly under `lib/artifact-icons.ts`'s existing
+keyword-based `skill` category; `Flow Diagrams` needed a new
+`EXACT_OVERRIDES` entry (same pattern as `c4`/`ears`) since it has no
+generic keyword match. Both tags, plus `superpowers skill`/`spec-kit
+skill` from competency 2, needed new `lib/artifact-glossary.ts`
+entries so the existing full-coverage test keeps passing.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

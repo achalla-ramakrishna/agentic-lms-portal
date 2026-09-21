@@ -77,6 +77,8 @@ export default async function CompetencyPage({
           competencyNumber={competency.number}
           competencyTitle={competency.title}
           tagline={competency.tagline}
+          quoteMarkdown={competency.quoteMarkdown}
+          quoteAttribution={competency.quoteAttribution}
           shiftMarkdown={competency.shiftMarkdown}
           masteryBullets={masteryBullets(competency)}
           commonMistakeMarkdown={competency.commonMistakeMarkdown}

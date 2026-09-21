@@ -1,5 +1,6 @@
 import { AgentCoreDiagram } from "./AgentCoreDiagram";
 import { SpecFramingDiagram } from "./SpecFramingDiagram";
+import { ContextLayerDiagram } from "./ContextLayerDiagram";
 
 // Each competency's booklet diagram is structurally bespoke (radial setup
 // diagram, two-column comparison, ...), so this dispatches to a hardcoded
@@ -14,6 +15,8 @@ export function CompetencyDiagram({ competencyNumber }: { competencyNumber: numb
       return <AgentCoreDiagram competencyNumber={competencyNumber} />;
     case 2:
       return <SpecFramingDiagram />;
+    case 3:
+      return <ContextLayerDiagram />;
     default:
       return null;
   }
