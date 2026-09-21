@@ -4,7 +4,7 @@
       "number": 1,
       "title": "Toolchain Setup",
       "subtitle": "Project Rules, Hooks, Guardrails & CLI/MCP Wiring",
-      "shiftMarkdown": "You've always configured your own setup, and it lived in your head and your dotfiles. Now you're configuring for someone else: an agent that starts every session blind to your repo. Set it up once so every session inherits it.",
+      "shiftMarkdown": "You've always configured your own setup: linters, formatters, pre-commit hooks, coding conventions, a .gitignore, the commands you run on autopilot. You did it for yourself, and it lived in your head and your dotfiles.\n\nNow you're configuring for someone else: an agent that starts every session blind to your repo, your conventions, and what it must never touch. Unconfigured, it invents patterns, runs wrong commands, and in YOLO mode, reads your .env or force-pushes a branch.\n\nYour job now is to build it a safe, wired workshop: a tight rules file for the house style, guardrails so it can't take dangerous actions, and least-privilege access so a stray instruction (even one hidden in an issue or tool description it reads) can't reach your secrets. Set it up once; every session inherits it.",
       "masteryBullets": [
         "New sessions need almost no re-explaining",
         "the agent runs your checks without being told",
@@ -22,10 +22,10 @@
       "inPracticeBullets": [
         "Write a tight AGENTS.md / CLAUDE.md: project overview, scripts, and team conventions agents should follow",
         "Split deep rules into skills so the always-on file stays lean",
-        "Run in safe auto mode, not YOLO: let it act, but keep approval on risky stuff",
-        "Add deny rules so it cannot read sensitive data like .env files or secrets manager",
+        "Run in **safe auto mode, not YOLO**: let it act, but keep approval on risky stuff",
+        "Add **deny rules** so it cannot read sensitive data like .env files or secrets manager",
         "Map trust boundaries clearly: secrets, PII, auth paths, external inputs, privileged commands, and untrusted sources the agent must treat as data, not instructions",
-        "Use PreToolUse hooks for guardrails that static rules alone cannot prevent",
+        "Use **PreToolUse hooks** for guardrails that static rules alone cannot prevent",
         "Wire only the CLIs / MCP you need; vet MCP servers first, and disable the rest",
         "Treat what the agent reads as untrusted: issues, READMEs, and tool descriptions can hijack it",
         "Review and scan its output: AI code can carry vulnerabilities and look-alike packages",

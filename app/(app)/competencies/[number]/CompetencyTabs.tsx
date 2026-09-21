@@ -83,7 +83,9 @@ export function CompetencyTabs({
             <h2 className="text-xs font-semibold uppercase tracking-wide text-accent">
               The Shift
             </h2>
-            <p className="mt-2 leading-relaxed text-fg">{shiftMarkdown}</p>
+            <p className="mt-2 whitespace-pre-line leading-relaxed text-fg">
+              {shiftMarkdown}
+            </p>
           </div>
 
           {inPracticeBullets.length > 0 && (
@@ -99,14 +101,16 @@ export function CompetencyTabs({
               </h3>
               <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-fg">
                 {inPracticeBullets.map((b, i) => (
-                  <li key={i}>{b}</li>
+                  <li key={i}>
+                    <BoldText text={b} />
+                  </li>
                 ))}
               </ul>
             </div>
           )}
 
           <div className="grid grid-cols-1 gap-6 border-t border-line pt-5 sm:grid-cols-2">
-            <div className="rounded-xl border border-success-fg/40 bg-success-subtle p-4">
+            <div className="rounded-xl border border-success-fg/40 bg-success-fg/10 p-4">
               <h3 className="text-sm font-semibold text-success-fg">
                 ✓ What mastery looks like
               </h3>
@@ -116,7 +120,7 @@ export function CompetencyTabs({
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl border border-attention-fg/40 bg-attention-subtle p-4">
+            <div className="rounded-xl border border-attention-fg/40 bg-attention-fg/10 p-4">
               <h3 className="text-sm font-semibold text-attention-fg">
                 ⚠ Common mistake to avoid
               </h3>
@@ -290,5 +294,24 @@ export function CompetencyTabs({
         </section>
       )}
     </div>
+  );
+}
+
+// Renders **bold** markers within an otherwise-plain bullet — a couple of
+// the real "In Practice" bullets bold specific terms in the booklet
+// (e.g. "safe auto mode, not YOLO") — not full markdown, just this one
+// marker, since that's all the source content actually uses here.
+function BoldText({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith("**") && part.endsWith("**") ? (
+          <strong key={i}>{part.slice(2, -2)}</strong>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
   );
 }

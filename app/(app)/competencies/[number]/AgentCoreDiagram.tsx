@@ -23,12 +23,14 @@ export function AgentCoreDiagram({ competencyNumber }: { competencyNumber: numbe
       </h3>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <DiagramCard
+          icon="📋"
           label="Rules"
           heading="House rules & conventions"
           tags={["AGENTS.md", "CLAUDE.md", "conventions"]}
           accent={palette.border}
         />
         <DiagramCard
+          icon="🛡️"
           label="Guardrails"
           heading="Gated, not wide open"
           tags={["safe-automode", "deny rules", "PreToolUse Hooks"]}
@@ -50,22 +52,26 @@ export function AgentCoreDiagram({ competencyNumber }: { competencyNumber: numbe
         <Connector />
 
         <DiagramCard
+          icon="🔑"
           label="Least Privilege"
           heading="Only the CLIs/MCPs it needs"
           tags={["github", "gcp", "docs", "playwright"]}
           accent={palette.border}
         />
 
-        <div className="rounded-xl border border-danger-fg/40 bg-danger-subtle p-4">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-semibold uppercase tracking-wide text-danger-fg">
-              Secrets · .env
+        <div className="rounded-xl border-2 border-danger-fg/50 bg-danger-subtle p-4">
+          <div className="flex items-start justify-between gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-danger-fg/50 bg-canvas text-base">
+              🔒
             </span>
             <span className="shrink-0 rounded bg-danger-fg px-1.5 py-0.5 text-[10px] font-bold text-white">
               DENY
             </span>
           </div>
-          <p className="mt-2 text-sm font-semibold text-danger-fg">
+          <span className="mt-2 block text-xs font-semibold uppercase tracking-wide text-danger-fg">
+            Secrets · .env
+          </span>
+          <p className="mt-1 text-sm font-semibold text-danger-fg">
             Blocked by a deny rule
           </p>
           <p className="text-xs text-danger-fg/80">
@@ -92,30 +98,45 @@ function Connector() {
 }
 
 function DiagramCard({
+  icon,
   label,
   heading,
   tags,
   accent,
 }: {
+  icon: string;
   label: string;
   heading: string;
   tags: string[];
   accent: string;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-canvas-subtle p-4">
-      <span
-        className="text-xs font-semibold uppercase tracking-wide"
-        style={{ color: accent }}
-      >
-        {label}
-      </span>
-      <p className="mt-1 text-sm font-semibold text-fg">{heading}</p>
+    <div
+      className="rounded-xl border-2 p-4"
+      style={{ borderColor: `${accent}80`, backgroundColor: `${accent}1f` }}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-canvas text-base"
+          style={{ borderColor: `${accent}80` }}
+          aria-hidden="true"
+        >
+          {icon}
+        </span>
+        <span
+          className="text-xs font-semibold uppercase tracking-wide"
+          style={{ color: accent }}
+        >
+          {label}
+        </span>
+      </div>
+      <p className="mt-2 text-sm font-semibold text-fg">{heading}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-full border border-line px-2 py-0.5 font-mono text-xs text-fg-muted"
+            className="rounded-full border bg-canvas px-2 py-0.5 font-mono text-xs text-fg-muted"
+            style={{ borderColor: `${accent}60` }}
           >
             {tag}
           </span>

@@ -20,10 +20,18 @@ boxes, Toolkit) were read directly, not summarized from memory.
 Checked the booklet against `content/seed.json`'s existing competency 1
 entry before changing anything:
 
-- `shiftMarkdown`, `masteryBullets`, `commonMistakeMarkdown` — already
-  match the booklet's own wording (the seed's Shift text is a condensed
-  version of the booklet's fuller 3-paragraph text; not changed here,
-  since the user didn't ask for that and it isn't wrong, just shorter).
+- `masteryBullets`, `commonMistakeMarkdown` — already match the
+  booklet's own wording verbatim.
+- `shiftMarkdown` — the seed initially had a condensed version of the
+  booklet's fuller 3-paragraph text; not wrong, just shorter. Left
+  as-is in the first pass, then the user explicitly asked for the full
+  text verbatim too — updated to the exact 3-paragraph booklet text,
+  same extraction verified earlier (`pdftotext -layout` cross-checked
+  against the rendered page). Required one rendering fix alongside it:
+  the Shift `<p>` had no `whitespace-pre-line`, so the `\n\n` paragraph
+  breaks in the fuller text would have collapsed into one run-on block
+  — added that class (safe for every other competency too, a no-op
+  where there's no newline in the string).
 - `toolkitTags` — the booklet lists 12 tags for competency 1; the seed
   currently has 6 (missing `.guidelines/`, `/permissions`, `gh`,
   `vercel`, `gcp`, `playwright-cli`). **Not changed here** — the user
@@ -51,8 +59,8 @@ and `ToolkitHub` are untouched.
 
 - Rolling out to the other 11 competencies — explicitly staged as a
   pilot; the user reviews competency 1 first.
-- Changing `shiftMarkdown` or `toolkitTags` — flagged above, not acted
-  on without a separate decision.
+- Changing `toolkitTags` — flagged above, not acted on without a
+  separate decision (`shiftMarkdown` *was* changed — see above).
 - Automating extraction from the booklet PDF via
   `scripts/generate-seed.mjs`. That script's real job is parsing the
   guidebook's actual HTML source pages, which aren't available in this
