@@ -1,14 +1,17 @@
-# Feature spec — Learn tab refresh from the real guidebook booklet (rolling out one competency at a time)
+# Feature spec — Learn tab refresh from the real guidebook booklet (rollout complete: 12/12)
 
 Written before implementation, per this repo's convention. Prompted by
 the user uploading the real "Agentic Engineering" booklet (v2 PDF,
 `codewalnut.com`) and asking the Learn tab to visibly reflect it — the
 diagram, the "In Practice" content, and closer visual fidelity —
-starting with Competency 01 as a pilot, reviewed and approved, and now
-being rolled out to the remaining competencies **one at a time** per the
+starting with Competency 01 as a pilot, reviewed and approved, and then
+rolled out to the remaining competencies **one at a time** per the
 user's explicit instruction, since each competency's diagram is
 structurally bespoke (verified by rendering and reading several
 competencies' actual booklet pages before committing to this pacing).
+As of Competency 12, all 12 have the real tagline, Shift text, In
+Practice bullets, and a bespoke diagram — each competency's own
+section below documents its source pages and what changed.
 
 ## Competency 02 — Spec Framing
 
@@ -215,6 +218,32 @@ previous 4: added `StyleProof`). `StyleProof` needed an
 `EXACT_OVERRIDES` entry (`"test"` — it verifies a refactor's output,
 no generic keyword match) and a new `lib/artifact-glossary.ts` entry.
 
+## Competency 12 — Agentic Retrospective
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 27–28. The last one in
+the rollout — all 12 competencies now have the booklet's tagline,
+Shift text, In Practice bullets, and a bespoke diagram. Same
+treatment: `tagline`, full 3-paragraph `shiftMarkdown`, 7
+`inPracticeBullets`, and a bespoke diagram (`RetroLoopDiagram.tsx`).
+No pull-quote on this page.
+
+This is the one diagram in the whole refresh that's genuinely circular
+in the booklet — a 5-step flywheel (Capture → Analyze → Draft the fix
+→ Approve → Smarter, looping back to Capture) with "each turn
+compounds" at the center — so it's the one exception to the
+stacked-card pattern every other diagram in this refresh uses: 5 nodes
+absolute-positioned around a plain dashed-border circle (percentages
+computed from evenly-spaced angles, not measured from the booklet
+image), rather than a straight-line chain. Still no curved SVG
+connectors — the circle itself is the only "track," a single CSS
+border.
+
+`toolkitTags` reconciled once more (booklet's 5 vs. the seed's
+previous 3: added `AGENTS.md & context updates`, `skills`). `skills`
+already had a glossary entry from competency 3; `AGENTS.md & context
+updates` needed a new one. Both classify correctly under the existing
+keyword-based categories (doc, skill) with no override needed.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").
@@ -325,3 +354,15 @@ decision.
 - [ ] `npm run build` clean, `npm test` passing, a fresh reseed
   succeeds, and a live Playwright screenshot of competency 1's Learn
   tab is reviewed before shipping.
+
+## Rollout status
+
+The acceptance criteria above are the original Competency 1 pilot's —
+left as the historical record of what was checked before the user
+approved rolling out further. Each subsequent competency (02 through
+12) got the same checklist applied fresh, documented in its own
+section above: real tagline/Shift/In Practice content verified against
+the booklet PDF, a bespoke diagram, `npm run build` clean, `npm test`
+passing, a fresh reseed, and a live Playwright screenshot reviewed
+before shipping. All 12 competencies are done as of Competency 12's
+commit — the rollout described in the title is complete.

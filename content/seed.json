@@ -352,7 +352,7 @@
       "number": 12,
       "title": "Agentic Retrospective",
       "subtitle": "Session Review, Waste Reduction & Improvement",
-      "shiftMarkdown": "Every sprint ends with a retro, yet most of us drive a coding agent for months and never review a single session. Those sessions are data now — create a workflow where the agent reviews its own trace and drafts the fix, and you approve the merge.",
+      "shiftMarkdown": "Every sprint ends with a retro: what worked, what dragged, what to fix next time. You would never run a team for a year without one. Yet most of us drive a coding agent for months and never review a single session.\n\nThose sessions are data now. Every thread shows where the agent guessed wrong, where you re-prompted three times, where tokens went into retry loops. Create a workflow such that at every session end, the agent reviews its own trace and drafts the fix: a sharper rule, a new skill, or a hook. You approve, and the next session starts smarter.\n\nKeep yourself in the loop where it counts: the capture and first draft are automatic, but the merge is yours. Left to rewrite itself unwatched, the context bloats and buries the rules that matter. The goal is not a system that edits itself, but one that proposes changes and lets you decide.",
       "masteryBullets": [
         "The same mistake stops recurring across sessions",
         "rules and skills grow from real session evidence",
@@ -362,10 +362,20 @@
       "toolkitTags": [
         "session logs",
         "Stop/PreToolUse hooks",
+        "AGENTS.md & context updates",
+        "skills",
         "agenttrace"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Capture automatically: a session-end hook logs corrections, re-prompts, and abandoned threads",
+        "Let the agent analyze recent sessions: where context grew, prompts failed, and rewrites happened",
+        "Have it draft the fix: a rule in AGENTS.md, a new skill, a hook, or a habit change",
+        "Diff its output against your final commit; what you corrected by hand is the lesson",
+        "Approve before it lands: the agent never silently rewrites its own rules",
+        "Prune as you go: drop contradictory or bloated rules so context stays tight",
+        "Track tokens, cost, and tool failures over time so you can see the loop working"
+      ],
+      "tagline": "Wire the loop so each session improves the next: the agent flags what went wrong, you approve the fix, and your setup keeps getting better."
     }
   ],
   "exercises": [

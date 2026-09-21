@@ -74,6 +74,7 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "strangler pattern": "A migration strategy that routes traffic to a new implementation incrementally, piece by piece, while the old system keeps running underneath, until it can be fully retired.",
   styleproof: "A named tool referenced in this competency's guidebook for verifying a refactor changed structure without changing visual or behavioral output.",
   "session logs": "The recorded transcript of an agent session — every prompt, tool call, and result — used afterward to review what the agent actually did.",
+  "agents.md & context updates": "The retrospective's actual output: a sharper rule, corrected instruction, or pruned line added back into AGENTS.md so the next session starts from the lesson instead of repeating it.",
   agenttrace: "A named tool referenced in this competency's guidebook for capturing and analyzing agent session traces.",
 
   // The recurring before/after evidence protocol: nearly every exercise

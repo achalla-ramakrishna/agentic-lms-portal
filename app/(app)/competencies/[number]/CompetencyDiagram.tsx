@@ -9,6 +9,7 @@ import { EvidenceLadderDiagram } from "./EvidenceLadderDiagram";
 import { ReviewAgentsDiagram } from "./ReviewAgentsDiagram";
 import { TokenSavingsDiagram } from "./TokenSavingsDiagram";
 import { RefactorLoopDiagram } from "./RefactorLoopDiagram";
+import { RetroLoopDiagram } from "./RetroLoopDiagram";
 
 // Each competency's booklet diagram is structurally bespoke (radial setup
 // diagram, two-column comparison, ...), so this dispatches to a hardcoded
@@ -41,6 +42,8 @@ export function CompetencyDiagram({ competencyNumber }: { competencyNumber: numb
       return <TokenSavingsDiagram />;
     case 11:
       return <RefactorLoopDiagram />;
+    case 12:
+      return <RetroLoopDiagram />;
     default:
       return null;
   }
