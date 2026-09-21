@@ -179,6 +179,26 @@ booklet exactly (`/review`, `MergeMitra`, `SuperPowers Skills`) — no
 reconciliation needed this time. `CompetencyDiagram.tsx` gained a
 `case 9`.
 
+## Competency 10 — Token Economics
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 23–24. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 7 `inPracticeBullets` (5
+bold). No pull-quote on this page. A bespoke diagram
+(`TokenSavingsDiagram.tsx`) — the levers that cut an agent's token
+bill, grouped by what they save (fewer input tokens / smarter dispatch
+/ fewer output tokens). The booklet sizes each card by its real share
+of $ saved; this app can't verify that number, so every card in a
+column renders at equal height instead of a fabricated precise size —
+the diagram's own caption says so explicitly rather than silently
+implying false precision. `CompetencyDiagram.tsx` gained a `case 10`.
+
+`toolkitTags` reconciled once more (booklet's 8 vs. the seed's
+previous 4: added `/clear`, `/status`, `Ponytail Skill`, `RTK`). `RTK`
+(Rust Token Killer) needed an `EXACT_OVERRIDES` entry in
+`lib/artifact-icons.ts` grouping it with `Graphify` under the
+`metric` category (no generic keyword match). All four tags needed
+new `lib/artifact-glossary.ts` entries.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

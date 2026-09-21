@@ -289,7 +289,7 @@
       "number": 10,
       "title": "Token Economics",
       "subtitle": "Right Model & Token Cost Optimizations",
-      "shiftMarkdown": "For most of your career, the cost of writing code was your time, not tokens. With agents, every turn has a cost — context gets billed again, reasoning costs more. Use a strong model to plan and review, a cheaper one for routine implementation.",
+      "shiftMarkdown": "For most of your career, the cost of writing code was your time. You did not think about the price of a function or the cost of another review pass.\n\nWith agents, every turn has a cost. Context gets billed again, reasoning costs more, and slow model choices add up. If you use max-effort frontier models for every task, the bill and the wait both grow.\n\nThe fix is basic engineering judgment. Say what you mean. Keep the workspace tidy. Do not hand the agent more than the job needs. Use a strong model to plan and review. Use a cheaper, faster one for routine implementation.",
       "masteryBullets": [
         "You pick model and effort on purpose, per task",
         "your bill tracks task difficulty, not session count",
@@ -298,12 +298,24 @@
       "commonMistakeMarkdown": "Do not use the strongest model on simple edits. Max effort by habit spends expensive tokens on work that never needed them.",
       "toolkitTags": [
         "/compact",
+        "/clear",
+        "/status",
         "/usage",
         "Graphify",
-        "Hand-off Skill"
+        "Ponytail Skill",
+        "Hand-off Skill",
+        "RTK"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Plan, architect, and review with **frontier models** (Opus, GPT); implement the plan with **cost-efficient models** (Kimi, GLM)",
+        "Match reasoning effort to the task: low/medium for routine edits, higher/max for hard design and deep reviews",
+        "Keep always-on context small: lean rules, few skills, only MCP tools you use",
+        "One task per session; **compact early** so stale context is not re-billed every turn; when resuming old threads, start from a summary",
+        "**Index the repo into a queryable map** (like Graphify) so the agent reads pointers before raw files",
+        "**Do not churn the cache** mid-task by changing model, effort, rules, or tools",
+        "Push repeated deterministic work down to a script or hook; the cheapest call is the one you do not make"
+      ],
+      "tagline": "Spend expensive tokens on judgment. Do not use them for routine edits."
     },
     {
       "number": 11,
