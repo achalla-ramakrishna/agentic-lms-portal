@@ -6,7 +6,7 @@ import { StatusBadge } from "@/app/status-badge";
 import { ToolkitHub } from "./ToolkitHub";
 import { HowToFlow } from "./HowToFlow";
 import { ActivityFlow } from "./ActivityFlow";
-import { AgentCoreDiagram } from "./AgentCoreDiagram";
+import { CompetencyDiagram } from "./CompetencyDiagram";
 import { competencyStyle } from "@/lib/competency-style";
 import type { ToolkitDoc } from "@/lib/toolkit-doc-links";
 import type { SubmissionStatus } from "@prisma/client";
@@ -98,7 +98,7 @@ export function CompetencyTabs({
 
           {inPracticeBullets.length > 0 && (
             <div className="border-t border-line pt-5">
-              <AgentCoreDiagram competencyNumber={competencyNumber} />
+              <CompetencyDiagram competencyNumber={competencyNumber} />
             </div>
           )}
 

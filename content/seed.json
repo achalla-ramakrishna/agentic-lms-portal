@@ -37,7 +37,7 @@
       "number": 2,
       "title": "Spec Framing",
       "subtitle": "Requirements Decomposition & Testable Spec Creation",
-      "shiftMarkdown": "Fuzzy tickets used to be survivable — your judgment caught the missing edge case before review. Give an agent the same fuzzy ticket and it fills the gaps too, but without your judgment: it guesses confidently and builds fast. Use the agent to find assumptions and draft product questions, then turn the answers into a clear, testable spec.",
+      "shiftMarkdown": "Fuzzy tickets used to be easier to survive. You could read between the lines, ask the product team a sharper question, and catch the missing edge case before review. Your judgment kept the work from drifting.\n\nGive that same fuzzy ticket to an agent and it fills the gaps too, but without your judgment. It will not pause at ambiguity. It guesses confidently and builds fast. The vaguer the ask, the more wrong code comes back.\n\nThe skill is not new. The handoff point is. Use the agent to find assumptions, draft product questions, capture your answers, and turn them into a clear spec. Write down the user, the state change, the examples, the non-goals, and the checks that prove it works. Keep each slice small enough to test and review.",
       "masteryBullets": [
         "Implementation starts from clear acceptance criteria",
         "the first diff matches intent",
@@ -48,11 +48,21 @@
         "/plan",
         "spec.md",
         "acceptance criteria",
+        "superpowers skill",
+        "spec-kit skill",
         "Given/When/Then",
         "EARS"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Let the agent **interview the ticket first**: gaps, assumptions, and product questions before code planning",
+        "Decompose into **PR-sized chunks**: each independent, testable, reviewable in one sitting",
+        "Write acceptance criteria the agent can verify: expected behavior, boundaries, failure states, and done conditions",
+        "Include concrete examples: sample inputs, expected outputs, UI states, API responses, and errors",
+        "**Brainstorm edge cases with the agent:** limits, auth, concurrency, and failure paths before code, not in review",
+        "Add a **\"Not in scope\"** line so the agent stops guessing at boundaries",
+        "Before any code, **have the agent mirror the spec back**: restate intent, list inputs and outputs, and flag what it had to assume"
+      ],
+      "tagline": "Don't hand the agent a vague ticket. Hand it a contract it can test."
     },
     {
       "number": 3,

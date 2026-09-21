@@ -17,6 +17,8 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "clis/mcp": "Command-line tools and Model Context Protocol servers — the two main ways an agent gets structured access to external systems (a database, an API, a ticketing system) beyond plain file edits.",
   "/plan": "A slash command that asks the agent to propose an approach and stop for approval before writing any code — separating \"what to do\" from \"doing it.\"",
   "spec.md": "A written specification file capturing requirements and acceptance criteria before implementation starts, so both the human and the agent are building toward the same, testable definition of done.",
+  "superpowers skill": "A packaged skill that walks an agent through interviewing a vague ticket — surfacing assumptions and drafting clarifying product questions before any spec gets written.",
+  "spec-kit skill": "A packaged skill that turns clarified requirements into a structured spec.md (actor, state change, examples, acceptance criteria, non-goals) instead of an ad-hoc write-up.",
   "acceptance criteria": "The specific, checkable conditions that decide whether a requirement is actually satisfied — the difference between \"looks done\" and \"is done.\"",
   "given/when/then": "A structured format for writing a behavior scenario (its starting state, the action taken, the expected result) so acceptance criteria are unambiguous and testable.",
   ears: "Easy Approach to Requirements Syntax — a constrained sentence template (\"While <state>, when <trigger>, the system shall <response>\") that makes requirements precise enough for an agent to implement without guessing.",

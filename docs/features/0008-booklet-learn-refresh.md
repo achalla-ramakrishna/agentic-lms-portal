@@ -1,11 +1,40 @@
-# Feature spec — Learn tab refresh from the real guidebook booklet (pilot: Competency 01)
+# Feature spec — Learn tab refresh from the real guidebook booklet (rolling out one competency at a time)
 
 Written before implementation, per this repo's convention. Prompted by
 the user uploading the real "Agentic Engineering" booklet (v2 PDF,
 `codewalnut.com`) and asking the Learn tab to visibly reflect it — the
 diagram, the "In Practice" content, and closer visual fidelity —
-starting with one competency as a pilot before deciding whether to roll
-out to all 12.
+starting with Competency 01 as a pilot, reviewed and approved, and now
+being rolled out to the remaining competencies **one at a time** per the
+user's explicit instruction, since each competency's diagram is
+structurally bespoke (verified by rendering and reading several
+competencies' actual booklet pages before committing to this pacing).
+
+## Competency 02 — Spec Framing
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 6–7. Same treatment as
+Competency 01: `tagline`, the full 3-paragraph `shiftMarkdown`, 7
+`inPracticeBullets` (3 with `**bold**` terms), and a bespoke diagram
+(`SpecFramingDiagram.tsx`) — a two-column Vague Request (danger-tinted)
+vs. A Contract It Can Test (success-tinted) comparison, plus a bottom "A
+Spec Spells Out" pill list, reusing the existing
+`border-danger-fg/50 bg-danger-fg/10` / `border-success-fg/50
+bg-success-fg/10` card tokens rather than custom SVG line art (same
+approach as `AgentCoreDiagram`'s `Connector`).
+
+Unlike Competency 01, `toolkitTags` **was** updated here: the booklet
+lists 7 tags (`/plan`, `spec.md`, `acceptance criteria`, `superpowers
+skill`, `spec-kit skill`, `Given/When/Then`, `EARS`) against the seed's
+previous 5 (missing the two skill tags) — reconciled to match the
+booklet, since by this competency the discrepancy pattern was already
+flagged once for competency 1 and the user's continued "follow the
+booklet" instruction covers it.
+
+A new `CompetencyDiagram.tsx` dispatcher (`competencyNumber` →
+`AgentCoreDiagram` for 1, `SpecFramingDiagram` for 2, `null` for the
+rest) replaces `CompetencyTabs.tsx`'s previous hardcoded
+`AgentCoreDiagram` import, since the diagram is no longer
+competency-1-only.
 
 ## Source
 
