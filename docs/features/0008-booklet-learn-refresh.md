@@ -199,6 +199,22 @@ previous 4: added `/clear`, `/status`, `Ponytail Skill`, `RTK`). `RTK`
 `metric` category (no generic keyword match). All four tags needed
 new `lib/artifact-glossary.ts` entries.
 
+## Competency 11 — Agentic Refactoring
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 25–26. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 7 `inPracticeBullets` (3
+bold), a real pull-quote, and a bespoke diagram
+(`RefactorLoopDiagram.tsx`) — the 4-step refactor loop (Characterize →
+Change → Verify → Commit), repeated each pass, plus the "tests are the
+contract" callout. Plain arrow characters between cards instead of a
+curved SVG return-path for the repeat loop. `CompetencyDiagram.tsx`
+gained a `case 11`.
+
+`toolkitTags` reconciled once more (booklet's 5 vs. the seed's
+previous 4: added `StyleProof`). `StyleProof` needed an
+`EXACT_OVERRIDES` entry (`"test"` — it verifies a refactor's output,
+no generic keyword match) and a new `lib/artifact-glossary.ts` entry.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

@@ -321,7 +321,7 @@
       "number": 11,
       "title": "Agentic Refactoring",
       "subtitle": "Test-Driven Tech-Debt Cleanup",
-      "shiftMarkdown": "Every codebase has a module nobody wants to open, because without tests any cleanup can break behavior nobody knew existed. Agents make cleanup cheaper, but a clean rewrite that changes behavior is still a bug — the move is test-first: characterize, then change in small steps.",
+      "shiftMarkdown": "Every codebase has a module nobody wants to open. It was written years ago, or rushed last quarter under deadline. It works, sort of, so it sits in the backlog. The fear is rational: without tests, any cleanup can break behavior you did not know existed.\n\nAgents make cleanup cheaper, but blind rewrites are still dangerous. A clean rewrite that changes behavior is still a bug. The move is test-first: have the agent read the code, write a behavior spec, generate characterization tests, get a green baseline, then refactor in small steps.\n\nYour job is to decide what must stay true. The tests make the scary part safer.",
       "masteryBullets": [
         "A green baseline exists before you start",
         "every chunk leaves the suite green",
@@ -332,10 +332,21 @@
         "behavior spec",
         "characterization tests",
         "feature flags",
+        "StyleProof",
         "Strangler Pattern"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Start with a net: generate a **behavior spec** from existing code, then **characterization tests**",
+        "Get a **green baseline** before you move a line; tests must pass against current code first",
+        "Mark each behavior: must-preserve, intentionally-changing, or actually-a-bug",
+        "Move in small, reviewable steps: isolate I/O, split validation from side effects, retire one branch of conditionals at a time; never \"rewrite this module\"",
+        "Keep the suite green at every chunk; never carry red into the next step",
+        "Preserve external contracts: APIs, schemas, logs, outputs, and screenshots",
+        "Do not patch a test just to make the refactor pass"
+      ],
+      "tagline": "Before the agent cleans up old code, make it prove the behavior stays the same.",
+      "quoteMarkdown": "The first question you should always ask on any new codebase is: do we have behavioural-focused tests that give us confidence that we can change the internals and the actual experience for a user or client is maintained? That's number one. That is how we refactor.",
+      "quoteAttribution": "Ben SE, CTO, CodeWalnut"
     },
     {
       "number": 12,

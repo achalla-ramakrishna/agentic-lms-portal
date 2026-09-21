@@ -72,6 +72,7 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   "characterization tests": "Tests written against existing, undocumented behavior to lock in what a legacy system currently does before refactoring it — a safety net when there's no spec to test against.",
   "feature flags": "A configuration switch that turns a feature on or off without a new deploy, letting a risky change roll out gradually or roll back instantly.",
   "strangler pattern": "A migration strategy that routes traffic to a new implementation incrementally, piece by piece, while the old system keeps running underneath, until it can be fully retired.",
+  styleproof: "A named tool referenced in this competency's guidebook for verifying a refactor changed structure without changing visual or behavioral output.",
   "session logs": "The recorded transcript of an agent session — every prompt, tool call, and result — used afterward to review what the agent actually did.",
   agenttrace: "A named tool referenced in this competency's guidebook for capturing and analyzing agent session traces.",
 

@@ -8,6 +8,7 @@ import { AdrSequenceDiagram } from "./AdrSequenceDiagram";
 import { EvidenceLadderDiagram } from "./EvidenceLadderDiagram";
 import { ReviewAgentsDiagram } from "./ReviewAgentsDiagram";
 import { TokenSavingsDiagram } from "./TokenSavingsDiagram";
+import { RefactorLoopDiagram } from "./RefactorLoopDiagram";
 
 // Each competency's booklet diagram is structurally bespoke (radial setup
 // diagram, two-column comparison, ...), so this dispatches to a hardcoded
@@ -38,6 +39,8 @@ export function CompetencyDiagram({ competencyNumber }: { competencyNumber: numb
       return <ReviewAgentsDiagram />;
     case 10:
       return <TokenSavingsDiagram />;
+    case 11:
+      return <RefactorLoopDiagram />;
     default:
       return null;
   }

@@ -64,6 +64,7 @@ const EXACT_OVERRIDES: Record<string, ArtifactCategory> = {
   "backlog.md": "spec", // would otherwise false-match the "log" substring in the metric check below
   "allure reports": "review", // groups with ci artifacts/coverage report as PR review evidence, not generic "test" tooling
   rtk: "metric", // Rust Token Killer — same bucket as graphify, a token/usage-reduction tool
+  styleproof: "test", // verifies a refactor's output, not a generic doc
 };
 
 // Order matters: more specific/exclusive checks first, so e.g. "excalidraw
