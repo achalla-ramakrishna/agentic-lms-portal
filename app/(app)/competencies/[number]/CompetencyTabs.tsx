@@ -79,23 +79,18 @@ export function CompetencyTabs({
 
       {tab === "Learn" && (
         <section className="mt-6 space-y-6 rounded-xl border border-line bg-canvas-subtle p-7">
-          <div
-            className={
-              inPracticeBullets.length > 0
-                ? "grid grid-cols-1 gap-6 lg:grid-cols-2"
-                : undefined
-            }
-          >
-            <div>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-accent">
-                The Shift
-              </h2>
-              <p className="mt-2 leading-relaxed text-fg">{shiftMarkdown}</p>
-            </div>
-            {inPracticeBullets.length > 0 && (
-              <AgentCoreDiagram competencyNumber={competencyNumber} />
-            )}
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-accent">
+              The Shift
+            </h2>
+            <p className="mt-2 leading-relaxed text-fg">{shiftMarkdown}</p>
           </div>
+
+          {inPracticeBullets.length > 0 && (
+            <div className="border-t border-line pt-5">
+              <AgentCoreDiagram competencyNumber={competencyNumber} />
+            </div>
+          )}
 
           {inPracticeBullets.length > 0 && (
             <div className="border-t border-line pt-5">
