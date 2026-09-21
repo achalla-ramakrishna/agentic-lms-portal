@@ -19,6 +19,7 @@ model Competency {
   masteryBullets        String // JSON-encoded string[]
   commonMistakeMarkdown String
   toolkitTags           String // JSON-encoded string[]
+  inPracticeBullets     String     @default("[]") // JSON-encoded string[] — empty until authored for a competency (docs/features/0008-booklet-learn-refresh.md)
   exercises             Exercise[]
 }
 

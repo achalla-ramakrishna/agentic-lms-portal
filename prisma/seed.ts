@@ -36,6 +36,7 @@ type SeedCompetency = {
   masteryBullets: string[];
   commonMistakeMarkdown: string;
   toolkitTags: string[];
+  inPracticeBullets: string[];
 };
 type Seed = { competencies: SeedCompetency[]; exercises: SeedExercise[] };
 
@@ -53,6 +54,7 @@ async function main() {
         masteryBullets: JSON.stringify(c.masteryBullets),
         commonMistakeMarkdown: c.commonMistakeMarkdown,
         toolkitTags: JSON.stringify(c.toolkitTags),
+        inPracticeBullets: JSON.stringify(c.inPracticeBullets),
       },
       create: {
         number: c.number,
@@ -62,6 +64,7 @@ async function main() {
         masteryBullets: JSON.stringify(c.masteryBullets),
         commonMistakeMarkdown: c.commonMistakeMarkdown,
         toolkitTags: JSON.stringify(c.toolkitTags),
+        inPracticeBullets: JSON.stringify(c.inPracticeBullets),
       },
     });
   }

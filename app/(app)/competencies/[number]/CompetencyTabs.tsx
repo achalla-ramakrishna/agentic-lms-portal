@@ -6,6 +6,7 @@ import { StatusBadge } from "@/app/status-badge";
 import { ToolkitHub } from "./ToolkitHub";
 import { HowToFlow } from "./HowToFlow";
 import { ActivityFlow } from "./ActivityFlow";
+import { AgentCoreDiagram } from "./AgentCoreDiagram";
 import { competencyStyle } from "@/lib/competency-style";
 import type { ToolkitDoc } from "@/lib/toolkit-doc-links";
 import type { SubmissionStatus } from "@prisma/client";
@@ -29,6 +30,7 @@ type Props = {
   masteryBullets: string[];
   commonMistakeMarkdown: string;
   toolkitTags: string[];
+  inPracticeBullets: string[];
   toolkitDocs: ToolkitDoc[];
   inputArtifacts: string[];
   outputArtifacts: string[];
@@ -46,6 +48,7 @@ export function CompetencyTabs({
   masteryBullets,
   commonMistakeMarkdown,
   toolkitTags,
+  inPracticeBullets,
   toolkitDocs,
   inputArtifacts,
   outputArtifacts,
@@ -76,15 +79,39 @@ export function CompetencyTabs({
 
       {tab === "Learn" && (
         <section className="mt-6 space-y-6 rounded-xl border border-line bg-canvas-subtle p-7">
-          <div>
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-accent">
-              The Shift
-            </h2>
-            <p className="mt-2 leading-relaxed text-fg">{shiftMarkdown}</p>
+          <div
+            className={
+              inPracticeBullets.length > 0
+                ? "grid grid-cols-1 gap-6 lg:grid-cols-2"
+                : undefined
+            }
+          >
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-accent">
+                The Shift
+              </h2>
+              <p className="mt-2 leading-relaxed text-fg">{shiftMarkdown}</p>
+            </div>
+            {inPracticeBullets.length > 0 && (
+              <AgentCoreDiagram competencyNumber={competencyNumber} />
+            )}
           </div>
 
+          {inPracticeBullets.length > 0 && (
+            <div className="border-t border-line pt-5">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
+                In Practice
+              </h3>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-fg">
+                {inPracticeBullets.map((b, i) => (
+                  <li key={i}>{b}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-6 border-t border-line pt-5 sm:grid-cols-2">
-            <div>
+            <div className="rounded-xl border border-success-fg/40 bg-success-subtle p-4">
               <h3 className="text-sm font-semibold text-success-fg">
                 ✓ What mastery looks like
               </h3>
@@ -94,7 +121,7 @@ export function CompetencyTabs({
                 ))}
               </ul>
             </div>
-            <div>
+            <div className="rounded-xl border border-attention-fg/40 bg-attention-subtle p-4">
               <h3 className="text-sm font-semibold text-attention-fg">
                 ⚠ Common mistake to avoid
               </h3>

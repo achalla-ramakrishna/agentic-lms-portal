@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import {
   masteryBullets,
   toolkitTags,
+  inPracticeBullets,
   howToSteps,
   evidenceChecklist,
 } from "@/lib/content";
@@ -79,6 +80,7 @@ export default async function CompetencyPage({
           masteryBullets={masteryBullets(competency)}
           commonMistakeMarkdown={competency.commonMistakeMarkdown}
           toolkitTags={toolkitTags(competency)}
+          inPracticeBullets={inPracticeBullets(competency)}
           toolkitDocs={toolkitDocs}
           inputArtifacts={artifacts.inputs}
           outputArtifacts={artifacts.outputs}

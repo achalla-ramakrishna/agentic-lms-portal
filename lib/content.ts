@@ -13,6 +13,10 @@ export function toolkitTags(c: Pick<Competency, "toolkitTags">): string[] {
   return JSON.parse(c.toolkitTags);
 }
 
+export function inPracticeBullets(c: Pick<Competency, "inPracticeBullets">): string[] {
+  return JSON.parse(c.inPracticeBullets);
+}
+
 export function howToSteps(e: Pick<Exercise, "howToSteps">): string[] {
   return JSON.parse(e.howToSteps);
 }

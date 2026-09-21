@@ -18,6 +18,18 @@
         "sandboxing",
         "secret scanning",
         "CLIs/MCP"
+      ],
+      "inPracticeBullets": [
+        "Write a tight AGENTS.md / CLAUDE.md: project overview, scripts, and team conventions agents should follow",
+        "Split deep rules into skills so the always-on file stays lean",
+        "Run in safe auto mode, not YOLO: let it act, but keep approval on risky stuff",
+        "Add deny rules so it cannot read sensitive data like .env files or secrets manager",
+        "Map trust boundaries clearly: secrets, PII, auth paths, external inputs, privileged commands, and untrusted sources the agent must treat as data, not instructions",
+        "Use PreToolUse hooks for guardrails that static rules alone cannot prevent",
+        "Wire only the CLIs / MCP you need; vet MCP servers first, and disable the rest",
+        "Treat what the agent reads as untrusted: issues, READMEs, and tool descriptions can hijack it",
+        "Review and scan its output: AI code can carry vulnerabilities and look-alike packages",
+        "Codify repeated corrections back into the rules file, not just that thread alone"
       ]
     },
     {
@@ -37,7 +49,8 @@
         "acceptance criteria",
         "Given/When/Then",
         "EARS"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 3,
@@ -56,7 +69,8 @@
         "ADRs",
         "architecture.md",
         "conventions.md"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 4,
@@ -75,7 +89,8 @@
         "API Mocks",
         "Role Locators",
         "Trace Viewer"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 5,
@@ -93,7 +108,8 @@
         ".agents/skills",
         ".claude/skills/",
         "Skill Creator Skill"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 6,
@@ -111,7 +127,8 @@
         "subagents",
         "agent teams",
         "Treehouse"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 7,
@@ -129,7 +146,8 @@
         "Mermaid",
         "C4",
         "excalidraw skill"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 8,
@@ -147,7 +165,8 @@
         "CI artifacts",
         "PR template",
         "Coverage Report"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 9,
@@ -164,7 +183,8 @@
         "/review",
         "MergeMitra",
         "SuperPowers Skills"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 10,
@@ -182,7 +202,8 @@
         "/usage",
         "Graphify",
         "Hand-off Skill"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 11,
@@ -200,7 +221,8 @@
         "characterization tests",
         "feature flags",
         "Strangler Pattern"
-      ]
+      ],
+      "inPracticeBullets": []
     },
     {
       "number": 12,
@@ -217,7 +239,8 @@
         "session logs",
         "Stop/PreToolUse hooks",
         "agenttrace"
-      ]
+      ],
+      "inPracticeBullets": []
     }
   ],
   "exercises": [
