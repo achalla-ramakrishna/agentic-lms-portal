@@ -30,7 +30,8 @@
         "Treat what the agent reads as untrusted: issues, READMEs, and tool descriptions can hijack it",
         "Review and scan its output: AI code can carry vulnerabilities and look-alike packages",
         "Codify repeated corrections back into the rules file, not just that thread alone"
-      ]
+      ],
+      "tagline": "Set up the agent like a new teammate: house rules, guardrails, and only the keys it needs."
     },
     {
       "number": 2,
@@ -50,7 +51,8 @@
         "Given/When/Then",
         "EARS"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 3,
@@ -70,7 +72,8 @@
         "architecture.md",
         "conventions.md"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 4,
@@ -90,7 +93,8 @@
         "Role Locators",
         "Trace Viewer"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 5,
@@ -109,7 +113,8 @@
         ".claude/skills/",
         "Skill Creator Skill"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 6,
@@ -128,7 +133,8 @@
         "agent teams",
         "Treehouse"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 7,
@@ -147,7 +153,8 @@
         "C4",
         "excalidraw skill"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 8,
@@ -166,7 +173,8 @@
         "PR template",
         "Coverage Report"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 9,
@@ -184,7 +192,8 @@
         "MergeMitra",
         "SuperPowers Skills"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 10,
@@ -203,7 +212,8 @@
         "Graphify",
         "Hand-off Skill"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 11,
@@ -222,7 +232,8 @@
         "feature flags",
         "Strangler Pattern"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     },
     {
       "number": 12,
@@ -240,7 +251,8 @@
         "Stop/PreToolUse hooks",
         "agenttrace"
       ],
-      "inPracticeBullets": []
+      "inPracticeBullets": [],
+      "tagline": ""
     }
   ],
   "exercises": [

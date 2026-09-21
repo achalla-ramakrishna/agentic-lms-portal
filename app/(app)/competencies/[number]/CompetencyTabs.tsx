@@ -26,6 +26,7 @@ type ExerciseTabData = {
 type Props = {
   competencyNumber: number;
   competencyTitle: string;
+  tagline: string;
   shiftMarkdown: string;
   masteryBullets: string[];
   commonMistakeMarkdown: string;
@@ -44,6 +45,7 @@ type Tab = (typeof TABS)[number];
 export function CompetencyTabs({
   competencyNumber,
   competencyTitle,
+  tagline,
   shiftMarkdown,
   masteryBullets,
   commonMistakeMarkdown,
@@ -79,11 +81,17 @@ export function CompetencyTabs({
 
       {tab === "Learn" && (
         <section className="mt-6 space-y-6 rounded-xl border border-line bg-canvas-subtle p-7">
+          {tagline && (
+            <p className="border-l-4 pl-4 text-base font-bold text-fg" style={{ borderColor: color }}>
+              {tagline}
+            </p>
+          )}
+
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-wide text-accent">
               The Shift
             </h2>
-            <p className="mt-2 whitespace-pre-line leading-relaxed text-fg">
+            <p className="mt-2 whitespace-pre-line text-justify leading-relaxed text-fg">
               {shiftMarkdown}
             </p>
           </div>
@@ -96,10 +104,8 @@ export function CompetencyTabs({
 
           {inPracticeBullets.length > 0 && (
             <div className="border-t border-line pt-5">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
-                In Practice
-              </h3>
-              <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-fg">
+              <h3 className="text-xl font-bold text-fg">In Practice</h3>
+              <ul className="mt-3 list-disc space-y-1.5 pl-4 text-sm text-fg">
                 {inPracticeBullets.map((b, i) => (
                   <li key={i}>
                     <BoldText text={b} />

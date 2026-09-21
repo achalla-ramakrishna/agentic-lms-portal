@@ -15,6 +15,7 @@ model Competency {
   number                Int        @unique
   title                 String
   subtitle              String
+  tagline               String     @default("") // real booklet callout line under the title, empty until authored (docs/features/0008-booklet-learn-refresh.md)
   shiftMarkdown         String
   masteryBullets        String // JSON-encoded string[]
   commonMistakeMarkdown String

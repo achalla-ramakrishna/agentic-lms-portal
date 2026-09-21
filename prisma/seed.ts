@@ -32,6 +32,7 @@ type SeedCompetency = {
   number: number;
   title: string;
   subtitle: string;
+  tagline: string;
   shiftMarkdown: string;
   masteryBullets: string[];
   commonMistakeMarkdown: string;
@@ -50,6 +51,7 @@ async function main() {
       update: {
         title: c.title,
         subtitle: c.subtitle,
+        tagline: c.tagline,
         shiftMarkdown: c.shiftMarkdown,
         masteryBullets: JSON.stringify(c.masteryBullets),
         commonMistakeMarkdown: c.commonMistakeMarkdown,
@@ -60,6 +62,7 @@ async function main() {
         number: c.number,
         title: c.title,
         subtitle: c.subtitle,
+        tagline: c.tagline,
         shiftMarkdown: c.shiftMarkdown,
         masteryBullets: JSON.stringify(c.masteryBullets),
         commonMistakeMarkdown: c.commonMistakeMarkdown,
