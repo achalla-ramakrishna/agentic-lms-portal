@@ -60,6 +60,7 @@ const EXACT_OVERRIDES: Record<string, ArtifactCategory> = {
   ears: "spec",
   "flow diagrams": "diagram",
   fixtures: "test",
+  "background agents": "agent",
 };
 
 // Order matters: more specific/exclusive checks first, so e.g. "excalidraw

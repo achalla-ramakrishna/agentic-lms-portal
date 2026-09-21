@@ -101,6 +101,26 @@ correctly under `lib/artifact-icons.ts`'s existing keyword-based
 `skill` category (no override needed); added its
 `lib/artifact-glossary.ts` entry.
 
+## Competency 06 — Multi-Agent Workflows
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 15–16. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 7 `inPracticeBullets` (3
+bold), a real pull-quote (Matt Pocock, AI Educator), and a bespoke
+diagram (`ParallelLanesDiagram.tsx`) — three independent-task lanes
+branching off `main`, each its own PR, converging on one review point,
+plus the booklet's two bottom callouts ("Same files, two agents" /
+"One complex task? Use subagents"). The booklet draws the branches as
+a curved git-graph; here it's three plain lanes (a colored line either
+side of a card) instead of fragile curved SVG paths, same approach as
+every other diagram in this app. `CompetencyDiagram.tsx` gained a
+`case 6`.
+
+`toolkitTags` reconciled once more (booklet's 6 vs. the seed's
+previous 4: added `/agents`, `Background Agents`). `Background Agents`
+needed a new `EXACT_OVERRIDES` entry in `lib/artifact-icons.ts` (its
+keyword checks require "agent team", not just "agents") and both tags
+needed new `lib/artifact-glossary.ts` entries.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

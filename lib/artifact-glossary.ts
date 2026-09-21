@@ -44,6 +44,8 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   subagents: "A separate agent session spawned to handle one bounded sub-task (e.g. a focused code review) and report back, keeping the parent session's context clean.",
   "agent teams": "Multiple agents working the same problem from different roles or on different parts of it in parallel, with a coordination point to merge their results.",
   treehouse: "A named tool referenced in this competency's guidebook for coordinating multi-agent or multi-worktree workflows.",
+  "/agents": "A slash command that opens or manages subagent configuration — defining the focused roles (search, review, checks) a main session can spawn.",
+  "background agents": "Agent sessions that keep running a task after you've moved on, checked periodically or notified on completion, instead of holding your attention for the whole run.",
   mermaid: "A text-based diagramming syntax (flowcharts, sequence diagrams, etc.) that renders directly from Markdown — lets an agent produce a diagram as plain text a human and a renderer both understand.",
   c4: "The C4 model — a standard set of diagram levels (Context, Container, Component, Code) for describing a software system's architecture at increasing detail.",
   "excalidraw skill": "A packaged skill for producing hand-drawn-style architecture diagrams via Excalidraw, callable by an agent instead of requiring manual diagramming.",

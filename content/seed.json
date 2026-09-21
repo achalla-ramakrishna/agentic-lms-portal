@@ -163,7 +163,7 @@
       "number": 6,
       "title": "Multi-Agent Workflows",
       "subtitle": "Parallel Agents on Isolated Tasks",
-      "shiftMarkdown": "You have probably worked one task at a time, even with an agent. Independent work does not need to queue — give each separate task its own agent, branch, and git worktree, and use subagents inside one complex task for focused search or checks.",
+      "shiftMarkdown": "You have probably worked one task at a time. Even with an agent, you start a task, watch it, then start the next. The agent got faster, but the work still moved one task at a time.\n\nIndependent work does not need to queue. A test automation pass here, a report-generation workflow there, RBAC in another module: none of them need to wait. The catch is collisions. Two agents editing the same files will create cleanup work.\n\nYour job is to choose the right kind of parallelism. For separate tasks, give each one its own agent, branch, and git worktree. For one complex task, keep one main thread in charge and use subagents for focused search, research, or checks.",
       "masteryBullets": [
         "Independent tasks run side by side, not in a queue",
         "worktrees keep branches from colliding",
@@ -174,10 +174,22 @@
         "git worktrees",
         "subagents",
         "agent teams",
+        "/agents",
+        "Background Agents",
         "Treehouse"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Split work into isolated tasks first; parallelism only helps when tasks do not touch the same files",
+        "Give each parallel task its own **git worktree** and branch",
+        "Treat each parallel agent result like a separate PR: review it, test it, then merge deliberately",
+        "Use **subagents** inside one task for focused search, repo review, or independent NFR checks",
+        "Keep the main thread clean: subagents return summaries; the main thread owns the plan and final diff",
+        "Keep parallel agents few enough that you can review every output properly",
+        "**Pool worktrees, don't recreate them**: a manager like Treehouse hands each agent a clean, ready worktree with dependencies and build cache intact"
+      ],
+      "tagline": "Run independent work in parallel, with each agent in its own lane.",
+      "quoteMarkdown": "Explicitly spawning subagents with Claude Code is extremely freaking cool. My workflow is: Enter plan mode. Explicitly say how many subagents I want and which tasks they should perform. Let it rip.",
+      "quoteAttribution": "Matt Pocock, AI Educator"
     },
     {
       "number": 7,
