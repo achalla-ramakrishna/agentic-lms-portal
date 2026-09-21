@@ -6,6 +6,7 @@ import { SkillPackageDiagram } from "./SkillPackageDiagram";
 import { ParallelLanesDiagram } from "./ParallelLanesDiagram";
 import { AdrSequenceDiagram } from "./AdrSequenceDiagram";
 import { EvidenceLadderDiagram } from "./EvidenceLadderDiagram";
+import { ReviewAgentsDiagram } from "./ReviewAgentsDiagram";
 
 // Each competency's booklet diagram is structurally bespoke (radial setup
 // diagram, two-column comparison, ...), so this dispatches to a hardcoded
@@ -32,6 +33,8 @@ export function CompetencyDiagram({ competencyNumber }: { competencyNumber: numb
       return <AdrSequenceDiagram />;
     case 8:
       return <EvidenceLadderDiagram />;
+    case 9:
+      return <ReviewAgentsDiagram />;
     default:
       return null;
   }

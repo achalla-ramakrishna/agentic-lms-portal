@@ -260,7 +260,7 @@
       "number": 9,
       "title": "Code Review",
       "subtitle": "Code Quality & Risk Review for Merge Confidence",
-      "shiftMarkdown": "Review was always demanding, but the trust model was clearer when a vetted teammate wrote the code by hand. An agent can hand you a large PR in minutes that looks clean and confident — but clean-looking code is not always correct, secure, or maintainable. Review becomes part of the core work, not a quick approval step.",
+      "shiftMarkdown": "Review was always demanding, but the trust model was clearer. The code usually came from you or a vetted teammate, so there was shared judgment behind the diff. Not many PRs arrived at once because writing it by hand was the slow part.\n\nThat has changed. An agent can hand you a large PR in minutes: code you did not write and have not read. It may look clean and confident. Clean-looking code is not always correct, secure, testable, or maintainable.\n\nSo review becomes part of the core work, not a quick approval step. Read the diff, understand the behavior, check security, accessibility, performance, and stand behind what merges.",
       "masteryBullets": [
         "A fresh session reviewer adds findings, not noise",
         "security and accessibility are explicit checks",
@@ -272,8 +272,18 @@
         "MergeMitra",
         "SuperPowers Skills"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Review with a **fresh agent on a different model**; variance catches what the implementer missed",
+        "Spin up **specialist subagents** for security, accessibility, performance, or other NFRs when the task needs it",
+        "Make NFRs explicit; agents defer security, a11y, and observability unless you ask",
+        "Read the diff yourself; your name is on the commit and PR",
+        "Use /review to enforce consistency in naming, structure, and conventions, not just to hunt bugs & regressions",
+        "One automated pass is not enough confidence for AI code; combine checks with human judgment",
+        "Triage findings: fix, defer, or dismiss with a reason, then re-review until clean"
+      ],
+      "tagline": "AI code can look clean and still be wrong. Review is where you prove it is safe to merge.",
+      "quoteMarkdown": "Dynamic workflows and adversarial code review was part of what made it possible to rewrite Bun in Rust in 6 days.",
+      "quoteAttribution": "Jarred Sumner, creator of Bun"
     },
     {
       "number": 10,

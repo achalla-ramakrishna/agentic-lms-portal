@@ -166,6 +166,19 @@ as PR evidence rather than generic test tooling — this app's existing
 classifier already groups `Coverage Report` under `review` the same
 way). All three tags needed new `lib/artifact-glossary.ts` entries.
 
+## Competency 09 — Code Review
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 21–22. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 7 `inPracticeBullets` (3
+bold), a real pull-quote (Jarred Sumner, creator of Bun), and a
+bespoke diagram (`ReviewAgentsDiagram.tsx`) — a "specialized review
+agents" root fanning out into 4 review lenses (Correctness, NFR, Test
+Quality, Code Quality), each producing ranked findings, converging
+into a shared "review memory" card. `toolkitTags` already matched the
+booklet exactly (`/review`, `MergeMitra`, `SuperPowers Skills`) — no
+reconciliation needed this time. `CompetencyDiagram.tsx` gained a
+`case 9`.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").
