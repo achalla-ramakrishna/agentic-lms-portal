@@ -6,9 +6,13 @@ import { competencyStyle } from "@/lib/competency-style";
 // secrets stay outside all of it behind a deny rule. Hardcoded to
 // competency 1 for this pilot (docs/features/0008-booklet-learn-refresh.md)
 // rather than data-driven, since only this competency's content has been
-// verified against the real source so far. Uses this app's own
-// per-competency palette and card system instead of the booklet's literal
-// colors, for consistency with every other diagram in the app.
+// verified against the real source so far. The center card uses
+// accent-emphasis (a real, already-defined strong blue) rather than the
+// per-competency palette — competency 1's own pastel green had poor
+// contrast with white text and read as washed out; a fixed strong color
+// for the diagram's single focal point matches the booklet's own choice
+// to make it the most visually dominant element, which a pastel
+// per-competency accent can't guarantee for every competency's palette.
 export function AgentCoreDiagram({ competencyNumber }: { competencyNumber: number }) {
   const palette = competencyStyle(competencyNumber);
 
@@ -31,11 +35,10 @@ export function AgentCoreDiagram({ competencyNumber }: { competencyNumber: numbe
           accent={palette.border}
         />
 
+        <Connector />
+
         <div className="flex justify-center sm:col-span-2">
-          <div
-            className="flex flex-col items-center gap-1.5 rounded-2xl px-12 py-7 text-center text-white shadow-lg"
-            style={{ backgroundColor: palette.border }}
-          >
+          <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-accent-emphasis px-12 py-7 text-center text-white shadow-lg">
             <span className="text-3xl" aria-hidden="true">
               🛡️
             </span>
@@ -43,6 +46,8 @@ export function AgentCoreDiagram({ competencyNumber }: { competencyNumber: numbe
             <span className="text-xs opacity-90">one setup, every session</span>
           </div>
         </div>
+
+        <Connector />
 
         <DiagramCard
           label="Least Privilege"
@@ -68,6 +73,20 @@ export function AgentCoreDiagram({ competencyNumber }: { competencyNumber: numbe
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Same visual language as ActivityFlow's own Connector — a simple arrow
+// between stacked sections, not a fragile per-corner diagonal SVG line
+// that would need recalculating on every reflow/breakpoint.
+function Connector() {
+  return (
+    <div
+      className="flex justify-center text-fg-subtle sm:col-span-2"
+      aria-hidden="true"
+    >
+      <span className="text-lg">↓</span>
     </div>
   );
 }
