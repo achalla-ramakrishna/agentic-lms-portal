@@ -133,7 +133,7 @@
       "number": 5,
       "title": "Skill Packaging",
       "subtitle": "Workflow Packaging into Reusable Skills",
-      "shiftMarkdown": "Every team has one engineer with the useful prompt, trapped in their chat history. Now you can package that workflow as a skill — a folder with a SKILL.md the agent loads when the task matches, shipped through git like any other project asset.",
+      "shiftMarkdown": "Every team has one engineer with the useful prompt: the review checklist, the migration recipe, the PR routine. It works, but it is trapped in their chat history.\n\nBefore agents, sharing this know-how usually meant a wiki page people forgot to open. Now you can package the workflow as a skill: a folder with a SKILL.md that the agent loads and uses when the task matches. Ship it through git like any other project asset.\n\nYour job is to notice the workflows you repeat and turn them into shared, versioned skills. One person's recipe becomes the team's default. The agent gets the same instructions every time, on every machine.",
       "masteryBullets": [
         "Teammates get your workflow without you in the room",
         "the agent invokes the right skill on its own",
@@ -144,10 +144,20 @@
         "SKILL.md",
         ".agents/skills",
         ".claude/skills/",
+        "skills.sh",
         "Skill Creator Skill"
       ],
-      "inPracticeBullets": [],
-      "tagline": ""
+      "inPracticeBullets": [
+        "Notice what you prompt repeatedly; that is a workflow you can turn into a skill",
+        "Write a SKILL.md: YAML name + a precise **\"Use when...\"** description so the agent invokes it",
+        "Keep the body lean (≤ ~500 lines); push detail into reference files",
+        "Include when-to-use, when-**not**-to-use, and a concrete example",
+        "Ship team skills in-repo over git",
+        "Make skills **focused and independent**: one job, one output others can build on",
+        "Version and refine them as real sessions reveal gaps (start small, grow)",
+        "**Verify auto-invocation**: run a few tasks that should trigger the skill and a few that shouldn't, and watch whether it loads at the right moment"
+      ],
+      "tagline": "If a workflow works, package it once so the whole team can use it."
     },
     {
       "number": 6,

@@ -83,6 +83,24 @@ previous 5: added `Fixtures`). `Fixtures` needed both a new
 match, classifies as `test`) and a new `lib/artifact-glossary.ts`
 entry.
 
+## Competency 05 — Skill Packaging
+
+Source: `agentic-engg.-booklet-v2.pdf`, pages 13–14. Same treatment:
+`tagline`, full 3-paragraph `shiftMarkdown`, 8 `inPracticeBullets` (4
+bold markers), and a bespoke diagram (`SkillPackageDiagram.tsx`) — a
+required-root `SKILL.md` card branching into its 6 real folder parts
+(Front Matter, Instructions, `references/`, `scripts/`, `assets/`,
+`evals/`), again reusing this app's existing color tokens. No
+pull-quote on this page — `quoteMarkdown`/`quoteAttribution` stay at
+their `""` default for this competency, same as any competency without
+one. `CompetencyDiagram.tsx` gained a `case 5`.
+
+`toolkitTags` reconciled once more (booklet's 5 vs. the seed's
+previous 4: added `skills.sh`). `skills.sh` already classifies
+correctly under `lib/artifact-icons.ts`'s existing keyword-based
+`skill` category (no override needed); added its
+`lib/artifact-glossary.ts` entry.
+
 ## Source
 
 `agentic-engg.-booklet-v2.pdf`, pages 4–5 (Competency 01, "01 / 12").

@@ -39,6 +39,7 @@ export const ARTIFACT_GLOSSARY: Record<string, string> = {
   ".agents/skills": "A conventional folder location for packaging Agent Skills inside a repository so they ship with the code they apply to.",
   ".claude/skills/": "Claude Code's specific folder convention for skills scoped to a project, auto-discovered without extra configuration.",
   "skill creator skill": "A meta-skill that helps author new Agent Skills — scaffolding the SKILL.md structure and prompting for the details a good skill needs.",
+  "skills.sh": "A validator script bundled with a skill that checks its SKILL.md structure (front matter, required sections) before it ships, catching malformed skills before an agent tries to load one.",
   "git worktrees": "A Git feature that checks out multiple branches into separate working directories from one repository — lets multiple agents (or agent + human) work on different branches in parallel without stashing or cloning again.",
   subagents: "A separate agent session spawned to handle one bounded sub-task (e.g. a focused code review) and report back, keeping the parent session's context clean.",
   "agent teams": "Multiple agents working the same problem from different roles or on different parts of it in parallel, with a coordination point to merge their results.",
