@@ -43,6 +43,9 @@ export default function LandingPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-fg">
           Master agentic engineering.
         </h1>
+        <p className="text-lg font-medium text-fg">
+          Agents write fast. You engineer what lasts.
+        </p>
         <p className="text-fg-muted">
           12 competencies. 35 evidence-graded exercises. Real starter apps.
         </p>
