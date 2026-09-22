@@ -86,6 +86,31 @@ No schema changes. Everything derives from existing
   grid, kept as-is.
 - `app/(app)/profile/page.tsx` — heading text only.
 
+## Follow-up — pie + bar charts (same day)
+
+The user asked for "some other charts... pie, bar charts etc" for more
+clarity across 12 competencies / 35 exercises. Two changes:
+
+- `app/(app)/dashboard/StatusBar.tsx` **removed**, replaced by
+  `StatusDonut.tsx` — a donut for the same status breakdown. Checked
+  this against the dataviz skill's anti-patterns first: a donut is
+  flagged bad *for comparing close values*, legal for an "at a glance"
+  part-to-whole read at <= 6 segments, which this is (5 segments,
+  direct-labeled legend). Re-validated the CVD checks for this exact
+  circular order, including the wrap-around pair the stacked bar never
+  had to consider — same clean result. Kept only one chart for status
+  (not both bar and donut) since two charts of identical data is
+  redundant, not clearer.
+- `app/(app)/dashboard/CompetencyBarChart.tsx` (new) — a genuinely new
+  view: a horizontal bar per competency (curriculum order, not
+  ranked), magnitude = % complete, each bar in that competency's own
+  established color. The card grid's per-card meter (added earlier the
+  same day) shows the same number but a bar chart makes cross-
+  competency comparison actually readable at a glance.
+- `app/(app)/dashboard/page.tsx` — the old single "where every exercise
+  stands" section became a two-column row: the donut card and the new
+  bar-chart card side by side on `lg:`, stacked below that on mobile.
+
 ## Acceptance criteria
 
 - [x] Nav (header + sidebar) reads "My Progress", not "Profile".

@@ -5,7 +5,8 @@ import { prisma } from "@/lib/db";
 import { statusBreakdown, progressMessage, daysSince } from "@/lib/dashboard-stats";
 import { CompetencyGrid } from "./CompetencyGrid";
 import { ProgressRing } from "./ProgressRing";
-import { StatusBar } from "./StatusBar";
+import { StatusDonut } from "./StatusDonut";
+import { CompetencyBarChart } from "./CompetencyBarChart";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,13 @@ export default async function DashboardPage() {
   const dayNumber = firstStarted._min.startedAt
     ? daysSince(firstStarted._min.startedAt, new Date()) + 1
     : null;
+  const competencyProgress = competencies.map((c) => ({
+    number: c.number,
+    title: c.title,
+    passed: c.exercises.filter((ex) => statusByExercise.get(ex.id) === "passed")
+      .length,
+    total: c.exercises.length,
+  }));
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
@@ -86,12 +94,20 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-muted">
-          Where every exercise stands
-        </h2>
-        <StatusBar counts={counts} />
-      </section>
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section className="rounded-2xl border border-line bg-canvas-subtle p-6">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-muted">
+            Status breakdown
+          </h2>
+          <StatusDonut counts={counts} />
+        </section>
+        <section className="rounded-2xl border border-line bg-canvas-subtle p-6">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-muted">
+            Progress by competency
+          </h2>
+          <CompetencyBarChart competencies={competencyProgress} />
+        </section>
+      </div>
 
       {mostRecentInProgress && (
         <Link
@@ -114,16 +130,7 @@ export default async function DashboardPage() {
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Competencies
         </h2>
-        <CompetencyGrid
-          competencies={competencies.map((c) => ({
-            number: c.number,
-            title: c.title,
-            passed: c.exercises.filter(
-              (ex) => statusByExercise.get(ex.id) === "passed",
-            ).length,
-            total: c.exercises.length,
-          }))}
-        />
+        <CompetencyGrid competencies={competencyProgress} />
       </section>
     </main>
   );
