@@ -30,6 +30,18 @@ these values for anything real:
 | Learner     | `learner@example.com`     | `learner-demo-pw`     |
 | Facilitator | `facilitator@example.com` | `facilitator-demo-pw` |
 
+`prisma/demo-data.ts` also seeds a realistic-named cohort for customer/
+conference demos — 5 learners at different progress levels (brand new,
+mid-progress with a rework, a pending-review queue, and two advanced/
+near-complete) plus a reviewer who has actually decided some of them,
+so a roster or dashboard screenshot shows real variety instead of an
+empty or flat state. All share one password:
+
+| Role        | Names                                                                                    | Password           |
+|-------------|-------------------------------------------------------------------------------------------|---------------------|
+| Learner     | `priya.natarajan` · `diego.fernandez` · `liam.carter` · `amara.okafor` · `yuki.tanaka` (`@example.com`) | `Conference2026!`   |
+| Facilitator | `jordan.blake@example.com`                                                               | `Conference2026!`   |
+
 ## Regenerating seed content
 
 `content/seed.json` is generated, not hand-written — see

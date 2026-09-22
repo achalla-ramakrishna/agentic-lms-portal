@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { requireCurrentUser } from "@/lib/current-user";
 import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  const session = await getServerSession(authOptions);
-  const userId = Number(session!.user.id);
+  const user = await requireCurrentUser();
+  const userId = user.id;
 
   const [competencies, submissions] = await Promise.all([
     prisma.competency.findMany({
@@ -28,7 +27,7 @@ export default async function ProfilePage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-fg">
-        {session!.user.name}&apos;s progress
+        {user.name}&apos;s progress
       </h1>
       <p className="mt-1 text-sm text-fg-muted">
         Every exercise across all 12 competencies.

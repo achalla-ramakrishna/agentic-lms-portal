@@ -185,3 +185,56 @@ export async function createUser(formData: FormData) {
   revalidatePath("/admin/users");
   redirect("/admin/users?created=1");
 }
+
+// Any signed-in user editing their own name/email — re-derives userId
+// from the session rather than trusting a hidden form field, so nobody
+// can edit someone else's account by tampering with the request.
+export async function updateProfile(formData: FormData) {
+  const userId = await requireUserId();
+
+  const name = String(formData.get("name") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+
+  if (!name || !email) {
+    redirect("/account?error=invalid");
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing && existing.id !== userId) {
+    redirect("/account?error=email_taken");
+  }
+
+  await prisma.user.update({ where: { id: userId }, data: { name, email } });
+
+  revalidatePath("/account");
+  revalidatePath("/dashboard");
+  redirect("/account?updated=1");
+}
+
+// Requires the current password (not just an active session) so a
+// hijacked/left-open session can't be used to lock the real owner out.
+export async function changePassword(formData: FormData) {
+  const userId = await requireUserId();
+
+  const currentPassword = String(formData.get("currentPassword") || "");
+  const newPassword = String(formData.get("newPassword") || "");
+  const confirmPassword = String(formData.get("confirmPassword") || "");
+
+  if (newPassword.length < 8) {
+    redirect("/account?error=password_too_short");
+  }
+  if (newPassword !== confirmPassword) {
+    redirect("/account?error=password_mismatch");
+  }
+
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!valid) {
+    redirect("/account?error=current_password_wrong");
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+
+  redirect("/account?password_changed=1");
+}

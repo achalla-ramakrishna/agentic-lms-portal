@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import bcrypt from "bcryptjs";
+import { seedDemoData } from "./demo-data";
 
 const prisma = new PrismaClient();
 
@@ -172,6 +173,8 @@ async function main() {
   console.log(
     `Seeded ${seed.competencies.length} competencies, ${seed.exercises.length} exercises, ${demoUsers.length} demo users.`,
   );
+
+  await seedDemoData(prisma);
 }
 
 main()

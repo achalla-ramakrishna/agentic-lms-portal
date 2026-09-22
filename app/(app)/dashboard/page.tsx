@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { requireCurrentUser } from "@/lib/current-user";
 import { statusBreakdown, progressMessage, daysSince } from "@/lib/dashboard-stats";
 import { CompetencyGrid } from "./CompetencyGrid";
 import { ProgressRing } from "./ProgressRing";
@@ -11,8 +10,8 @@ import { CompetencyBarChart } from "./CompetencyBarChart";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
-  const userId = Number(session!.user.id);
+  const user = await requireCurrentUser();
+  const userId = user.id;
 
   const [competencies, submissions, mostRecentInProgress, evidenceCount, firstStarted] =
     await Promise.all([
@@ -69,7 +68,7 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-fg">
-        Welcome back, {session!.user.name}
+        Welcome back, {user.name}
       </h1>
       <p className="mt-1 text-sm text-fg-muted">Here&apos;s your snapshot.</p>
 

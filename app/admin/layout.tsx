@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { forbidden } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/current-user";
 import { SignOutButton } from "@/app/sign-out-button";
 import { AppSidebar } from "@/app/app-sidebar";
 import { CodewalnutLogo } from "@/app/codewalnut-logo";
@@ -16,6 +17,7 @@ export default async function AdminLayout({
   if (session?.user.role !== "facilitator") {
     forbidden();
   }
+  const user = await requireCurrentUser();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -27,7 +29,10 @@ export default async function AdminLayout({
           </span>
         </div>
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-fg-muted">{session.user.email}</span>
+          <a href="/account" className="font-medium text-fg hover:text-accent">
+            Profile
+          </a>
+          <span className="text-fg-muted">{user.email}</span>
           <a href="/competencies" className="font-medium text-fg hover:text-accent">
             Learner view
           </a>
