@@ -4,10 +4,16 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { competencyStyle } from "@/lib/competency-style";
 
-// Persistent left nav for every session-protected page — proxy.ts already
+// Persistent left nav for the learner shell only — proxy.ts already
 // guarantees a session exists before this renders. Mirrors the same
 // passed/total-per-competency shape as app/dashboard/page.tsx and
 // lib/roster.ts, just as a compact always-visible list instead of a grid.
+// Purely learner-facing: Roster/Users live in app/admin/AdminSidebar.tsx
+// instead, so this never shows a facilitator's own (meaningless)
+// personal progress mixed in with real reviewer tooling. A facilitator
+// does still see this exact sidebar when they deliberately switch to
+// "Learner view" (RoleViewSwitcher) — that's the point, it's the real
+// learner experience, not a different, hybrid one.
 export async function AppSidebar() {
   const session = await getServerSession(authOptions);
   const userId = Number(session!.user.id);
@@ -29,6 +35,17 @@ export async function AppSidebar() {
 
   return (
     <aside className="h-full w-full border-r border-line bg-canvas-subtle px-3 py-6">
+      {session?.user.role === "facilitator" && (
+        // Guaranteed reachable on every screen size, unlike AppHeader's
+        // RoleViewSwitcher (hidden below md:) — a facilitator previewing
+        // as learner always has a way back, mobile drawer included.
+        <Link
+          href="/admin/roster"
+          className="mb-4 flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-xs font-medium text-fg-muted hover:border-fg-subtle hover:text-fg"
+        >
+          ← Back to Reviewer view
+        </Link>
+      )}
       <nav className="flex flex-col gap-0.5 text-sm">
         <Link
           href="/dashboard"
@@ -48,22 +65,6 @@ export async function AppSidebar() {
         >
           Profile
         </Link>
-        {session?.user.role === "facilitator" && (
-          <>
-            <Link
-              href="/admin/roster"
-              className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
-            >
-              Roster
-            </Link>
-            <Link
-              href="/admin/users"
-              className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
-            >
-              Users
-            </Link>
-          </>
-        )}
       </nav>
 
       <div className="mt-6">

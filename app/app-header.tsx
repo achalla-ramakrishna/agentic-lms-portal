@@ -2,6 +2,7 @@ import { requireCurrentUser } from "@/lib/current-user";
 import { SignOutButton } from "@/app/sign-out-button";
 import { CodewalnutLogo } from "@/app/codewalnut-logo";
 import { MenuToggleButton } from "@/app/mobile-nav";
+import { RoleViewSwitcher } from "@/app/role-view-switcher";
 
 // Shared shell for every session-protected page (/dashboard,
 // /competencies/**, /submissions/**). proxy.ts already guarantees a
@@ -40,12 +41,13 @@ export async function AppHeader() {
             Profile
           </a>
           <span className="text-fg-muted">{user.email}</span>
-          {user.role === "facilitator" && (
-            <a href="/admin" className="font-medium text-fg hover:text-accent">
-              Admin
-            </a>
-          )}
         </div>
+        {user.role === "facilitator" && (
+          <span className="hidden items-center gap-2 md:flex">
+            <span className="text-xs text-fg-subtle">Previewing as learner</span>
+            <RoleViewSwitcher current="learner" />
+          </span>
+        )}
         <SignOutButton />
       </div>
     </header>

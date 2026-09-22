@@ -1,13 +1,20 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  // An explicit callbackUrl (proxy.ts sets one when redirecting a
+  // logged-out visit to a specific protected page) always wins — that's
+  // a deep link, not the generic "just logged in" case. Only the
+  // generic case falls back to a role-based landing page: learners
+  // don't belong on the reviewer's Roster, and a facilitator landing on
+  // their own (empty) learner dashboard is exactly the "everything
+  // mixed up" complaint this fixes.
+  const explicitCallbackUrl = searchParams.get("callbackUrl");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,15 +32,19 @@ export function LoginForm() {
       redirect: false,
     });
 
-    setSubmitting(false);
-
     if (!result || result.error) {
+      setSubmitting(false);
       // Deliberately generic — don't reveal whether the email exists.
       setError("Incorrect email or password.");
       return;
     }
 
-    router.push(callbackUrl);
+    const session = await getSession();
+    const target =
+      explicitCallbackUrl ||
+      (session?.user.role === "facilitator" ? "/admin/roster" : "/dashboard");
+
+    router.push(target);
     router.refresh();
   }
 

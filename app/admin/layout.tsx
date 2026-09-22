@@ -3,9 +3,10 @@ import { forbidden } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { requireCurrentUser } from "@/lib/current-user";
 import { SignOutButton } from "@/app/sign-out-button";
-import { AppSidebar } from "@/app/app-sidebar";
+import { AdminSidebar } from "@/app/admin/AdminSidebar";
 import { CodewalnutLogo } from "@/app/codewalnut-logo";
 import { MenuToggleButton, MobileNavProvider, MobileSidebarFrame } from "@/app/mobile-nav";
+import { RoleViewSwitcher } from "@/app/role-view-switcher";
 
 export default async function AdminLayout({
   children,
@@ -26,12 +27,12 @@ export default async function AdminLayout({
         <header className="flex items-center justify-between gap-2 border-b border-line bg-canvas-subtle px-3 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <MenuToggleButton />
-            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <a href="/admin/roster" className="flex min-w-0 items-center gap-2 sm:gap-3">
               <CodewalnutLogo height={22} />
               <span className="hidden truncate text-sm font-semibold text-fg sm:inline">
-                Agentic Engineering — Admin
+                Agentic Engineering — Reviewer
               </span>
-            </div>
+            </a>
           </div>
           <div className="flex shrink-0 items-center gap-3 text-sm sm:gap-4">
             <div className="hidden items-center gap-4 md:flex">
@@ -39,16 +40,14 @@ export default async function AdminLayout({
                 Profile
               </a>
               <span className="text-fg-muted">{user.email}</span>
-              <a href="/competencies" className="font-medium text-fg hover:text-accent">
-                Learner view
-              </a>
             </div>
+            <RoleViewSwitcher current="reviewer" />
             <SignOutButton />
           </div>
         </header>
         <div className="flex flex-1">
           <MobileSidebarFrame>
-            <AppSidebar />
+            <AdminSidebar />
           </MobileSidebarFrame>
           <div className="min-w-0 flex-1">{children}</div>
         </div>

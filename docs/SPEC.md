@@ -106,16 +106,32 @@ each exercise's own `README.md` (see `scripts/generate-seed.mjs`, chunk 2).
 
 ```
 /                                    (public landing, anonymous)
-/login                               (credentials — see ADR 0002 Q4)
+/login                               (credentials — see ADR 0002 Q4;
+                                       routes by role after sign-in —
+                                       learner -> /dashboard,
+                                       facilitator -> /admin/roster —
+                                       unless an explicit callbackUrl
+                                       deep-link is present, which
+                                       always wins — docs/features/
+                                       0013-role-separation.md)
 /dashboard                           (learner home)
 /competencies/:id                    (concept content + exercise list)
 /competencies/:id/exercises/:exId    (mission, checklist, submission panel)
 /submissions/new?exercise=:id        (attach evidence)
 /submissions/:id                     (detail + facilitator comment)
 /profile                             (learner's own full history)
-/admin/roster                        (facilitator-only)
+/admin/roster                        (facilitator-only, their landing page)
 /admin/submissions/:id               (review queue, decision control)
 ```
+
+**Two separate shells, not one hybrid nav**: the learner shell
+(`AppHeader`/`AppSidebar`) and the reviewer shell (admin's own header/
+`AdminSidebar`) each show only their own role's nav — no stray "Admin"
+link on the learner side, no stray "Learner view" link on the reviewer
+side. A facilitator can still deliberately switch into the learner
+shell via `RoleViewSwitcher` (a labeled dropdown, not an ambient link)
+to preview that experience; a plain learner never sees that control at
+all, since they have no second role to switch into.
 
 **Fixed ordering**: competencies always render 01→12, exercises 01→04
 within a competency — a deliberate learning path, never re-sorted by
