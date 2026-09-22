@@ -28,7 +28,7 @@ export async function AppSidebar() {
   );
 
   return (
-    <aside className="w-64 shrink-0 border-r border-line bg-canvas-subtle px-3 py-6">
+    <aside className="h-full w-full border-r border-line bg-canvas-subtle px-3 py-6">
       <nav className="flex flex-col gap-0.5 text-sm">
         <Link
           href="/dashboard"

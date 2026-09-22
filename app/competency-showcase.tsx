@@ -6,11 +6,30 @@ import { useConnectorPaths, ConnectorOverlay } from "@/app/connector-lines";
 
 type Competency = { title: string; subtitle: string };
 
-// Snake layout: row 1 reads 1→4 left-to-right, row 2 reads 8→5
-// (continuing down from 4, then right-to-left), row 3 reads 9→12
-// (continuing down from 8, then left-to-right again) — matches the
-// reference numbering flow.
-const SNAKE_ORDER = [0, 1, 2, 3, 7, 6, 5, 4, 8, 9, 10, 11];
+// Snake layout, 4-column desktop only (md:): row 1 reads 1→4
+// left-to-right, row 2 reads 8→5 (continuing down from 4, then
+// right-to-left), row 3 reads 9→12 (continuing down from 8, then
+// left-to-right again). Applied purely via CSS `order` — cards render
+// in plain 1→12 DOM order otherwise, both for correct top-to-bottom
+// reading order at the 2-col/3-col widths the grid collapses to below
+// md (where this exact snake shape doesn't fit anyway), and so the
+// connector lines — which just draw between wherever competency N and
+// N+1 actually land, regardless of visual order — always connect the
+// right neighbors without needing their own breakpoint logic.
+const ORDER_MD = [
+  "md:order-1",
+  "md:order-2",
+  "md:order-3",
+  "md:order-4",
+  "md:order-8",
+  "md:order-7",
+  "md:order-6",
+  "md:order-5",
+  "md:order-9",
+  "md:order-10",
+  "md:order-11",
+  "md:order-12",
+];
 
 const ROTATIONS = ["-1.5deg", "1deg", "-0.75deg", "1.5deg"];
 
@@ -28,18 +47,17 @@ export function CompetencyShowcase({
       <ConnectorOverlay paths={paths} />
 
       <div className="relative grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-4">
-        {SNAKE_ORDER.map((idx, position) => {
-          const c = competencies[idx];
+        {competencies.map((c, idx) => {
           const number = idx + 1;
           const palette = competencyStyle(number);
-          const rotation = ROTATIONS[position % ROTATIONS.length];
+          const rotation = ROTATIONS[idx % ROTATIONS.length];
           return (
             <div
               key={idx}
               ref={(el) => {
                 cardRefs.current[number - 1] = el;
               }}
-              className="relative pt-8"
+              className={`relative pt-8 ${ORDER_MD[idx]}`}
               style={{ transform: `rotate(${rotation})` }}
             >
               <span className="absolute -top-1 left-2 font-mono text-sm font-bold text-fg-subtle">

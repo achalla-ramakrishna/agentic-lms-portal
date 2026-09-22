@@ -60,6 +60,8 @@ body {
   padding: 0;
 }
 .markdown-body table {
+  display: block;
+  overflow-x: auto;
   border-collapse: collapse;
   margin-bottom: 0.75em;
   width: 100%;

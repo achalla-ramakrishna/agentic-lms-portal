@@ -54,11 +54,13 @@ export default async function SubmissionDetailPage({
         ← {String(exercise.number).padStart(2, "0")} {exercise.title}
       </Link>
 
-      <div className="mt-4 flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-fg">
+      <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h1 className="min-w-0 text-xl font-semibold tracking-tight text-fg">
           Submission · {exercise.title}
         </h1>
-        <StatusBadge status={submission.status} />
+        <span className="shrink-0">
+          <StatusBadge status={submission.status} />
+        </span>
       </div>
 
       <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">

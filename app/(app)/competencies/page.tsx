@@ -26,17 +26,17 @@ export default async function CompetenciesPage() {
           <li key={c.id}>
             <Link
               href={`/competencies/${c.number}`}
-              className="flex items-center justify-between rounded-lg border-l-2 border-line bg-canvas-subtle px-5 py-4 hover:border-fg-subtle"
+              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-lg border-l-2 border-line bg-canvas-subtle px-5 py-4 hover:border-fg-subtle"
               style={{ borderLeftColor: competencyStyle(c.number).border }}
             >
-              <span className="flex items-center gap-4">
+              <span className="flex min-w-0 items-center gap-4">
                 <span aria-hidden="true">{COMPETENCY_ICON[c.number]}</span>
                 <span className="font-mono text-sm text-fg-subtle">
                   {String(c.number).padStart(2, "0")}
                 </span>
                 <span className="font-medium text-fg">{c.title}</span>
               </span>
-              <span className="text-sm text-fg-muted">
+              <span className="shrink-0 text-sm text-fg-muted">
                 {c._count.exercises} exercises
               </span>
             </Link>

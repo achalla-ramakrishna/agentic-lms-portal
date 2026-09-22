@@ -66,12 +66,12 @@ export default async function ExercisePage({
         ← {String(competency.number).padStart(2, "0")} {competency.title}
       </Link>
 
-      <div className="mt-4 flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-fg">
+      <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h1 className="min-w-0 text-2xl font-semibold tracking-tight text-fg">
           Exercise {String(exercise.number).padStart(2, "0")} ·{" "}
           {exercise.title}
         </h1>
-        <span className="text-sm text-fg-muted">
+        <span className="shrink-0 text-sm text-fg-muted">
           ⏱ {exercise.durationLabel}
         </span>
       </div>

@@ -259,10 +259,10 @@ export function CompetencyTabs({
                   key={ex.id}
                   className="overflow-hidden rounded-lg border border-line bg-canvas-subtle"
                 >
-                  <div className="flex items-center justify-between gap-3 px-5 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 py-3">
                     <Link
                       href={`/competencies/${competencyNumber}/exercises/${ex.number}`}
-                      className="flex min-w-0 flex-1 items-center gap-4 hover:opacity-90"
+                      className="flex min-w-0 flex-1 basis-full items-center gap-4 hover:opacity-90 sm:basis-0"
                     >
                       <span className="font-mono text-sm text-accent">
                         {String(ex.number).padStart(2, "0")}
@@ -272,7 +272,7 @@ export function CompetencyTabs({
                       </span>
                     </Link>
                     <span className="flex shrink-0 items-center gap-3 text-sm text-fg-muted">
-                      {ex.durationLabel}
+                      <span className="hidden sm:inline">{ex.durationLabel}</span>
                       <StatusBadge status={ex.status} />
                       <button
                         type="button"
