@@ -28,7 +28,7 @@ export default async function ProfilePage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-fg">
-        {session!.user.name}&apos;s history
+        {session!.user.name}&apos;s progress
       </h1>
       <p className="mt-1 text-sm text-fg-muted">
         Every exercise across all 12 competencies.

@@ -22,7 +22,7 @@ export async function AppHeader() {
           Dashboard
         </a>
         <a href="/profile" className="font-medium text-fg hover:text-accent">
-          Profile
+          My Progress
         </a>
         <span className="text-fg-muted">{session?.user?.email}</span>
         {session?.user?.role === "facilitator" && (

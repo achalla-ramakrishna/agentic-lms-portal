@@ -2,7 +2,10 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { statusBreakdown, progressMessage, daysSince } from "@/lib/dashboard-stats";
 import { CompetencyGrid } from "./CompetencyGrid";
+import { ProgressRing } from "./ProgressRing";
+import { StatusBar } from "./StatusBar";
 
 export const dynamic = "force-dynamic";
 
@@ -10,21 +13,29 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   const userId = Number(session!.user.id);
 
-  const [competencies, submissions, mostRecentInProgress] = await Promise.all([
-    prisma.competency.findMany({
-      orderBy: { number: "asc" }, // fixed 01→12 — docs/SPEC.md §4
-      include: { exercises: { orderBy: { number: "asc" } } },
-    }),
-    prisma.submission.findMany({
-      where: { userId },
-      select: { exerciseId: true, status: true },
-    }),
-    prisma.submission.findFirst({
-      where: { userId, status: "in_progress" },
-      orderBy: { startedAt: "desc" },
-      include: { exercise: { include: { competency: true } } },
-    }),
-  ]);
+  const [competencies, submissions, mostRecentInProgress, evidenceCount, firstStarted] =
+    await Promise.all([
+      prisma.competency.findMany({
+        orderBy: { number: "asc" }, // fixed 01→12 — docs/SPEC.md §4
+        include: { exercises: { orderBy: { number: "asc" } } },
+      }),
+      prisma.submission.findMany({
+        where: { userId },
+        select: { exerciseId: true, status: true },
+      }),
+      prisma.submission.findFirst({
+        where: { userId, status: "in_progress" },
+        orderBy: { startedAt: "desc" },
+        include: { exercise: { include: { competency: true } } },
+      }),
+      prisma.evidenceArtifact.count({
+        where: { submission: { userId } },
+      }),
+      prisma.submission.aggregate({
+        where: { userId, startedAt: { not: null } },
+        _min: { startedAt: true },
+      }),
+    ]);
 
   const statusByExercise = new Map(
     submissions.map((s) => [s.exerciseId, s.status]),
@@ -37,20 +48,55 @@ export default async function DashboardPage() {
   const passedCount = submissions.filter((s) => s.status === "passed").length;
   const overallPct =
     totalExercises === 0 ? 0 : Math.round((passedCount / totalExercises) * 100);
+  const counts = statusBreakdown(submissions, totalExercises);
+  const completedCompetencies = competencies.filter(
+    (c) =>
+      c.exercises.length > 0 &&
+      c.exercises.every((ex) => statusByExercise.get(ex.id) === "passed"),
+  ).length;
+  const dayNumber = firstStarted._min.startedAt
+    ? daysSince(firstStarted._min.startedAt, new Date()) + 1
+    : null;
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-fg">
-          Welcome back, {session!.user.name}
-        </h1>
-        <span className="text-sm text-fg-muted">Overall: {overallPct}%</span>
+    <main className="mx-auto max-w-5xl px-6 py-12">
+      <h1 className="text-2xl font-semibold tracking-tight text-fg">
+        Welcome back, {session!.user.name}
+      </h1>
+      <p className="mt-1 text-sm text-fg-muted">Here&apos;s your snapshot.</p>
+
+      <div className="mt-8 flex flex-col items-center gap-8 rounded-2xl border border-line bg-canvas-subtle p-6 sm:flex-row">
+        <ProgressRing pct={overallPct} />
+        <div className="flex-1">
+          <p
+            className="border-l-4 border-success-fg pl-4 text-base font-semibold text-fg"
+          >
+            {progressMessage(overallPct)}
+          </p>
+
+          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatTile label="Exercises passed" value={`${passedCount}/${totalExercises}`} />
+            <StatTile label="Competencies completed" value={`${completedCompetencies}/12`} />
+            <StatTile label="Evidence submitted" value={String(evidenceCount)} />
+            <StatTile
+              label="Your journey"
+              value={dayNumber ? `Day ${dayNumber}` : "Not started"}
+            />
+          </div>
+        </div>
       </div>
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-muted">
+          Where every exercise stands
+        </h2>
+        <StatusBar counts={counts} />
+      </section>
 
       {mostRecentInProgress && (
         <Link
           href={`/competencies/${mostRecentInProgress.exercise.competency.number}/exercises/${mostRecentInProgress.exercise.number}`}
-          className="mt-6 block rounded-xl border border-line bg-canvas-subtle p-5 hover:border-fg-subtle"
+          className="mt-8 block rounded-xl border border-line bg-canvas-subtle p-5 hover:border-fg-subtle"
         >
           <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Continue where you left off
@@ -80,5 +126,16 @@ export default async function DashboardPage() {
         />
       </section>
     </main>
+  );
+}
+
+function StatTile({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-line bg-canvas-inset px-3 py-2.5">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-fg-muted">
+        {label}
+      </p>
+      <p className="mt-0.5 text-2xl font-semibold text-fg">{value}</p>
+    </div>
   );
 }

@@ -49,3 +49,14 @@ export const STATUS_BADGE_CLASS: Record<Submission["status"], string> = {
     "border border-attention-fg/40 bg-attention-fg/10 text-attention-fg",
   passed: "border border-success-fg/40 bg-success-fg/10 text-success-fg",
 };
+
+// Same status→hue mapping as STATUS_BADGE_CLASS, as solid fills for a
+// chart segment (dashboard status bar) rather than a tinted pill — a
+// stacked-bar segment needs to read as a filled mark, not a wash.
+export const STATUS_FILL_CLASS: Record<Submission["status"], string> = {
+  not_started: "bg-line",
+  in_progress: "bg-accent",
+  submitted: "bg-done-fg",
+  needs_rework: "bg-attention-fg",
+  passed: "bg-success-fg",
+};

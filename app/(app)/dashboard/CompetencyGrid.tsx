@@ -28,6 +28,7 @@ export function CompetencyGrid({
       <div className="relative grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3">
         {competencies.map((c) => {
           const palette = competencyStyle(c.number);
+          const pct = c.total === 0 ? 0 : Math.round((c.passed / c.total) * 100);
           return (
             <Link
               key={c.number}
@@ -63,6 +64,15 @@ export function CompetencyGrid({
                   </div>
                   <div className="mt-1.5 text-xs font-semibold" style={{ color: palette.text }}>
                     {c.passed}/{c.total} passed
+                  </div>
+                  <div
+                    className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full"
+                    style={{ backgroundColor: `${palette.border}33` }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${pct}%`, backgroundColor: palette.border }}
+                    />
                   </div>
                 </div>
               </div>

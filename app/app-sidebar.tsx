@@ -40,7 +40,7 @@ export async function AppSidebar() {
           href="/profile"
           className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
         >
-          Profile
+          My Progress
         </Link>
         {session?.user.role === "facilitator" && (
           <>
