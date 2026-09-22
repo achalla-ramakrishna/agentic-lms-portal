@@ -37,7 +37,14 @@ export default async function RosterPage() {
           <tbody>
             {roster.map((row) => (
               <tr key={row.userId} className="border-b border-line-muted">
-                <td className="px-4 py-3 font-medium text-fg">{row.name}</td>
+                <td className="px-4 py-3 font-medium text-fg">
+                  <Link
+                    href={`/admin/learners/${row.userId}`}
+                    className="hover:text-accent hover:underline"
+                  >
+                    {row.name}
+                  </Link>
+                </td>
                 {competencies.map((c) => {
                   const cell = row.perCompetency.get(c.number);
                   return (
