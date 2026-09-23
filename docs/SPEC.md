@@ -154,13 +154,33 @@ each exercise's own `README.md` (see `scripts/generate-seed.mjs`, chunk 2).
                                        %, status breakdown, competency
                                        pass rates — docs/features/
                                        0015-companies-roles.md)
+/admin/settings                      (facilitator or company_admin —
+                                       branding (logo, accent color) and
+                                       the embed snippet for this
+                                       company's own portal — docs/
+                                       features/0016-embed-widget.md)
+/login/:companySlug                  (public — company-branded login
+                                       page, the embed widget's target;
+                                       unknown slug falls back to
+                                       default branding rather than
+                                       404ing — docs/features/
+                                       0016-embed-widget.md)
 ```
 
 **Every user belongs to a company** (`docs/adr/
 0004-multi-tenant-companies.md`) — every `/admin/**` list/aggregate
 above is scoped to the current facilitator's own `companyId`. Today
 that's unobservable (one company, "CodeWalnut", exists), but it's a
-real boundary the moment a second one does.
+real boundary the moment a second one does. `/admin/**` itself now
+admits `company_admin` as well as `facilitator` (read access to the
+whole shell, plus `/admin/settings`); creating users and deciding
+submissions stay `facilitator`-only.
+
+**`public/embed.js`** — the actual integration mechanism for "plug
+this into any company's portal." One static script, parameterized by
+a `data-company="slug"` attribute, renders a button that opens
+`/login/:slug` in a new tab. No iframe, no per-company server
+configuration — the same file works unmodified for every company.
 
 **Two separate shells, not one hybrid nav**: the learner shell
 (`AppHeader`/`AppSidebar`) and the reviewer shell (admin's own header/
@@ -218,8 +238,9 @@ are what chunk 2 implements as `prisma/schema.prisma`.
 - **ExerciseProject** — `id`, `exerciseId` (FK), `repoPath`,
   `displayName`, `isPrimary`.
 - **Company** (chunk 16, `docs/adr/0004-multi-tenant-companies.md`) —
-  `id`, `name`, `slug` (unique — the eventual SSO routing key), 
-  `createdAt`. Seeded, not authored in-app, same as `Competency`.
+  `id`, `name`, `slug` (unique — routes `/login/:slug`, chunk 17),
+  `logoUrl` (nullable, chunk 17), `accentColor` (nullable hex, chunk
+  17), `createdAt`. Seeded, not authored in-app, same as `Competency`.
 - **User** — `id`, `name`, `email`, `passwordHash`, `role`
   (`learner|facilitator|company_admin`), `companyId` (FK, required —
   every user belongs to exactly one company).
@@ -365,6 +386,18 @@ Chunked so each commit lands a coherent, working slice.
   SAML wiring and in-app company creation explicitly deferred. `docs/
   adr/0004-multi-tenant-companies.md`, `docs/features/
   0015-companies-roles.md`.
+- [x] **Chunk 17 — Embed widget, branded login, company settings**
+  (this commit): `Company` gains `logoUrl`/`accentColor`;
+  `public/embed.js` (a generic, static, `data-company`-slug-driven
+  script — zero per-company code) opens a company-branded
+  `/login/:slug` page in a new tab; `/admin/settings` lets a
+  facilitator or `company_admin` set branding and copy their embed
+  snippet. Chosen over an iframe (would need per-company CSP
+  allow-listing and fights third-party-cookie blocking) and over
+  building real SSO first (no IdP to integrate against yet) — this is
+  what "integrate to 100 companies" actually needed: zero marginal
+  engineering cost per company onboarded. `docs/features/
+  0016-embed-widget.md`.
 
 **Planned, not yet built** — `docs/features/
 0007-project-starter-kits.md` scopes a start.spring.io-style wizard
@@ -431,9 +464,20 @@ slice — **shipped** (chunk 16 below), not just planned:
   components the individual learner dashboard already renders
   (`ProgressRing`, `StatusDonut`, `CompetencyBarChart`) rather than
   duplicating them or just filtering Roster's table.
+- **Embed mechanism — decided and shipped: a new-tab launcher widget,
+  not SSO.** `docs/features/0016-embed-widget.md` (chunk 17 below)
+  superseded the SSO-as-first-embed direction above once the user
+  clarified the actual goal was scaling to ~100 companies with zero
+  marginal engineering cost per company. `public/embed.js` + a
+  company-branded `/login/:slug` page does that; SSO remains the
+  longer-term target for a company that wants real single sign-on, not
+  what shipped first. This is also `company_admin`'s first real
+  behavior: it (and `facilitator`) can save their company's branding.
 
 **Still open, deliberately deferred** — real SAML wiring (needs an
 actual IdP to integrate against); in-app company creation/signup (a
 real billing/verification decision, not a code decision — companies are
-seeded today, the same way competencies are); what `company_admin`
-grants beyond `facilitator` today.
+seeded today, the same way competencies are); iframe embedding; file
+upload for logos (a URL field is enough for now); whether
+`company_admin` should eventually create users or decide submissions,
+not just manage branding.

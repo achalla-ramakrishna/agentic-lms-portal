@@ -9,6 +9,7 @@ import { prisma } from "@/lib/db";
 import { getOrCreateSubmission } from "@/lib/submissions";
 import { evidenceChecklist } from "@/lib/content";
 import { canStart, canSubmitEvidence, canDecide, isValidDecision } from "@/lib/status";
+import { isValidAccentColor, isValidLogoUrl } from "@/lib/company-branding";
 import type { Role } from "@prisma/client";
 
 async function requireUserId(): Promise<number> {
@@ -34,6 +35,27 @@ async function requireFacilitator(): Promise<{ id: number; companyId: number }> 
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: Number(session.user.id) },
     select: { id: true, companyId: true },
+  });
+  return user;
+}
+
+// Company settings (branding, embed snippet) are the first real use of
+// company_admin — docs/features/0016-embed-widget.md. Deliberately
+// broader than requireFacilitator(): a company_admin manages their
+// company's own settings but doesn't review submissions or create
+// users, so this helper is scoped narrowly to just this one action
+// rather than widening requireFacilitator() itself.
+async function requireCompanyStaff(): Promise<{ companyId: number }> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+  if (session.user.role !== "facilitator" && session.user.role !== "company_admin") {
+    forbidden();
+  }
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: Number(session.user.id) },
+    select: { companyId: true },
   });
   return user;
 }
@@ -254,4 +276,34 @@ export async function changePassword(formData: FormData) {
   await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
 
   redirect("/account?password_changed=1");
+}
+
+// Both fields are optional (empty string clears back to the default
+// CodeWalnut look on /login/:slug) — see lib/company-branding.ts for
+// why an empty string is valid but a malformed non-empty one isn't.
+export async function updateCompanyBranding(formData: FormData) {
+  const staff = await requireCompanyStaff();
+
+  const logoUrl = String(formData.get("logoUrl") || "").trim();
+  const accentColor = String(formData.get("accentColor") || "").trim();
+
+  if (!isValidLogoUrl(logoUrl)) {
+    redirect("/admin/settings?error=invalid_logo_url");
+  }
+  if (!isValidAccentColor(accentColor)) {
+    redirect("/admin/settings?error=invalid_accent_color");
+  }
+
+  await prisma.company.update({
+    where: { id: staff.companyId },
+    data: {
+      logoUrl: logoUrl || null,
+      accentColor: accentColor || null,
+    },
+  });
+
+  // /login/:slug is force-dynamic (no caching to invalidate), so only
+  // this settings page itself needs revalidating.
+  revalidatePath("/admin/settings");
+  redirect("/admin/settings?updated=1");
 }

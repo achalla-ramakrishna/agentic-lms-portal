@@ -59,6 +59,14 @@ built now: `Company` carries a `slug` (the eventual SSO routing key —
 `User.companyId`, so wiring a real SAML provider later is additive to
 the schema, not a redesign of it. The Credentials provider stays the
 only working login path until a real company brings real IdP metadata.
+**Superseded in part by `docs/features/0016-embed-widget.md`**: rather
+than wait on SSO, the actual first embed mechanism shipped is a
+new-tab launcher widget (`public/embed.js`) pointing at a
+company-branded `/login/:slug` page — cheaper, no per-company CSP or
+cookie work, and it's what "easy to integrate to 100 companies" turned
+out to mean in practice. SSO/SAML remains the longer-term target for
+a company that wants real single sign-on; the widget is not a
+replacement for it, just the thing that shipped first.
 
 ## Not decided here
 
@@ -69,10 +77,10 @@ only working login path until a real company brings real IdP metadata.
   docs/features/0015-companies-roles.md's non-goals. A self-serve
   "create your company" signup flow is a real product decision (billing
   model, verification, abuse prevention) deferred until asked for.
-- Real SAML wiring (see Embed model above).
-- What a `company_admin` can do differently from `facilitator` beyond
-  existing today, if anything. The role value is added to the enum now
-  (so the data model doesn't need another migration when this is
-  answered) but nothing in the app grants it different behavior yet —
-  no seeded user has this role, so adding it is inert for existing
-  functionality. Deferred rather than guessed at.
+- Real SAML wiring (see Embed model above) — still not built.
+- What a `company_admin` can do differently from `facilitator`:
+  **partially resolved by `docs/features/0016-embed-widget.md`** — a
+  `company_admin` can now reach `/admin/**` read-only and save their
+  company's branding/embed settings. Still `facilitator`-only:
+  creating users, deciding submissions. Whether `company_admin` should
+  eventually gain those too remains open.

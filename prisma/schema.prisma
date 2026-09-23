@@ -76,11 +76,15 @@ model ExerciseGuidanceDoc {
 // actual capabilities doesn't need a second migration; nothing branches
 // on it yet.
 model Company {
-  id        Int      @id @default(autoincrement())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  users     User[]
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  logoUrl     String? // shown on the company-branded login page
+                       // (/login/:slug) and in the embed snippet's
+                       // preview — docs/features/0016-embed-widget.md
+  accentColor String? // hex, e.g. "#3fb950" — same page, optional
+  createdAt   DateTime @default(now())
+  users       User[]
 }
 
 enum Role {

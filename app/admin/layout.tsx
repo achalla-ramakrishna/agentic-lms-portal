@@ -15,8 +15,12 @@ export default async function AdminLayout({
 }) {
   // middleware.ts already guarantees a session exists here — this only
   // decides whether *this* session is allowed past the role gate.
+  // company_admin gets read/settings access to the shell (docs/features/
+  // 0016-embed-widget.md, its first real use); mutating actions like
+  // createUser/decideSubmission still call requireFacilitator() and
+  // stay facilitator-only.
   const session = await getServerSession(authOptions);
-  if (session?.user.role !== "facilitator") {
+  if (session?.user.role !== "facilitator" && session?.user.role !== "company_admin") {
     forbidden();
   }
   const user = await requireCurrentUser();
@@ -41,7 +45,7 @@ export default async function AdminLayout({
               </a>
               <span className="text-fg-muted">{user.email}</span>
             </div>
-            <RoleViewSwitcher current="reviewer" />
+            {user.role === "facilitator" && <RoleViewSwitcher current="reviewer" />}
             <SignOutButton />
           </div>
         </header>

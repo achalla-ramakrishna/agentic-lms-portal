@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-// Facilitator-only nav — deliberately does NOT include AppSidebar's
+// Facilitator/company_admin nav (gated by app/admin/layout.tsx) —
+// deliberately does NOT include AppSidebar's
 // Dashboard/My Progress links or the per-competency personal-progress
 // list: a reviewer's own "0/3 passed" on every competency is meaningless
 // noise, not useful nav. Keeping this as its own component (rather than
@@ -34,6 +35,12 @@ export function AdminSidebar() {
           className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
         >
           Users
+        </Link>
+        <Link
+          href="/admin/settings"
+          className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
+        >
+          Company Settings
         </Link>
         <Link
           href="/account"

@@ -4,7 +4,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function LoginForm() {
+export function LoginForm({ accentColor }: { accentColor?: string } = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   // An explicit callbackUrl (proxy.ts sets one when redirecting a
@@ -85,7 +85,12 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-md bg-success-emphasis px-4 py-2 text-sm font-medium text-white hover:bg-success-emphasis-hover disabled:opacity-50"
+        style={accentColor ? { backgroundColor: accentColor } : undefined}
+        className={`rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 ${
+          accentColor
+            ? "hover:opacity-90"
+            : "bg-success-emphasis hover:bg-success-emphasis-hover"
+        }`}
       >
         {submitting ? "Logging in…" : "Log in"}
       </button>
