@@ -72,7 +72,7 @@ export default async function CompanySettingsPage({
             />
             <p className="text-xs text-fg-subtle">
               Shown on your branded login page ({origin}/login/{company.slug}).
-              Leave blank to use the default CodeWalnut logo.
+              Leave blank to show just your company name, no logo.
             </p>
           </div>
           <div className="flex flex-col gap-1">

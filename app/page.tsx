@@ -1,4 +1,3 @@
-import { CodewalnutLogo } from "@/app/codewalnut-logo";
 import { CompetencyShowcase } from "@/app/competency-showcase";
 
 // Same title/subtitle text as content/seed.json (the real guidebook data)
@@ -26,8 +25,7 @@ export default function LandingPage() {
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col items-center gap-14 px-6 py-16 text-center">
       <header className="flex w-full items-center justify-between">
         <div className="flex items-center gap-3">
-          <CodewalnutLogo height={24} />
-          <span className="hidden text-sm font-semibold tracking-wide text-fg sm:inline">
+          <span className="text-sm font-semibold tracking-wide text-fg">
             Agentic Engineering
           </span>
         </div>
@@ -69,11 +67,6 @@ export default function LandingPage() {
         &ldquo;Agents replace typing, not thinking.&rdquo; — from the
         guidebook
       </p>
-
-      <footer className="flex items-center gap-1.5 pb-8 text-xs text-fg-subtle">
-        crafted by
-        <CodewalnutLogo className="text-fg-muted" />
-      </footer>
     </main>
   );
 }

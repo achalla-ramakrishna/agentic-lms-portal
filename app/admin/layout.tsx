@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth";
 import { requireCurrentUser } from "@/lib/current-user";
 import { SignOutButton } from "@/app/sign-out-button";
 import { AdminSidebar } from "@/app/admin/AdminSidebar";
-import { CodewalnutLogo } from "@/app/codewalnut-logo";
 import { MenuToggleButton, MobileNavProvider, MobileSidebarFrame } from "@/app/mobile-nav";
 import { RoleViewSwitcher } from "@/app/role-view-switcher";
 
@@ -32,8 +31,7 @@ export default async function AdminLayout({
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <MenuToggleButton />
             <a href="/admin/roster" className="flex min-w-0 items-center gap-2 sm:gap-3">
-              <CodewalnutLogo height={22} />
-              <span className="hidden truncate text-sm font-semibold text-fg sm:inline">
+              <span className="truncate text-sm font-semibold text-fg">
                 Agentic Engineering — Reviewer
               </span>
             </a>

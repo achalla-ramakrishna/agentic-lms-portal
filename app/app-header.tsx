@@ -1,6 +1,5 @@
 import { requireCurrentUser } from "@/lib/current-user";
 import { SignOutButton } from "@/app/sign-out-button";
-import { CodewalnutLogo } from "@/app/codewalnut-logo";
 import { MenuToggleButton } from "@/app/mobile-nav";
 import { RoleViewSwitcher } from "@/app/role-view-switcher";
 
@@ -23,8 +22,7 @@ export async function AppHeader() {
       <div className="flex min-w-0 items-center gap-1 sm:gap-3">
         <MenuToggleButton />
         <a href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <CodewalnutLogo height={22} />
-          <span className="hidden truncate text-sm font-semibold text-fg sm:inline">
+          <span className="truncate text-sm font-semibold text-fg">
             Agentic Engineering
           </span>
         </a>

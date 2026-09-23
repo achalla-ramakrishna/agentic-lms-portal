@@ -12,8 +12,12 @@ export const dynamic = "force-dynamic";
 // LoginForm, same Credentials auth, same post-login role routing as
 // plain /login — only the branding around it changes. An unknown slug
 // (typo'd snippet, a company that was since removed) falls back to
-// plain CodeWalnut branding rather than 404ing, so a bad snippet never
-// dead-ends a visitor — see docs/features/0016-embed-widget.md.
+// plain, generic branding rather than 404ing, so a bad snippet never
+// dead-ends a visitor — see docs/features/0016-embed-widget.md. A
+// company that hasn't set its own logoUrl yet also gets the plain,
+// generic look here — the CodeWalnut mark stays only in the small
+// "Powered by" attribution below, never standing in as if it were the
+// company's own logo (the white-labeling this exists for).
 export default async function CompanyLoginPage({
   params,
 }: {
@@ -28,15 +32,13 @@ export default async function CompanyLoginPage({
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6">
       <div className="flex items-center gap-3">
-        {company?.logoUrl ? (
+        {company?.logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={company.logoUrl}
             alt={company.name}
             style={{ height: 28, width: "auto", display: "block" }}
           />
-        ) : (
-          <CodewalnutLogo height={24} />
         )}
         <span className="text-lg font-semibold text-fg">
           {company?.name ?? "Agentic Engineering"} Training Portal
