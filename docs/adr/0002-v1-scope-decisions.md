@@ -9,6 +9,12 @@ Accepted
 organization. No `org_id` added to `user`/`cohort` for v1 — the product
 spec explicitly flags multi-tenancy as out of scope and a genuine product
 pivot (Phase 3), not a cheap-to-add-later toggle worth pre-building.
+**Reopened 2026-09-23** — see `docs/adr/0004-multi-tenant-companies.md`,
+which adds a `Company` entity and `companyId` scoping (chunk 16). That
+ADR's "Backfill" decision is what keeps this reopening non-disruptive:
+every user this Q1 originally treated as "the one organization" is
+backfilled into a single seeded company, so nothing here actually
+changes in effect until a second company exists.
 
 **Q2 — Exercise ordering.** Open by default: learners can browse and
 attempt any exercise in any order. No locked/unlocked derived state on

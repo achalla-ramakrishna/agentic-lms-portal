@@ -148,7 +148,19 @@ each exercise's own `README.md` (see `scripts/generate-seed.mjs`, chunk 2).
                                        /dashboard, via a picker dropdown
                                        — docs/features/
                                        0014-reviewer-learner-dashboard.md)
+/admin/company                       (facilitator-only — aggregate
+                                       progress across the whole
+                                       company: total learners, overall
+                                       %, status breakdown, competency
+                                       pass rates — docs/features/
+                                       0015-companies-roles.md)
 ```
+
+**Every user belongs to a company** (`docs/adr/
+0004-multi-tenant-companies.md`) — every `/admin/**` list/aggregate
+above is scoped to the current facilitator's own `companyId`. Today
+that's unobservable (one company, "CodeWalnut", exists), but it's a
+real boundary the moment a second one does.
 
 **Two separate shells, not one hybrid nav**: the learner shell
 (`AppHeader`/`AppSidebar`) and the reviewer shell (admin's own header/
@@ -205,8 +217,12 @@ are what chunk 2 implements as `prisma/schema.prisma`.
   (JSON array).
 - **ExerciseProject** — `id`, `exerciseId` (FK), `repoPath`,
   `displayName`, `isPrimary`.
+- **Company** (chunk 16, `docs/adr/0004-multi-tenant-companies.md`) —
+  `id`, `name`, `slug` (unique — the eventual SSO routing key), 
+  `createdAt`. Seeded, not authored in-app, same as `Competency`.
 - **User** — `id`, `name`, `email`, `passwordHash`, `role`
-  (`learner|facilitator`).
+  (`learner|facilitator|company_admin`), `companyId` (FK, required —
+  every user belongs to exactly one company).
 - **Submission** — `id`, `userId` (FK), `exerciseId` (FK), `status`
   (`not_started|in_progress|submitted|needs_rework|passed`), `startedAt`,
   `submittedAt`, `decidedAt`, `decidedById` (FK, nullable),
@@ -337,6 +353,18 @@ Chunked so each commit lands a coherent, working slice.
   dropdown, so a reviewer isn't limited to Roster's raw counts or
   their own empty preview dashboard. `docs/features/
   0014-reviewer-learner-dashboard.md`.
+- [x] **Chunk 16 — Company entity, company-scoped roles, Company
+  Dashboard** (this commit): a `Company` model with a hand-authored
+  migration that seeds one "CodeWalnut" company and backfills every
+  pre-existing user into it (existing functionality verified
+  undisturbed, live, before and after); `Role` gains `company_admin`
+  (inert — no behavior change); Roster/Learner Dashboards/Users/
+  submission decisions all scoped by `companyId`; a new `/admin/
+  company` aggregate dashboard reusing the individual dashboard's
+  chart components. First slice of the multi-tenant/SaaS pivot — real
+  SAML wiring and in-app company creation explicitly deferred. `docs/
+  adr/0004-multi-tenant-companies.md`, `docs/features/
+  0015-companies-roles.md`.
 
 **Planned, not yet built** — `docs/features/
 0007-project-starter-kits.md` scopes a start.spring.io-style wizard
@@ -361,49 +389,51 @@ facilitator's review question is the same one the exercise-set repo's own
 codes — don't claim a check passed without proof.* The portal puts that
 existing standard into a UI; it does not invent a new bar.
 
-## 9. Multi-tenant / SaaS pivot — open questions (not yet decided)
+## 9. Multi-tenant / SaaS pivot
 
 Raised 2026-09-23: turn this into a SaaS product any company can run,
 with a Company entity, company-scoped roles, and a company dashboard.
 This reopens ADR 0002 Q1, which deliberately ruled multi-tenancy out of
 v1 as "a genuine product pivot ... not a cheap-to-add-later toggle worth
-pre-building" — that assessment still holds. Nearly every table
-(`User`, `Submission`, `EvidenceArtifact`, and arguably `Competency`/
-`Exercise` if companies can ever customize curriculum) and every query
-in `lib/roster.ts`, `lib/dashboard-stats.ts`, `requireCurrentUser()`,
-and the `/admin/**` role guard would need a tenant boundary, not just an
-added table. Per this repo's own convention (spec before
-implementation, competency 02), this needs a real spec — written before
-any schema change — covering at minimum:
+pre-building." Three scoping decisions, recorded in `docs/adr/
+0004-multi-tenant-companies.md`, turned that into a safe, additive v1
+slice — **shipped** (chunk 16 below), not just planned:
 
-- **Isolation model**: a `companyId` column + row-level scoping (single
-  shared DB, cheaper, must be enforced in *every* query — one missed
-  `where` clause leaks another company's data), vs. schema-per-tenant or
-  DB-per-tenant (stronger isolation, real operational cost). Given this
-  app's current single-SQLite-file-on-a-Railway-volume deployment (§7
-  Chunk 7), shared-DB-with-`companyId` is the only one that doesn't
-  also force a deployment-model change at the same time.
-- **Role model**: does "facilitator" split into a company-scoped
-  reviewer plus a company-admin (manages that company's users/billing/
-  branding) plus a platform-admin (manages companies themselves)? Three
-  tiers, not two — a different shape than today's flat `learner |
-  facilitator` enum.
-- **"Plugged into any company portal"**: what does embedding actually
-  mean here — SSO/SAML into an existing identity provider (reopens ADR
-  0002 Q4, which explicitly deferred SSO), an iframe embed, or a
-  headless API the host portal calls? Each implies different auth and
-  UI work; "plug in" is three different features depending on which one
-  is meant.
-- **Content model**: shared curriculum (12 competencies/35 exercises,
-  same for every company — cheap) vs. per-company customization of
-  competencies/exercises (expensive, reopens "in-app authoring UI",
-  explicitly out of scope for v1 in §1).
-- **Company dashboard**: aggregated across which axis — a company's own
-  roster (close to today's `/admin/roster`, generalized with a
-  `companyId` filter) vs. cross-company platform metrics (a genuinely
-  new, higher-privilege view)?
+- **Isolation model — decided: shared DB, `companyId` column.** Every
+  tenant-scoped table (`User`, and `Submission`/`EvidenceArtifact`
+  transitively via the user) carries the boundary; `Competency`/
+  `Exercise` stay global. Chosen over schema-per-tenant/DB-per-tenant
+  because this app's single-SQLite-on-Railway deployment (§7 Chunk 7)
+  has no per-tenant provisioning story to build that against yet.
+- **Backfill — decided: every existing user is CodeWalnut's own data.**
+  The migration seeds one company (`CodeWalnut`) and backfills every
+  pre-existing `User` row into it before `companyId` is made required —
+  the mechanism behind "existing functionality must not be disturbed":
+  with one company in existence, every newly-scoped query returns the
+  identical result set it always did.
+- **Role model — decided for v1: no new capabilities yet.** `Role`
+  gains `company_admin` in the enum (so a later decision on its actual
+  behavior doesn't need a second migration), but nothing branches on it
+  — no seeded user has it, and `learner`/`facilitator` behave exactly
+  as before. What a `company_admin` does differently is explicitly
+  deferred, not guessed at.
+- **Embed model — decided as the target, not built: SSO/SAML.** Chosen
+  over an iframe embed or a headless API (reopens ADR 0002 Q4, which
+  deferred SSO). Not implemented this pass — there's no real identity
+  provider to integrate against yet; `Company.slug` exists as the
+  eventual SSO routing key so wiring a real provider later is additive.
+- **Content model — decided: curriculum stays shared**, not
+  per-company. Per-company customization would reopen "in-app authoring
+  UI," explicitly out of scope for v1 in §1.
+- **Company dashboard — decided: a real aggregate view, `/admin/
+  company`.** Total learners, company-wide completion %, status
+  breakdown, and competency-wide pass rates, reusing the exact chart
+  components the individual learner dashboard already renders
+  (`ProgressRing`, `StatusDonut`, `CompetencyBarChart`) rather than
+  duplicating them or just filtering Roster's table.
 
-No implementation started. Answering these (likely as ADR 0004) is the
-next step before any code changes, since the isolation-model choice
-alone determines whether this is an additive migration or a rebuild of
-every query in the app.
+**Still open, deliberately deferred** — real SAML wiring (needs an
+actual IdP to integrate against); in-app company creation/signup (a
+real billing/verification decision, not a code decision — companies are
+seeded today, the same way competencies are); what `company_admin`
+grants beyond `facilitator` today.
