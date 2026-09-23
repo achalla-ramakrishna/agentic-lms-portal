@@ -139,6 +139,15 @@ async function main() {
     });
   }
 
+  // Every user belongs to a company (docs/adr/0004-multi-tenant-companies.md);
+  // CodeWalnut is the one company that exists today, and every seeded user —
+  // dev-only demo accounts and the realistic cohort alike — is its own data.
+  const company = await prisma.company.upsert({
+    where: { slug: "codewalnut" },
+    update: { name: "CodeWalnut" },
+    create: { name: "CodeWalnut", slug: "codewalnut" },
+  });
+
   // Dev-only demo accounts — see README "Demo accounts" for the fake,
   // documented credentials. Real accounts replace these once there's an
   // actual cohort (docs/features/0003-auth-roles.md non-goals).
@@ -166,6 +175,7 @@ async function main() {
         name: u.name,
         role: u.role,
         passwordHash,
+        companyId: company.id,
       },
     });
   }
@@ -174,7 +184,7 @@ async function main() {
     `Seeded ${seed.competencies.length} competencies, ${seed.exercises.length} exercises, ${demoUsers.length} demo users.`,
   );
 
-  await seedDemoData(prisma);
+  await seedDemoData(prisma, company.id);
 }
 
 main()

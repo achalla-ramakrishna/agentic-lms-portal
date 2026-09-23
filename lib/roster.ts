@@ -89,14 +89,15 @@ export function aggregateRoster(
   return rows;
 }
 
-export async function buildRoster(): Promise<RosterRow[]> {
+export async function buildRoster(companyId: number): Promise<RosterRow[]> {
   const [learners, competencies, submissions] = await Promise.all([
-    prisma.user.findMany({ where: { role: "learner" } }),
+    prisma.user.findMany({ where: { role: "learner", companyId } }),
     prisma.competency.findMany({
       orderBy: { number: "asc" },
       include: { exercises: { select: { id: true } } },
     }),
     prisma.submission.findMany({
+      where: { user: { companyId } },
       include: { exercise: { select: { competencyId: true } } },
     }),
   ]);
@@ -131,9 +132,11 @@ export type PendingSubmission = {
   submittedAt: Date | null;
 };
 
-export async function pendingSubmissions(): Promise<PendingSubmission[]> {
+export async function pendingSubmissions(
+  companyId: number,
+): Promise<PendingSubmission[]> {
   const submissions = await prisma.submission.findMany({
-    where: { status: "submitted" },
+    where: { status: "submitted", user: { companyId } },
     orderBy: { submittedAt: "asc" },
     include: {
       user: true,

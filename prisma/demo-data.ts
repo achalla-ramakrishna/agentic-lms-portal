@@ -158,7 +158,7 @@ function hoursAgo(now: Date, hours: number): Date {
   return new Date(now.getTime() - hours * 60 * 60 * 1000);
 }
 
-export async function seedDemoData(prisma: PrismaClient) {
+export async function seedDemoData(prisma: PrismaClient, companyId: number) {
   const now = new Date();
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
 
@@ -170,6 +170,7 @@ export async function seedDemoData(prisma: PrismaClient) {
       email: REVIEWER.email,
       role: "facilitator",
       passwordHash,
+      companyId,
     },
   });
 
@@ -182,6 +183,7 @@ export async function seedDemoData(prisma: PrismaClient) {
         email: learner.email,
         role: "learner",
         passwordHash,
+        companyId,
       },
     });
 

@@ -19,7 +19,7 @@ async function requireUserId(): Promise<number> {
   return Number(session.user.id);
 }
 
-async function requireFacilitatorId(): Promise<number> {
+async function requireFacilitator(): Promise<{ id: number; companyId: number }> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/login");
@@ -31,7 +31,11 @@ async function requireFacilitatorId(): Promise<number> {
   if (session.user.role !== "facilitator") {
     forbidden();
   }
-  return Number(session.user.id);
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: Number(session.user.id) },
+    select: { id: true, companyId: true },
+  });
+  return user;
 }
 
 export async function startExercise(
@@ -110,7 +114,7 @@ export async function saveSubmission(formData: FormData) {
 }
 
 export async function decideSubmission(formData: FormData) {
-  const facilitatorId = await requireFacilitatorId();
+  const facilitator = await requireFacilitator();
 
   const submissionId = Number(formData.get("submissionId"));
   const decision = formData.get("decision"); // "passed" | "needs_rework"
@@ -124,8 +128,15 @@ export async function decideSubmission(formData: FormData) {
 
   const submission = await prisma.submission.findUniqueOrThrow({
     where: { id: submissionId },
-    include: { exercise: { include: { competency: true } } },
+    include: { exercise: { include: { competency: true } }, user: true },
   });
+  // A facilitator from another company guessing a submission id should
+  // never be able to decide it — same company boundary as buildRoster()
+  // (docs/features/0015-companies-roles.md). Inert today (one company
+  // exists), a real boundary once a second one does.
+  if (submission.user.companyId !== facilitator.companyId) {
+    forbidden();
+  }
   if (!canDecide(submission.status)) {
     // Already decided, or not submitted yet — don't let a stale form
     // double-apply a decision (docs/features/0006-polish.md).
@@ -137,7 +148,7 @@ export async function decideSubmission(formData: FormData) {
     data: {
       status: decision,
       decidedAt: new Date(),
-      decidedById: facilitatorId,
+      decidedById: facilitator.id,
       facilitatorComment: facilitatorComment || null,
     },
   });
@@ -156,7 +167,7 @@ export async function decideSubmission(formData: FormData) {
 // this app's existing no-email-integration stance (ADR 0002 Q4/Q6) —
 // they share it with the new user out of band.
 export async function createUser(formData: FormData) {
-  await requireFacilitatorId();
+  const facilitator = await requireFacilitator();
 
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -179,7 +190,13 @@ export async function createUser(formData: FormData) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.create({
-    data: { name, email, passwordHash, role: role as Role },
+    data: {
+      name,
+      email,
+      passwordHash,
+      role: role as Role,
+      companyId: facilitator.companyId,
+    },
   });
 
   revalidatePath("/admin/users");

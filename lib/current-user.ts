@@ -14,6 +14,6 @@ export async function requireCurrentUser() {
   if (!session?.user?.id) redirect("/login");
   return prisma.user.findUniqueOrThrow({
     where: { id: Number(session.user.id) },
-    select: { id: true, name: true, email: true, role: true },
+    select: { id: true, name: true, email: true, role: true, companyId: true },
   });
 }

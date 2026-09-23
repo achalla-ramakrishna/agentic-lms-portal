@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { createUser } from "@/app/actions";
+import { requireCurrentUser } from "@/lib/current-user";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,10 @@ export default async function UsersPage({
   searchParams: Promise<{ error?: string; created?: string }>;
 }) {
   const { error, created } = await searchParams;
+  const currentUser = await requireCurrentUser();
 
   const users = await prisma.user.findMany({
+    where: { companyId: currentUser.companyId },
     orderBy: { id: "asc" },
     select: { id: true, name: true, email: true, role: true },
   });

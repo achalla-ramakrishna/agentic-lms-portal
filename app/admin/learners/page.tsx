@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { requireCurrentUser } from "@/lib/current-user";
 
 export const dynamic = "force-dynamic";
 
@@ -8,8 +9,9 @@ export const dynamic = "force-dynamic";
 // (alphabetically, matching LearnerPicker's order) instead of making the
 // reviewer pick one first.
 export default async function LearnerDashboardsIndexPage() {
+  const currentUser = await requireCurrentUser();
   const firstLearner = await prisma.user.findFirst({
-    where: { role: "learner" },
+    where: { role: "learner", companyId: currentUser.companyId },
     orderBy: { name: "asc" },
     select: { id: true },
   });

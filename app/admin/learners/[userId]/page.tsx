@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { requireCurrentUser } from "@/lib/current-user";
 import { LearnerDashboardView } from "@/app/(app)/dashboard/LearnerDashboardView";
 import { LearnerPicker } from "@/app/admin/learners/LearnerPicker";
 
@@ -14,14 +15,15 @@ export default async function LearnerDashboardPage({
 }) {
   const { userId: userIdParam } = await params;
   const userId = Number(userIdParam);
+  const currentUser = await requireCurrentUser();
 
   const [learner, learners] = await Promise.all([
     prisma.user.findFirst({
-      where: { id: userId, role: "learner" },
+      where: { id: userId, role: "learner", companyId: currentUser.companyId },
       select: { id: true, name: true },
     }),
     prisma.user.findMany({
-      where: { role: "learner" },
+      where: { role: "learner", companyId: currentUser.companyId },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),

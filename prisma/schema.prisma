@@ -70,9 +70,23 @@ model ExerciseGuidanceDoc {
   sortOrder  Int
 }
 
+// Every user belongs to exactly one company — see docs/adr/
+// 0004-multi-tenant-companies.md and docs/features/0015-companies-roles.md.
+// company_admin is added to the enum now so a later decision on its
+// actual capabilities doesn't need a second migration; nothing branches
+// on it yet.
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+}
+
 enum Role {
   learner
   facilitator
+  company_admin
 }
 
 model User {
@@ -81,6 +95,8 @@ model User {
   email        String       @unique
   passwordHash String
   role         Role         @default(learner)
+  companyId    Int
+  company      Company      @relation(fields: [companyId], references: [id])
   submissions  Submission[] @relation("SubmissionsByUser")
   decisions    Submission[] @relation("DecisionsByFacilitator")
 }

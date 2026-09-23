@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { requireCurrentUser } from "@/lib/current-user";
 import { buildRoster, pendingSubmissions } from "@/lib/roster";
 import { templateCoverage } from "@/lib/template-coverage";
 
 export const dynamic = "force-dynamic";
 
 export default async function RosterPage() {
+  const currentUser = await requireCurrentUser();
   const competencies = await prisma.competency.findMany({
     orderBy: { number: "asc" }, // fixed 01→12 — docs/SPEC.md §4
     select: { number: true },
   });
   const [roster, pending, coverage] = await Promise.all([
-    buildRoster(),
-    pendingSubmissions(),
+    buildRoster(currentUser.companyId),
+    pendingSubmissions(currentUser.companyId),
     templateCoverage(),
   ]);
 

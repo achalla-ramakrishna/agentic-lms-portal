@@ -18,6 +18,12 @@ export function AdminSidebar() {
           Roster
         </Link>
         <Link
+          href="/admin/company"
+          className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
+        >
+          Company Dashboard
+        </Link>
+        <Link
           href="/admin/learners"
           className="rounded-md px-3 py-1.5 font-medium text-fg hover:bg-white/5"
         >
