@@ -52,8 +52,15 @@ export default async function AccountPage({
           <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Account details
           </h2>
-          <span className="rounded-full border border-line px-2.5 py-0.5 text-xs font-medium capitalize text-fg-muted">
-            {user.role}
+          <span className="flex flex-wrap gap-1.5">
+            {user.roles.map((r) => (
+              <span
+                key={r}
+                className="rounded-full border border-line px-2.5 py-0.5 text-xs font-medium capitalize text-fg-muted"
+              >
+                {r.replace("_", " ")}
+              </span>
+            ))}
           </span>
         </div>
         <form action={updateProfile} className="mt-4 flex flex-col gap-4">

@@ -1,5 +1,7 @@
+import { forbidden } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireCurrentUser } from "@/lib/current-user";
+import { resolveEffectiveCompany, parseCompanyIdParam } from "@/lib/company-scope";
 import { companyOverview } from "@/lib/company-stats";
 import { ProgressRing } from "@/app/(app)/dashboard/ProgressRing";
 import { StatusDonut } from "@/app/(app)/dashboard/StatusDonut";
@@ -7,19 +9,26 @@ import { CompetencyBarChart } from "@/app/(app)/dashboard/CompetencyBarChart";
 
 export const dynamic = "force-dynamic";
 
-// The aggregate view a company owner actually wants — reuses the exact
+// facilitator/super_admin only — same review-side visibility as Roster
+// (docs/features/0018-role-separation.md, 0019-multi-role.md). The
+// aggregate view a company owner actually wants — reuses the exact
 // chart components the individual learner dashboard already renders
 // (docs/features/0015-companies-roles.md), just fed company-wide
 // aggregated data instead of one learner's.
-export default async function CompanyDashboardPage() {
+export default async function CompanyDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ companyId?: string }>;
+}) {
+  const { companyId: companyIdParam } = await searchParams;
   const currentUser = await requireCurrentUser();
-  const companyId = currentUser.companyId;
+  if (!currentUser.roles.includes("facilitator") && !currentUser.roles.includes("super_admin")) {
+    forbidden();
+  }
+  const company = await resolveEffectiveCompany(currentUser, parseCompanyIdParam(companyIdParam));
+  const companyId = company.id;
 
-  const [company, learners, competencies, submissions] = await Promise.all([
-    prisma.company.findUniqueOrThrow({
-      where: { id: companyId },
-      select: { name: true },
-    }),
+  const [learners, competencies, submissions] = await Promise.all([
     prisma.user.findMany({
       where: { role: "learner", companyId },
       select: { id: true },

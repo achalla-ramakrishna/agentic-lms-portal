@@ -34,9 +34,13 @@ export default async function SubmissionDetailPage({
   const session = await getServerSession(authOptions);
   // Own-submission-only for this chunk — a facilitator's cross-learner
   // access is chunk 5 (docs/features/0004-learner-flow.md non-goals).
+  // super_admin reviews here too, and across every company, not just
+  // its own (docs/features/0018-role-separation.md) — decideSubmission
+  // itself is where that company boundary is actually enforced/skipped.
   const isOwner = Number(session!.user.id) === submission.userId;
-  const isFacilitator = session!.user.role === "facilitator";
-  if (!isOwner && !isFacilitator) {
+  const roles = session!.user.roles ?? [];
+  const isReviewer = roles.includes("facilitator") || roles.includes("super_admin");
+  if (!isOwner && !isReviewer) {
     forbidden();
   }
 
@@ -96,7 +100,7 @@ export default async function SubmissionDetailPage({
         </p>
       </section>
 
-      {isFacilitator && (
+      {isReviewer && (
         <section className="mt-6 rounded-xl border border-line bg-canvas-subtle p-7">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Evidence checklist (from the exercise)
@@ -184,7 +188,7 @@ export default async function SubmissionDetailPage({
           </Link>
         )}
 
-      {isFacilitator && submission.status === "submitted" && (
+      {isReviewer && submission.status === "submitted" && (
         <form
           action={decideSubmission}
           className="mt-6 flex flex-col gap-4 rounded-xl border border-line bg-canvas-subtle p-7"

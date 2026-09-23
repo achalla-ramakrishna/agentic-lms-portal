@@ -4,7 +4,13 @@ import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function LoginForm({ accentColor }: { accentColor?: string } = {}) {
+export function LoginForm({
+  accentColor,
+  companySlug,
+}: {
+  accentColor?: string;
+  companySlug?: string;
+} = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   // An explicit callbackUrl (proxy.ts sets one when redirecting a
@@ -13,8 +19,18 @@ export function LoginForm({ accentColor }: { accentColor?: string } = {}) {
   // generic case falls back to a role-based landing page: learners
   // don't belong on the reviewer's Roster, and a facilitator landing on
   // their own (empty) learner dashboard is exactly the "everything
-  // mixed up" complaint this fixes.
+  // mixed up" complaint this fixes. Per role (docs/features/
+  // 0018-role-separation.md's clean split): facilitator/super_admin
+  // land on Roster (the review side), company_admin lands on Users (the
+  // management side) — Roster would 403 a company_admin, since it's no
+  // longer their page.
   const explicitCallbackUrl = searchParams.get("callbackUrl");
+
+  const ROLE_LANDING: Record<string, string> = {
+    facilitator: "/admin/roster",
+    super_admin: "/admin/roster",
+    company_admin: "/admin/users",
+  };
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,15 +42,26 @@ export function LoginForm({ accentColor }: { accentColor?: string } = {}) {
     setSubmitting(true);
     setError(null);
 
+    // next-auth's signIn serializes credentials via URLSearchParams,
+    // which stringifies `undefined` as the literal text "undefined"
+    // rather than omitting the key — that string is truthy server-side,
+    // so plain /login (no companySlug prop) was failing every login,
+    // not just cross-company ones. Only include the key when it's a
+    // real value.
     const result = await signIn("credentials", {
       email,
       password,
+      ...(companySlug ? { companySlug } : {}),
       redirect: false,
     });
 
     if (!result || result.error) {
       setSubmitting(false);
-      // Deliberately generic — don't reveal whether the email exists.
+      // Deliberately generic — covers a wrong password AND a right
+      // password for an account that belongs to a different company
+      // than this branded page (lib/auth.ts) — same message either
+      // way, so a login attempt here never reveals which company an
+      // email address actually belongs to.
       setError("Incorrect email or password.");
       return;
     }
@@ -42,7 +69,8 @@ export function LoginForm({ accentColor }: { accentColor?: string } = {}) {
     const session = await getSession();
     const target =
       explicitCallbackUrl ||
-      (session?.user.role === "facilitator" ? "/admin/roster" : "/dashboard");
+      (session?.user.role ? ROLE_LANDING[session.user.role] : undefined) ||
+      "/dashboard";
 
     router.push(target);
     router.refresh();

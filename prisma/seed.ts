@@ -165,6 +165,21 @@ async function main() {
       password: "facilitator-demo-pw",
       role: "facilitator" as const,
     },
+    {
+      email: "company.admin@example.com",
+      name: "Demo Company Admin",
+      password: "company-admin-demo-pw",
+      role: "company_admin" as const,
+    },
+    {
+      // Home company is CodeWalnut (the platform operator), but its
+      // actual reach ignores companyId entirely — see docs/features/
+      // 0018-role-separation.md.
+      email: "super.admin@example.com",
+      name: "Demo Super Admin",
+      password: "super-admin-demo-pw",
+      role: "super_admin" as const,
+    },
   ];
   for (const u of demoUsers) {
     const passwordHash = await bcrypt.hash(u.password, 10);
@@ -180,6 +195,30 @@ async function main() {
       },
     });
   }
+
+  // A real multi-role account (docs/features/0019-multi-role.md) — a
+  // company_admin who's also a facilitator, exactly the "if company
+  // admin is a reviewer" case. Primary role is company_admin (default
+  // landing page); facilitator is granted as an extra role, so the
+  // ViewSwitcher offers both Company Admin and Reviewer views plus the
+  // usual Learner preview.
+  const dualRolePasswordHash = await bcrypt.hash("dual-role-demo-pw", 10);
+  const dualRoleUser = await prisma.user.upsert({
+    where: { email: "dual.role@example.com" },
+    update: { name: "Demo Dual Role", role: "company_admin", passwordHash: dualRolePasswordHash },
+    create: {
+      email: "dual.role@example.com",
+      name: "Demo Dual Role",
+      role: "company_admin",
+      passwordHash: dualRolePasswordHash,
+      companyId: company.id,
+    },
+  });
+  await prisma.userRole.upsert({
+    where: { userId_role: { userId: dualRoleUser.id, role: "facilitator" } },
+    update: {},
+    create: { userId: dualRoleUser.id, role: "facilitator" },
+  });
 
   console.log(
     `Seeded ${seed.competencies.length} competencies, ${seed.exercises.length} exercises, ${demoUsers.length} demo users.`,

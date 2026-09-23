@@ -18,6 +18,16 @@ export const dynamic = "force-dynamic";
 // generic look here — the CodeWalnut mark stays only in the small
 // "Powered by" attribution below, never standing in as if it were the
 // company's own logo (the white-labeling this exists for).
+//
+// A known slug also restricts *who* can log in here to that company's
+// own users (LoginForm's companySlug prop → lib/auth.ts) — without
+// this, a valid credential from any other company would authenticate
+// here too and correctly show that person's own (different) company's
+// data, which reads, from the outside, exactly like this portal
+// leaking the wrong company's data. See docs/features/
+// 0020-branded-login-company-restriction.md. An unknown slug has no
+// real company to restrict to, so it stays unrestricted, same as plain
+// /login.
 export default async function CompanyLoginPage({
   params,
 }: {
@@ -26,7 +36,7 @@ export default async function CompanyLoginPage({
   const { companySlug } = await params;
   const company = await prisma.company.findUnique({
     where: { slug: companySlug },
-    select: { name: true, logoUrl: true, accentColor: true },
+    select: { slug: true, name: true, logoUrl: true, accentColor: true },
   });
 
   return (
@@ -49,6 +59,7 @@ export default async function CompanyLoginPage({
       <Suspense>
         <LoginForm
           accentColor={company?.accentColor ?? undefined}
+          companySlug={company?.slug}
         />
       </Suspense>
 

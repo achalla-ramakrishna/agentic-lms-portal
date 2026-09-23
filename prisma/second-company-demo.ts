@@ -1,13 +1,13 @@
 // A second, distinctly-branded company — proof that the embed widget
-// (docs/features/0016-embed-widget.md) and company scoping (docs/adr/
-// 0004-multi-tenant-companies.md) genuinely work for more than one
-// client, not just CodeWalnut. Deliberately lightweight next to
-// demo-data.ts's 5-learner CodeWalnut cohort — this exists to
-// demonstrate multi-tenancy (a different slug, logo, accent color,
-// and its own isolated roster), not to be a second realistic
-// conference-demo dataset. Idempotent, same upsert-by-email/slug
-// pattern as the rest of prisma/seed.ts.
-import type { PrismaClient } from "@prisma/client";
+// (docs/features/0016-embed-widget.md), company scoping (docs/adr/
+// 0004-multi-tenant-companies.md), and the role split (docs/features/
+// 0018-role-separation.md) all genuinely work for more than one
+// client, not just CodeWalnut. Mirrors demo-data.ts's depth on
+// purpose — 5 learners at varied progress, a facilitator with a real
+// decision, plus a company_admin — so Acme Robotics is as convincing a
+// demo as CodeWalnut, not a token second row. Idempotent, same
+// upsert-by-email/slug pattern as the rest of prisma/seed.ts.
+import type { PrismaClient, SubmissionStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const PASSWORD = "AcmeDemo2026!";
@@ -23,22 +23,112 @@ const COMPANY = {
 };
 
 const FACILITATOR = { name: "Morgan Reyes", email: "morgan.reyes@acme-robotics.example.com" };
+const COMPANY_ADMIN = { name: "Devon Park", email: "devon.park@acme-robotics.example.com" };
 
-const LEARNERS = [
+type ProgressEntry = {
+  competencyNumber: number;
+  exerciseNumber: number;
+  status: SubmissionStatus;
+  facilitatorComment?: string;
+  learnerNote?: string;
+  daysAgo: number;
+};
+type LearnerPlan = { name: string; email: string; progress: ProgressEntry[] };
+
+// Five learners at different points, same spread as demo-data.ts's
+// CodeWalnut cohort (brand new, mid-progress with a rework, a pending-
+// review queue, and two advanced/near-complete) so a roster or
+// dashboard screenshot for Acme shows real variety too, not a flat
+// placeholder state.
+const LEARNERS: LearnerPlan[] = [
   {
     name: "Sam Okoye",
     email: "sam.okoye@acme-robotics.example.com",
     progress: [
-      { competencyNumber: 1, exerciseNumber: 1, status: "passed" as const, daysAgo: 4 },
-      { competencyNumber: 1, exerciseNumber: 2, status: "passed" as const, daysAgo: 3 },
-      { competencyNumber: 2, exerciseNumber: 1, status: "submitted" as const, daysAgo: 1 },
+      { competencyNumber: 1, exerciseNumber: 1, status: "passed", daysAgo: 3 },
+      { competencyNumber: 1, exerciseNumber: 2, status: "in_progress", daysAgo: 1 },
     ],
   },
   {
     name: "Ines Duarte",
     email: "ines.duarte@acme-robotics.example.com",
     progress: [
-      { competencyNumber: 1, exerciseNumber: 1, status: "in_progress" as const, daysAgo: 1 },
+      { competencyNumber: 1, exerciseNumber: 1, status: "passed", daysAgo: 9 },
+      { competencyNumber: 1, exerciseNumber: 2, status: "passed", daysAgo: 8 },
+      {
+        competencyNumber: 2,
+        exerciseNumber: 1,
+        status: "needs_rework",
+        daysAgo: 3,
+        facilitatorComment:
+          "Good spec structure, but the acceptance criteria don't cover the concurrent-access case we discussed. Add that scenario and resubmit.",
+        learnerNote: "Focused on the happy path first — will add the concurrency scenario next.",
+      },
+      { competencyNumber: 2, exerciseNumber: 2, status: "in_progress", daysAgo: 1 },
+    ],
+  },
+  {
+    name: "Noah Kim",
+    email: "noah.kim@acme-robotics.example.com",
+    progress: [
+      { competencyNumber: 1, exerciseNumber: 1, status: "passed", daysAgo: 14 },
+      { competencyNumber: 1, exerciseNumber: 2, status: "passed", daysAgo: 13 },
+      {
+        competencyNumber: 2,
+        exerciseNumber: 1,
+        status: "submitted",
+        daysAgo: 3,
+        learnerNote: "Spec + clarifications doc both linked below.",
+      },
+      { competencyNumber: 2, exerciseNumber: 2, status: "submitted", daysAgo: 2 },
+      { competencyNumber: 3, exerciseNumber: 1, status: "submitted", daysAgo: 1 },
+    ],
+  },
+  {
+    name: "Fatima Al-Sayed",
+    email: "fatima.alsayed@acme-robotics.example.com",
+    progress: [
+      { competencyNumber: 1, exerciseNumber: 1, status: "passed", daysAgo: 24 },
+      { competencyNumber: 1, exerciseNumber: 2, status: "passed", daysAgo: 23 },
+      { competencyNumber: 2, exerciseNumber: 1, status: "passed", daysAgo: 21 },
+      { competencyNumber: 2, exerciseNumber: 2, status: "passed", daysAgo: 20 },
+      { competencyNumber: 3, exerciseNumber: 1, status: "passed", daysAgo: 18 },
+      { competencyNumber: 3, exerciseNumber: 2, status: "passed", daysAgo: 17 },
+      { competencyNumber: 3, exerciseNumber: 3, status: "passed", daysAgo: 16 },
+      {
+        competencyNumber: 4,
+        exerciseNumber: 1,
+        status: "passed",
+        daysAgo: 14,
+        facilitatorComment: "Solid test coverage on the rescue scenario. Approved.",
+      },
+      { competencyNumber: 4, exerciseNumber: 2, status: "submitted", daysAgo: 1 },
+    ],
+  },
+  {
+    name: "Chen Wei",
+    email: "chen.wei@acme-robotics.example.com",
+    progress: [
+      { competencyNumber: 1, exerciseNumber: 1, status: "passed", daysAgo: 30 },
+      { competencyNumber: 1, exerciseNumber: 2, status: "passed", daysAgo: 29 },
+      { competencyNumber: 2, exerciseNumber: 1, status: "passed", daysAgo: 27 },
+      { competencyNumber: 2, exerciseNumber: 2, status: "passed", daysAgo: 26 },
+      { competencyNumber: 3, exerciseNumber: 1, status: "passed", daysAgo: 24 },
+      { competencyNumber: 3, exerciseNumber: 2, status: "passed", daysAgo: 23 },
+      { competencyNumber: 3, exerciseNumber: 3, status: "passed", daysAgo: 22 },
+      { competencyNumber: 4, exerciseNumber: 1, status: "passed", daysAgo: 20 },
+      { competencyNumber: 4, exerciseNumber: 2, status: "passed", daysAgo: 19 },
+      { competencyNumber: 4, exerciseNumber: 3, status: "passed", daysAgo: 18 },
+      { competencyNumber: 5, exerciseNumber: 1, status: "passed", daysAgo: 16 },
+      { competencyNumber: 5, exerciseNumber: 2, status: "passed", daysAgo: 15 },
+      {
+        competencyNumber: 5,
+        exerciseNumber: 3,
+        status: "passed",
+        daysAgo: 14,
+        facilitatorComment: "Clean skill package, benchmark gate passes cleanly. Approved.",
+      },
+      { competencyNumber: 6, exerciseNumber: 1, status: "in_progress", daysAgo: 1 },
     ],
   },
 ];
@@ -69,6 +159,18 @@ export async function seedSecondCompanyDemo(prisma: PrismaClient) {
     },
   });
 
+  await prisma.user.upsert({
+    where: { email: COMPANY_ADMIN.email },
+    update: { name: COMPANY_ADMIN.name, role: "company_admin", passwordHash },
+    create: {
+      name: COMPANY_ADMIN.name,
+      email: COMPANY_ADMIN.email,
+      role: "company_admin",
+      passwordHash,
+      companyId: company.id,
+    },
+  });
+
   for (const learner of LEARNERS) {
     const user = await prisma.user.upsert({
       where: { email: learner.email },
@@ -88,22 +190,31 @@ export async function seedSecondCompanyDemo(prisma: PrismaClient) {
           number: entry.exerciseNumber,
           competency: { number: entry.competencyNumber },
         },
+        include: { projects: true },
       });
       if (!exercise) continue;
 
       const startedAt = hoursAgo(now, entry.daysAgo * 24);
-      const isSubmitted = entry.status === "submitted" || entry.status === "passed";
+      const isDecided = entry.status === "passed" || entry.status === "needs_rework";
+      const isSubmitted = isDecided || entry.status === "submitted";
       const submittedAt = isSubmitted ? hoursAgo(now, entry.daysAgo * 24 - 3) : null;
-      const decidedAt = entry.status === "passed" ? hoursAgo(now, entry.daysAgo * 24 - 6) : null;
+      const decidedAt = isDecided ? hoursAgo(now, entry.daysAgo * 24 - 6) : null;
+      const projectName = exercise.projects[0]?.repoPath.split("/").pop() ?? "project";
+      const prNumber = 200 + exercise.id;
 
-      await prisma.submission.upsert({
+      const submission = await prisma.submission.upsert({
         where: { userId_exerciseId: { userId: user.id, exerciseId: exercise.id } },
         update: {
           status: entry.status,
           startedAt,
           submittedAt,
           decidedAt,
-          decidedById: entry.status === "passed" ? facilitator.id : null,
+          decidedById: isDecided ? facilitator.id : null,
+          facilitatorComment: entry.facilitatorComment ?? null,
+          learnerNote: entry.learnerNote ?? null,
+          prLink: isSubmitted
+            ? `https://github.com/acme-robotics-demo/${projectName}/pull/${prNumber}`
+            : null,
         },
         create: {
           userId: user.id,
@@ -112,13 +223,31 @@ export async function seedSecondCompanyDemo(prisma: PrismaClient) {
           startedAt,
           submittedAt,
           decidedAt,
-          decidedById: entry.status === "passed" ? facilitator.id : null,
+          decidedById: isDecided ? facilitator.id : null,
+          facilitatorComment: entry.facilitatorComment ?? null,
+          learnerNote: entry.learnerNote ?? null,
+          prLink: isSubmitted
+            ? `https://github.com/acme-robotics-demo/${projectName}/pull/${prNumber}`
+            : null,
         },
       });
+
+      if (isSubmitted) {
+        const checklist: { label: string }[] = JSON.parse(exercise.evidenceChecklist);
+        await prisma.evidenceArtifact.deleteMany({ where: { submissionId: submission.id } });
+        await prisma.evidenceArtifact.createMany({
+          data: checklist.map((item) => ({
+            submissionId: submission.id,
+            checklistLabel: item.label,
+            kind: "link" as const,
+            url: `https://github.com/acme-robotics-demo/${projectName}/blob/main/${item.label}`,
+          })),
+        });
+      }
     }
   }
 
   console.log(
-    `Seeded second company: ${COMPANY.name} (slug: ${COMPANY.slug}) — 1 facilitator + ${LEARNERS.length} learners. Password: ${PASSWORD}`,
+    `Seeded second company: ${COMPANY.name} (slug: ${COMPANY.slug}) — 1 facilitator, 1 company_admin, ${LEARNERS.length} learners. Password: ${PASSWORD}`,
   );
 }

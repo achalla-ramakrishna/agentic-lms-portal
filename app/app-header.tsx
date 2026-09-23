@@ -40,10 +40,10 @@ export async function AppHeader() {
           </a>
           <span className="text-fg-muted">{user.email}</span>
         </div>
-        {user.role === "facilitator" && (
+        {user.roles.some((r) => r !== "learner") && (
           <span className="hidden items-center gap-2 md:flex">
             <span className="text-xs text-fg-subtle">Previewing as learner</span>
-            <RoleViewSwitcher current="learner" />
+            <RoleViewSwitcher roles={user.roles} />
           </span>
         )}
         <SignOutButton />

@@ -1,26 +1,44 @@
 import Link from "next/link";
+import { forbidden } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireCurrentUser } from "@/lib/current-user";
+import { resolveEffectiveCompany, parseCompanyIdParam } from "@/lib/company-scope";
 import { buildRoster, pendingSubmissions } from "@/lib/roster";
 import { templateCoverage } from "@/lib/template-coverage";
 
 export const dynamic = "force-dynamic";
 
-export default async function RosterPage() {
+// facilitator/super_admin only — reviewing is not company_admin's job
+// under the clean split (docs/features/0018-role-separation.md). A
+// multi-role account (docs/features/0019-multi-role.md) qualifies if
+// *any* of its roles does.
+export default async function RosterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ companyId?: string }>;
+}) {
+  const { companyId: companyIdParam } = await searchParams;
   const currentUser = await requireCurrentUser();
+  if (!currentUser.roles.includes("facilitator") && !currentUser.roles.includes("super_admin")) {
+    forbidden();
+  }
+  const company = await resolveEffectiveCompany(currentUser, parseCompanyIdParam(companyIdParam));
   const competencies = await prisma.competency.findMany({
     orderBy: { number: "asc" }, // fixed 01→12 — docs/SPEC.md §4
     select: { number: true },
   });
   const [roster, pending, coverage] = await Promise.all([
-    buildRoster(currentUser.companyId),
-    pendingSubmissions(currentUser.companyId),
+    buildRoster(company.id),
+    pendingSubmissions(company.id),
     templateCoverage(),
   ]);
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-fg">Roster</h1>
+      {currentUser.roles.includes("super_admin") && (
+        <p className="mt-1 text-sm text-fg-muted">Showing {company.name}.</p>
+      )}
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-line bg-canvas-subtle">
         <table className="w-full text-sm">

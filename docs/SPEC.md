@@ -40,16 +40,38 @@ reading 35 folders of evidence by hand.
 
 ## 2. Roles
 
-Single `role` enum on `user`: `learner | facilitator`. No separate tables —
-promoting someone to facilitator is a one-field update.
+`role` enum on `user`: `learner | facilitator | company_admin | super_admin`
+— the account's *primary* role (default landing page, headline label). An
+account can also hold additional roles via the `UserRole` join table
+(`docs/features/0019-multi-role.md`); every permission check uses the full
+computed set (`roles`), not just the primary one. Promoting someone to
+facilitator (or granting an extra role) is a one-field/one-row update, no
+schema change.
 
 **Learner**: browses competencies/exercises, works exercises locally in
 their own clone of the exercise-set repo, logs progress and evidence links
 in the portal, sees own progress per competency and overall.
 
-**Facilitator**: sees the roster with per-competency status and overall %,
-opens a submission to review evidence against that exercise's checklist,
-marks Passed / Needs Rework with an optional comment.
+**Facilitator** (the review side, own company only): sees the roster with
+per-competency status and overall %, opens a submission to review evidence
+against that exercise's checklist, marks Passed / Needs Rework with an
+optional comment; also views the Company Dashboard and individual Learner
+Dashboards.
+
+**Company admin** (the management side, own company only): adds/edits
+users and sets company branding/settings. Does *not* review submissions —
+under the clean split (`docs/features/0018-role-separation.md`),
+facilitator and company_admin are two different jobs, not one role doing
+both, unless the same account genuinely holds both roles.
+
+**Super admin**: every capability above, for every company — no company
+boundary. Selects which company it's acting on via `CompanySwitcher`
+(`?companyId=` query param on whichever `/admin/**` page it's on).
+
+A company's branded login page (`/login/:slug`) additionally restricts
+*who* can authenticate there to that company's own users
+(`docs/features/0020-branded-login-company-restriction.md`) — plain
+`/login` stays unrestricted.
 
 ## 3. Content Model
 
@@ -134,47 +156,68 @@ each exercise's own `README.md` (see `scripts/generate-seed.mjs`, chunk 2).
                                        change password — nav label
                                        "Profile" — docs/features/
                                        0010-account-profile.md)
-/admin/roster                        (facilitator-only, their landing
-                                       page; learner names link into
-                                       /admin/learners/:userId)
-/admin/submissions/:id               (review queue, decision control)
-/admin/users                         (facilitator-only, list + add users
-                                       with a temporary password —
-                                       Chunk 8)
-/admin/learners                      (facilitator-only, redirects to the
+/admin/roster                        (facilitator/super_admin — the
+                                       review side's landing page;
+                                       learner names link into
+                                       /admin/learners/:userId — docs/
+                                       features/
+                                       0018-role-separation.md)
+/admin/submissions/:id               (review queue, decision control —
+                                       facilitator/super_admin)
+/admin/users                         (company_admin/super_admin — the
+                                       management side's landing page;
+                                       list + add users with a
+                                       temporary password — Chunk 8,
+                                       docs/features/
+                                       0018-role-separation.md)
+/admin/learners                      (facilitator/super_admin,
+                                       redirects to the
                                        alphabetically-first learner)
-/admin/learners/:userId              (facilitator-only — any learner's
-                                       real dashboard, same charts as
-                                       /dashboard, via a picker dropdown
-                                       — docs/features/
+/admin/learners/:userId              (facilitator/super_admin — any
+                                       learner's real dashboard, same
+                                       charts as /dashboard, via a
+                                       picker dropdown — docs/features/
                                        0014-reviewer-learner-dashboard.md)
-/admin/company                       (facilitator-only — aggregate
-                                       progress across the whole
-                                       company: total learners, overall
-                                       %, status breakdown, competency
-                                       pass rates — docs/features/
+/admin/company                       (facilitator/super_admin —
+                                       aggregate progress across the
+                                       whole company: total learners,
+                                       overall %, status breakdown,
+                                       competency pass rates — docs/
+                                       features/
                                        0015-companies-roles.md)
-/admin/settings                      (facilitator or company_admin —
+/admin/settings                      (company_admin/super_admin —
                                        branding (logo, accent color) and
                                        the embed snippet for this
                                        company's own portal — docs/
-                                       features/0016-embed-widget.md)
+                                       features/0016-embed-widget.md,
+                                       0018-role-separation.md)
 /login/:companySlug                  (public — company-branded login
                                        page, the embed widget's target;
                                        unknown slug falls back to
                                        default branding rather than
-                                       404ing — docs/features/
-                                       0016-embed-widget.md)
+                                       404ing, and stays unrestricted;
+                                       a known slug restricts login to
+                                       that company's own users —
+                                       docs/features/
+                                       0016-embed-widget.md,
+                                       0020-branded-login-company-
+                                       restriction.md)
 ```
 
 **Every user belongs to a company** (`docs/adr/
 0004-multi-tenant-companies.md`) — every `/admin/**` list/aggregate
-above is scoped to the current facilitator's own `companyId`. Today
-that's unobservable (one company, "CodeWalnut", exists), but it's a
-real boundary the moment a second one does. `/admin/**` itself now
-admits `company_admin` as well as `facilitator` (read access to the
-whole shell, plus `/admin/settings`); creating users and deciding
-submissions stay `facilitator`-only.
+above is scoped to the current actor's own `companyId` via
+`resolveEffectiveCompany` (`lib/company-scope.ts`). Two companies exist
+today (CodeWalnut, Acme Robotics — `prisma/second-company-demo.ts`), so
+this boundary is directly observable: an Acme account never sees
+CodeWalnut's roster, users, or dashboards, and vice versa.
+`super_admin` is the one role exempt from the boundary — it can view
+any company via `CompanySwitcher`'s `?companyId=` param. Within
+`/admin/**`, facilitator and company_admin no longer see the same
+pages: reviewing (Roster/Company Dashboard/Learner Dashboards) and
+managing (Users/Settings) are a clean split
+(`docs/features/0018-role-separation.md`) unless one account holds
+both roles (`0019-multi-role.md`).
 
 **`public/embed.js`** — the actual integration mechanism for "plug
 this into any company's portal." One static script, parameterized by
@@ -242,8 +285,13 @@ are what chunk 2 implements as `prisma/schema.prisma`.
   `logoUrl` (nullable, chunk 17), `accentColor` (nullable hex, chunk
   17), `createdAt`. Seeded, not authored in-app, same as `Competency`.
 - **User** — `id`, `name`, `email`, `passwordHash`, `role`
-  (`learner|facilitator|company_admin`), `companyId` (FK, required —
-  every user belongs to exactly one company).
+  (`learner|facilitator|company_admin|super_admin` — primary role),
+  `companyId` (FK, required — every user belongs to exactly one
+  company), `extraRoles` (→ `UserRole`).
+- **UserRole** (chunk 19, `docs/features/0019-multi-role.md`) — `id`,
+  `userId` (FK), `role`, unique on `(userId, role)`. Additional roles
+  an account holds beyond its primary `role`; the effective permission
+  set is always primary + every `UserRole` row, deduped.
 - **Submission** — `id`, `userId` (FK), `exerciseId` (FK), `status`
   (`not_started|in_progress|submitted|needs_rework|passed`), `startedAt`,
   `submittedAt`, `decidedAt`, `decidedById` (FK, nullable),
@@ -398,6 +446,24 @@ Chunked so each commit lands a coherent, working slice.
   what "integrate to 100 companies" actually needed: zero marginal
   engineering cost per company onboarded. `docs/features/
   0016-embed-widget.md`.
+- [x] **Chunk 18 — Separate company_admin and facilitator, add
+  super_admin** (this commit): the clean split — facilitator reviews
+  (Roster/Company Dashboard/Learner Dashboards), company_admin manages
+  (Users/Settings), neither can do the other's job, and super_admin
+  does both across every company via `CompanySwitcher`. `docs/features/
+  0018-role-separation.md`.
+- [x] **Chunk 19 — Multi-role accounts** (this commit): a `UserRole`
+  join table lets one account hold several roles at once (e.g. a
+  company_admin who's also a facilitator), getting the union of every
+  role's capabilities simultaneously; a `RoleViewSwitcher` dropdown
+  navigates between the sections its role set grants. `docs/features/
+  0019-multi-role.md`.
+- [x] **Chunk 20 — Restrict a branded login page to its own company**
+  (this commit): `/login/:slug` now rejects a valid credential that
+  belongs to a *different* company (same generic error a wrong
+  password gets), closing the gap where any company's credentials
+  could authenticate on any other company's branded portal. `docs/
+  features/0020-branded-login-company-restriction.md`.
 
 **Planned, not yet built** — `docs/features/
 0007-project-starter-kits.md` scopes a start.spring.io-style wizard
@@ -444,12 +510,15 @@ slice — **shipped** (chunk 16 below), not just planned:
   the mechanism behind "existing functionality must not be disturbed":
   with one company in existence, every newly-scoped query returns the
   identical result set it always did.
-- **Role model — decided for v1: no new capabilities yet.** `Role`
-  gains `company_admin` in the enum (so a later decision on its actual
-  behavior doesn't need a second migration), but nothing branches on it
-  — no seeded user has it, and `learner`/`facilitator` behave exactly
-  as before. What a `company_admin` does differently is explicitly
-  deferred, not guessed at.
+- **Role model — decided for v1 (chunk 16): no new capabilities yet;
+  decided for real (chunks 18–19): a clean split plus multi-role.**
+  `Role` gained `company_admin` inert in chunk 16; chunk 18 gave it
+  real, distinct capabilities (manages Users/Settings) that don't
+  overlap `facilitator`'s (reviews submissions/dashboards) unless one
+  account holds both roles at once (chunk 19's `UserRole` join table).
+  `super_admin` gained a real cross-company override
+  (`CompanySwitcher`) in the same pass. `docs/features/
+  0018-role-separation.md`, `0019-multi-role.md`.
 - **Embed model — decided as the target, not built: SSO/SAML.** Chosen
   over an iframe embed or a headless API (reopens ADR 0002 Q4, which
   deferred SSO). Not implemented this pass — there's no real identity
@@ -478,6 +547,10 @@ slice — **shipped** (chunk 16 below), not just planned:
 actual IdP to integrate against); in-app company creation/signup (a
 real billing/verification decision, not a code decision — companies are
 seeded today, the same way competencies are); iframe embedding; file
-upload for logos (a URL field is enough for now); whether
-`company_admin` should eventually create users or decide submissions,
-not just manage branding.
+upload for logos (a URL field is enough for now); an in-app UI for
+granting extra roles (`UserRole` rows are seed-only for now — chunk 19).
+
+**Resolved by chunks 18–20** — whether `company_admin` should
+eventually create users or decide submissions: decided as a clean
+split, not both on one role (chunk 18); a company's branded login page
+leaking cross-company access: closed (chunk 20).

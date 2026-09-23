@@ -20,7 +20,15 @@ async function requireUserId(): Promise<number> {
   return Number(session.user.id);
 }
 
-async function requireFacilitator(): Promise<{ id: number; companyId: number }> {
+// Reviews/decides submissions: facilitator (own company only) or
+// super_admin (any company — docs/features/0018-role-separation.md's
+// "clean split": facilitator and company_admin do not overlap, and
+// super_admin is the one role with full cross-company control). A
+// multi-role account (docs/features/0019-multi-role.md — e.g. a
+// company_admin who's also a facilitator) qualifies if *either* role is
+// in its set; session.user.roles is the full set computed at login
+// (lib/auth.ts), not just the primary role.
+async function requireReviewer(): Promise<{ id: number; companyId: number; roles: Role[] }> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/login");
@@ -29,35 +37,54 @@ async function requireFacilitator(): Promise<{ id: number; companyId: number }> 
   // form — a server action is a public endpoint regardless of which page
   // links to it (docs/features/0005-facilitator-flow.md acceptance
   // criteria).
-  if (session.user.role !== "facilitator") {
+  const roles = session.user.roles ?? [];
+  if (!roles.includes("facilitator") && !roles.includes("super_admin")) {
     forbidden();
   }
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: Number(session.user.id) },
     select: { id: true, companyId: true },
   });
-  return user;
+  return { ...user, roles };
 }
 
-// Company settings (branding, embed snippet) are the first real use of
-// company_admin — docs/features/0016-embed-widget.md. Deliberately
-// broader than requireFacilitator(): a company_admin manages their
-// company's own settings but doesn't review submissions or create
-// users, so this helper is scoped narrowly to just this one action
-// rather than widening requireFacilitator() itself.
-async function requireCompanyStaff(): Promise<{ companyId: number }> {
+// Manages users and company settings/branding: company_admin (own
+// company) or super_admin (any company). Deliberately excludes
+// facilitator — under the clean split, reviewing submissions and
+// managing a company are two different jobs, not one role doing both
+// (docs/features/0018-role-separation.md), unless the same account
+// genuinely holds both roles (0019-multi-role.md).
+async function requireCompanyManager(): Promise<{ id: number; companyId: number; roles: Role[] }> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/login");
   }
-  if (session.user.role !== "facilitator" && session.user.role !== "company_admin") {
+  const roles = session.user.roles ?? [];
+  if (!roles.includes("company_admin") && !roles.includes("super_admin")) {
     forbidden();
   }
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: Number(session.user.id) },
-    select: { companyId: true },
+    select: { id: true, companyId: true },
   });
-  return user;
+  return { ...user, roles };
+}
+
+// A super_admin acting on a company that isn't their own submits the
+// target company's id in a hidden field (set by the page to whichever
+// company it's currently showing — lib/company-scope.ts). Anyone else's
+// submitted value is ignored outright — their own companyId always
+// wins, so a company_admin/facilitator can never widen their own
+// request by tampering with a hidden field.
+async function resolveTargetCompanyId(
+  actor: { companyId: number; roles: Role[] },
+  formData: FormData,
+): Promise<number> {
+  if (!actor.roles.includes("super_admin")) return actor.companyId;
+  const submitted = Number(formData.get("companyId"));
+  if (!submitted) return actor.companyId;
+  const company = await prisma.company.findUnique({ where: { id: submitted } });
+  return company ? company.id : actor.companyId;
 }
 
 export async function startExercise(
@@ -136,7 +163,7 @@ export async function saveSubmission(formData: FormData) {
 }
 
 export async function decideSubmission(formData: FormData) {
-  const facilitator = await requireFacilitator();
+  const reviewer = await requireReviewer();
 
   const submissionId = Number(formData.get("submissionId"));
   const decision = formData.get("decision"); // "passed" | "needs_rework"
@@ -154,9 +181,10 @@ export async function decideSubmission(formData: FormData) {
   });
   // A facilitator from another company guessing a submission id should
   // never be able to decide it — same company boundary as buildRoster()
-  // (docs/features/0015-companies-roles.md). Inert today (one company
-  // exists), a real boundary once a second one does.
-  if (submission.user.companyId !== facilitator.companyId) {
+  // (docs/features/0015-companies-roles.md). super_admin has no such
+  // boundary — full cross-company control by design (docs/features/
+  // 0018-role-separation.md).
+  if (!reviewer.roles.includes("super_admin") && submission.user.companyId !== reviewer.companyId) {
     forbidden();
   }
   if (!canDecide(submission.status)) {
@@ -170,7 +198,7 @@ export async function decideSubmission(formData: FormData) {
     data: {
       status: decision,
       decidedAt: new Date(),
-      decidedById: facilitator.id,
+      decidedById: reviewer.id,
       facilitatorComment: facilitatorComment || null,
     },
   });
@@ -189,27 +217,38 @@ export async function decideSubmission(formData: FormData) {
 // this app's existing no-email-integration stance (ADR 0002 Q4/Q6) —
 // they share it with the new user out of band.
 export async function createUser(formData: FormData) {
-  const facilitator = await requireFacilitator();
+  const manager = await requireCompanyManager();
 
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
   const role = formData.get("role");
 
+  // Preserves a super_admin's current CompanySwitcher selection across
+  // the redirect (docs/features/0019-multi-role.md) — otherwise saving
+  // the form would silently bounce them back to their own default
+  // company's Users page instead of the one they were just managing.
+  const submittedCompanyId = String(formData.get("companyId") || "");
+  const companySuffix =
+    manager.roles.includes("super_admin") && submittedCompanyId
+      ? `&companyId=${submittedCompanyId}`
+      : "";
+
   if (
     !name ||
     !email ||
     password.length < 8 ||
-    (role !== "learner" && role !== "facilitator")
+    (role !== "learner" && role !== "facilitator" && role !== "company_admin")
   ) {
-    redirect("/admin/users?error=invalid");
+    redirect(`/admin/users?error=invalid${companySuffix}`);
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    redirect("/admin/users?error=email_taken");
+    redirect(`/admin/users?error=email_taken${companySuffix}`);
   }
 
+  const targetCompanyId = await resolveTargetCompanyId(manager, formData);
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.create({
     data: {
@@ -217,12 +256,12 @@ export async function createUser(formData: FormData) {
       email,
       passwordHash,
       role: role as Role,
-      companyId: facilitator.companyId,
+      companyId: targetCompanyId,
     },
   });
 
   revalidatePath("/admin/users");
-  redirect("/admin/users?created=1");
+  redirect(`/admin/users?created=1${companySuffix}`);
 }
 
 // Any signed-in user editing their own name/email — re-derives userId
@@ -282,20 +321,30 @@ export async function changePassword(formData: FormData) {
 // CodeWalnut look on /login/:slug) — see lib/company-branding.ts for
 // why an empty string is valid but a malformed non-empty one isn't.
 export async function updateCompanyBranding(formData: FormData) {
-  const staff = await requireCompanyStaff();
+  const manager = await requireCompanyManager();
 
   const logoUrl = String(formData.get("logoUrl") || "").trim();
   const accentColor = String(formData.get("accentColor") || "").trim();
 
+  // Same companyId-preservation as createUser — a super_admin editing
+  // another company's branding shouldn't bounce back to their own
+  // default company's settings page after saving.
+  const submittedCompanyId = String(formData.get("companyId") || "");
+  const companySuffix =
+    manager.roles.includes("super_admin") && submittedCompanyId
+      ? `&companyId=${submittedCompanyId}`
+      : "";
+
   if (!isValidLogoUrl(logoUrl)) {
-    redirect("/admin/settings?error=invalid_logo_url");
+    redirect(`/admin/settings?error=invalid_logo_url${companySuffix}`);
   }
   if (!isValidAccentColor(accentColor)) {
-    redirect("/admin/settings?error=invalid_accent_color");
+    redirect(`/admin/settings?error=invalid_accent_color${companySuffix}`);
   }
 
+  const targetCompanyId = await resolveTargetCompanyId(manager, formData);
   await prisma.company.update({
-    where: { id: staff.companyId },
+    where: { id: targetCompanyId },
     data: {
       logoUrl: logoUrl || null,
       accentColor: accentColor || null,
@@ -305,5 +354,5 @@ export async function updateCompanyBranding(formData: FormData) {
   // /login/:slug is force-dynamic (no caching to invalidate), so only
   // this settings page itself needs revalidating.
   revalidatePath("/admin/settings");
-  redirect("/admin/settings?updated=1");
+  redirect(`/admin/settings?updated=1${companySuffix}`);
 }

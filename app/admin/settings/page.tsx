@@ -1,6 +1,7 @@
+import { forbidden } from "next/navigation";
 import { headers } from "next/headers";
-import { prisma } from "@/lib/db";
 import { requireCurrentUser } from "@/lib/current-user";
+import { resolveEffectiveCompany, parseCompanyIdParam } from "@/lib/company-scope";
 import { updateCompanyBranding } from "@/app/actions";
 import { EmbedSnippet } from "./EmbedSnippet";
 
@@ -11,21 +12,21 @@ const ERROR_MESSAGES: Record<string, string> = {
   invalid_accent_color: "Accent color must be a 6-digit hex code like #3fb950.",
 };
 
-// Company settings (branding) + the embed snippet a company pastes into
-// their own portal — docs/features/0016-embed-widget.md. Reachable by
-// facilitator or company_admin (app/admin/layout.tsx's gate); the
-// underlying action, updateCompanyBranding, checks the same pair again
-// server-side.
+// company_admin/super_admin only — editing settings is not facilitator's
+// job under the clean split (docs/features/0018-role-separation.md,
+// 0019-multi-role.md); the underlying action, updateCompanyBranding,
+// checks the same pair again server-side.
 export default async function CompanySettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; updated?: string }>;
+  searchParams: Promise<{ error?: string; updated?: string; companyId?: string }>;
 }) {
-  const { error, updated } = await searchParams;
+  const { error, updated, companyId: companyIdParam } = await searchParams;
   const currentUser = await requireCurrentUser();
-  const company = await prisma.company.findUniqueOrThrow({
-    where: { id: currentUser.companyId },
-  });
+  if (!currentUser.roles.includes("company_admin") && !currentUser.roles.includes("super_admin")) {
+    forbidden();
+  }
+  const company = await resolveEffectiveCompany(currentUser, parseCompanyIdParam(companyIdParam));
 
   const host = (await headers()).get("host") ?? "localhost:3000";
   const protocol = host.startsWith("localhost") ? "http" : "https";
@@ -58,6 +59,7 @@ export default async function CompanySettingsPage({
           Branding
         </h2>
         <form action={updateCompanyBranding} className="mt-4 flex flex-col gap-4">
+          <input type="hidden" name="companyId" value={company.id} />
           <div className="flex flex-col gap-1">
             <label htmlFor="logoUrl" className="text-sm font-medium text-fg">
               Logo URL

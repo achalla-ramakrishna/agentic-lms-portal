@@ -33,14 +33,21 @@ export async function AppSidebar() {
     submissions.filter((s) => s.status === "passed").map((s) => s.exerciseId),
   );
 
+  const roles = session?.user.roles ?? [];
+  const isAdminIsh =
+    roles.includes("facilitator") || roles.includes("company_admin") || roles.includes("super_admin");
+  const backHref =
+    roles.includes("facilitator") || roles.includes("super_admin") ? "/admin/roster" : "/admin/users";
+
   return (
     <aside className="h-full w-full border-r border-line bg-canvas-subtle px-3 py-6">
-      {session?.user.role === "facilitator" && (
+      {isAdminIsh && (
         // Guaranteed reachable on every screen size, unlike AppHeader's
-        // RoleViewSwitcher (hidden below md:) — a facilitator previewing
-        // as learner always has a way back, mobile drawer included.
+        // RoleViewSwitcher (hidden below md:) — an admin/reviewer
+        // previewing as learner always has a way back, mobile drawer
+        // included. docs/features/0019-multi-role.md.
         <Link
-          href="/admin/roster"
+          href={backHref}
           className="mb-4 flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-xs font-medium text-fg-muted hover:border-fg-subtle hover:text-fg"
         >
           ← Back to Reviewer view

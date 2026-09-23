@@ -87,10 +87,15 @@ model Company {
   users       User[]
 }
 
+// See docs/features/0018-role-separation.md for the full capability
+// matrix. facilitator and company_admin are a clean split (reviews vs.
+// company management — neither does the other's job); super_admin has
+// full control across every company, not just its own.
 enum Role {
   learner
   facilitator
   company_admin
+  super_admin
 }
 
 model User {
@@ -98,11 +103,25 @@ model User {
   name         String
   email        String       @unique
   passwordHash String
-  role         Role         @default(learner)
+  role         Role         @default(learner) // the primary role — default landing page, Users table's headline role
+  extraRoles   UserRole[] // additional roles this account also holds, e.g. a company_admin who is also a facilitator — docs/features/0019-multi-role.md
   companyId    Int
   company      Company      @relation(fields: [companyId], references: [id])
   submissions  Submission[] @relation("SubmissionsByUser")
   decisions    Submission[] @relation("DecisionsByFacilitator")
+}
+
+// A user's *effective* role set is [role, ...extraRoles] deduped — see
+// lib/current-user.ts. Kept as its own table (not a JSON array on User)
+// so "does this account have role X" stays a real, indexable query
+// instead of string matching inside a JSON blob.
+model UserRole {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  role   Role
+
+  @@unique([userId, role])
 }
 
 enum SubmissionStatus {

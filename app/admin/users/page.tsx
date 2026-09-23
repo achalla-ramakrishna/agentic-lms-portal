@@ -1,6 +1,8 @@
+import { forbidden } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { createUser } from "@/app/actions";
 import { requireCurrentUser } from "@/lib/current-user";
+import { resolveEffectiveCompany, parseCompanyIdParam } from "@/lib/company-scope";
 
 export const dynamic = "force-dynamic";
 
@@ -10,16 +12,23 @@ const ERROR_MESSAGES: Record<string, string> = {
   email_taken: "A user with that email already exists.",
 };
 
+// company_admin/super_admin only — managing users is not facilitator's
+// job under the clean split (docs/features/0018-role-separation.md,
+// 0019-multi-role.md).
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; created?: string }>;
+  searchParams: Promise<{ error?: string; created?: string; companyId?: string }>;
 }) {
-  const { error, created } = await searchParams;
+  const { error, created, companyId: companyIdParam } = await searchParams;
   const currentUser = await requireCurrentUser();
+  if (!currentUser.roles.includes("company_admin") && !currentUser.roles.includes("super_admin")) {
+    forbidden();
+  }
+  const company = await resolveEffectiveCompany(currentUser, parseCompanyIdParam(companyIdParam));
 
   const users = await prisma.user.findMany({
-    where: { companyId: currentUser.companyId },
+    where: { companyId: company.id },
     orderBy: { id: "asc" },
     select: { id: true, name: true, email: true, role: true },
   });
@@ -27,6 +36,9 @@ export default async function UsersPage({
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-fg">Users</h1>
+      {currentUser.roles.includes("super_admin") && (
+        <p className="mt-1 text-sm text-fg-muted">Showing {company.name}.</p>
+      )}
       <p className="mt-1 text-sm text-fg-muted">
         Every account here only exists because someone added it below or
         seeded it — there&apos;s no signup. A new account can log in
@@ -71,6 +83,7 @@ export default async function UsersPage({
           Add a user
         </h2>
         <form action={createUser} className="mt-4 flex flex-col gap-4">
+          <input type="hidden" name="companyId" value={company.id} />
           <div className="flex flex-col gap-1">
             <label htmlFor="name" className="text-sm font-medium text-fg">
               Name
@@ -129,6 +142,10 @@ export default async function UsersPage({
               <label className="flex items-center gap-2">
                 <input type="radio" name="role" value="facilitator" />
                 Facilitator
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="role" value="company_admin" />
+                Company Admin
               </label>
             </div>
           </div>

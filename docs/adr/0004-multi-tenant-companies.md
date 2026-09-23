@@ -79,8 +79,10 @@ replacement for it, just the thing that shipped first.
   model, verification, abuse prevention) deferred until asked for.
 - Real SAML wiring (see Embed model above) — still not built.
 - What a `company_admin` can do differently from `facilitator`:
-  **partially resolved by `docs/features/0016-embed-widget.md`** — a
-  `company_admin` can now reach `/admin/**` read-only and save their
-  company's branding/embed settings. Still `facilitator`-only:
-  creating users, deciding submissions. Whether `company_admin` should
-  eventually gain those too remains open.
+  **resolved by `docs/features/0018-role-separation.md`** — a clean
+  split, not a superset: `company_admin` creates users and manages
+  company settings, `facilitator` reviews submissions and views
+  Roster/Company Dashboard/Learner Dashboards, and neither does the
+  other's job unless the same account holds both roles
+  (`docs/features/0019-multi-role.md`'s `UserRole` join table). A new
+  `super_admin` role does both, for every company, with no boundary.
