@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import bcrypt from "bcryptjs";
 import { seedDemoData } from "./demo-data";
+import { seedSecondCompanyDemo } from "./second-company-demo";
 
 const prisma = new PrismaClient();
 
@@ -185,6 +186,7 @@ async function main() {
   );
 
   await seedDemoData(prisma, company.id);
+  await seedSecondCompanyDemo(prisma);
 }
 
 main()

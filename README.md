@@ -42,6 +42,17 @@ empty or flat state. All share one password:
 | Learner     | `priya.natarajan` · `diego.fernandez` · `liam.carter` · `amara.okafor` · `yuki.tanaka` (`@example.com`) | `Conference2026!`   |
 | Facilitator | `jordan.blake@example.com`                                                               | `Conference2026!`   |
 
+`prisma/second-company-demo.ts` seeds a second, distinctly-branded
+company (**Acme Robotics**, slug `acme-robotics`, orange accent) —
+proof the embed widget and company scoping (`docs/adr/
+0004-multi-tenant-companies.md`) work for more than one client, not
+just CodeWalnut. Log in at `/login/acme-robotics`:
+
+| Role        | Email                                       | Password          |
+|-------------|----------------------------------------------|-------------------|
+| Facilitator | `morgan.reyes@acme-robotics.example.com`      | `AcmeDemo2026!`   |
+| Learner     | `sam.okoye@acme-robotics.example.com` · `ines.duarte@acme-robotics.example.com` | `AcmeDemo2026!` |
+
 ## Regenerating seed content
 
 `content/seed.json` is generated, not hand-written — see
