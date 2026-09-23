@@ -114,14 +114,40 @@ each exercise's own `README.md` (see `scripts/generate-seed.mjs`, chunk 2).
                                        deep-link is present, which
                                        always wins — docs/features/
                                        0013-role-separation.md)
-/dashboard                           (learner home)
-/competencies/:id                    (concept content + exercise list)
+/dashboard                           (learner home — progress ring, status
+                                       donut, competency bar chart, stat
+                                       tiles — docs/features/
+                                       0009-dashboard-snapshot.md)
+/competencies/:id                    (concept content + exercise list;
+                                       bespoke per-competency diagram +
+                                       real booklet content — docs/
+                                       features/0008-booklet-learn-
+                                       refresh.md)
 /competencies/:id/exercises/:exId    (mission, checklist, submission panel)
 /submissions/new?exercise=:id        (attach evidence)
 /submissions/:id                     (detail + facilitator comment)
-/profile                             (learner's own full history)
-/admin/roster                        (facilitator-only, their landing page)
+/profile                             (learner's own full history — nav
+                                       label "My Progress", not "Profile"
+                                       — docs/features/
+                                       0009-dashboard-snapshot.md)
+/account                             (any role — view/edit name+email,
+                                       change password — nav label
+                                       "Profile" — docs/features/
+                                       0010-account-profile.md)
+/admin/roster                        (facilitator-only, their landing
+                                       page; learner names link into
+                                       /admin/learners/:userId)
 /admin/submissions/:id               (review queue, decision control)
+/admin/users                         (facilitator-only, list + add users
+                                       with a temporary password —
+                                       Chunk 8)
+/admin/learners                      (facilitator-only, redirects to the
+                                       alphabetically-first learner)
+/admin/learners/:userId              (facilitator-only — any learner's
+                                       real dashboard, same charts as
+                                       /dashboard, via a picker dropdown
+                                       — docs/features/
+                                       0014-reviewer-learner-dashboard.md)
 ```
 
 **Two separate shells, not one hybrid nav**: the learner shell
@@ -267,9 +293,64 @@ Chunked so each commit lands a coherent, working slice.
   facilitator shares the temporary password out of band, matching this
   app's existing no-email-integration stance (ADR 0002 Q4/Q6).
 
+- [x] **Chunk 9 — Learn tab refresh from the real booklet** (this
+  commit): the Learn tab for all 12 competencies rebuilt from the real
+  "Agentic Engineering" guidebook booklet (v2 PDF) — real tagline,
+  full Shift narrative, In Practice bullets, and a bespoke diagram per
+  competency, rolled out one competency at a time and verified against
+  the actual booklet pages. `docs/features/
+  0008-booklet-learn-refresh.md`.
+- [x] **Chunk 10 — Dashboard snapshot + "My Progress" rename** (this
+  commit): "Profile" renamed to "My Progress" in nav (it's exercise
+  history, not account settings); `/dashboard` rebuilt into a real
+  at-a-glance snapshot — progress ring, status donut, competency bar
+  chart, KPI tiles, an honest encouragement message. `docs/features/
+  0009-dashboard-snapshot.md`.
+- [x] **Chunk 11 — Account/Profile page** (this commit): `/account`
+  (labeled "Profile" in nav, distinct from the renamed "My Progress"
+  route) — view name/email/role, edit name/email, change password,
+  for any role. `docs/features/0010-account-profile.md`.
+- [x] **Chunk 12 — Realistic demo data** (this commit): `prisma/
+  demo-data.ts` seeds 5 named learners at varied progress plus a named
+  reviewer (Jordan Blake) with real decisions/comments, for
+  conference/customer demos — additive to the original two bare demo
+  accounts, not a replacement. `docs/features/
+  0011-realistic-demo-data.md`.
+- [x] **Chunk 13 — Mobile responsive pass** (this commit): every page
+  verified live at 375px; fixed what actually broke — the shared
+  shell (sidebar → slide-in drawer via `MobileNavContext`), a landing-
+  page snake-ordering bug, and a title-truncation bug — rather than
+  rewriting pages that already degraded fine. `docs/features/
+  0012-mobile-responsive.md`.
+- [x] **Chunk 14 — Separate the learner and reviewer experiences**
+  (this commit): role-based post-login routing (facilitator →
+  `/admin/roster`, learner → `/dashboard`), a facilitator-only
+  `AdminSidebar` (no more shared `AppSidebar` showing meaningless
+  personal-progress nav to a reviewer), and `RoleViewSwitcher` — a
+  deliberate, labeled dropdown for a facilitator to preview the
+  learner shell, replacing the old ambient "Admin"/"Learner view"
+  cross-links. `docs/features/0013-role-separation.md`.
+- [x] **Chunk 15 — Reviewer-facing learner dashboard** (this commit):
+  `/admin/learners/:userId` — a facilitator-only view of any specific
+  learner's real dashboard (same charts as `/dashboard`, extracted
+  into a shared `LearnerDashboardView` component) via a picker
+  dropdown, so a reviewer isn't limited to Roster's raw counts or
+  their own empty preview dashboard. `docs/features/
+  0014-reviewer-learner-dashboard.md`.
+
+**Planned, not yet built** — `docs/features/
+0007-project-starter-kits.md` scopes a start.spring.io-style wizard
+(pick a stack + dependencies + rigor tier, get a tailored governance
+kit: `AGENTS.md`/`spec.md`/`architecture.md`/guardrails/ADRs) plus a
+deferred v2 (LLM-assisted drafting from uploaded project context). This
+is a full spec with acceptance criteria but zero implementation so far
+— no `content/stack-catalog.json`, no `lib/stack-kit.ts`, no
+`app/starter-kit`.
+
 Phase 2+ (explicitly deferred, not built here): cohorts and the
 "quiet for 7+ days" signal, Stage 2 CI verification integration, email
-notifications, toolkit-tag search/filter.
+notifications, toolkit-tag search/filter, multi-tenant/multi-org
+support (see §9 below for the current thinking on this).
 
 ## 8. Evidence & Review Standard
 
@@ -279,3 +360,50 @@ facilitator's review question is the same one the exercise-set repo's own
 `SUBMISSION_STANDARD.md` asks: *record exact commands, results, and exit
 codes — don't claim a check passed without proof.* The portal puts that
 existing standard into a UI; it does not invent a new bar.
+
+## 9. Multi-tenant / SaaS pivot — open questions (not yet decided)
+
+Raised 2026-09-23: turn this into a SaaS product any company can run,
+with a Company entity, company-scoped roles, and a company dashboard.
+This reopens ADR 0002 Q1, which deliberately ruled multi-tenancy out of
+v1 as "a genuine product pivot ... not a cheap-to-add-later toggle worth
+pre-building" — that assessment still holds. Nearly every table
+(`User`, `Submission`, `EvidenceArtifact`, and arguably `Competency`/
+`Exercise` if companies can ever customize curriculum) and every query
+in `lib/roster.ts`, `lib/dashboard-stats.ts`, `requireCurrentUser()`,
+and the `/admin/**` role guard would need a tenant boundary, not just an
+added table. Per this repo's own convention (spec before
+implementation, competency 02), this needs a real spec — written before
+any schema change — covering at minimum:
+
+- **Isolation model**: a `companyId` column + row-level scoping (single
+  shared DB, cheaper, must be enforced in *every* query — one missed
+  `where` clause leaks another company's data), vs. schema-per-tenant or
+  DB-per-tenant (stronger isolation, real operational cost). Given this
+  app's current single-SQLite-file-on-a-Railway-volume deployment (§7
+  Chunk 7), shared-DB-with-`companyId` is the only one that doesn't
+  also force a deployment-model change at the same time.
+- **Role model**: does "facilitator" split into a company-scoped
+  reviewer plus a company-admin (manages that company's users/billing/
+  branding) plus a platform-admin (manages companies themselves)? Three
+  tiers, not two — a different shape than today's flat `learner |
+  facilitator` enum.
+- **"Plugged into any company portal"**: what does embedding actually
+  mean here — SSO/SAML into an existing identity provider (reopens ADR
+  0002 Q4, which explicitly deferred SSO), an iframe embed, or a
+  headless API the host portal calls? Each implies different auth and
+  UI work; "plug in" is three different features depending on which one
+  is meant.
+- **Content model**: shared curriculum (12 competencies/35 exercises,
+  same for every company — cheap) vs. per-company customization of
+  competencies/exercises (expensive, reopens "in-app authoring UI",
+  explicitly out of scope for v1 in §1).
+- **Company dashboard**: aggregated across which axis — a company's own
+  roster (close to today's `/admin/roster`, generalized with a
+  `companyId` filter) vs. cross-company platform metrics (a genuinely
+  new, higher-privilege view)?
+
+No implementation started. Answering these (likely as ADR 0004) is the
+next step before any code changes, since the isolation-model choice
+alone determines whether this is an additive migration or a rebuild of
+every query in the app.
