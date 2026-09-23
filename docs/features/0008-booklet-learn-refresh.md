@@ -128,14 +128,23 @@ needed new `lib/artifact-glossary.ts` entries.
 
 Source: `agentic-engg.-booklet-v2.pdf`, pages 17–18. Same treatment:
 `tagline`, full 3-paragraph `shiftMarkdown`, 8 `inPracticeBullets` (5
-bold), and a bespoke diagram (`AdrSequenceDiagram.tsx`) — the same
-feature shown two ways, an ADR document mock and a sequence-diagram
-message list, plus the booklet's own caption. No pull-quote on this
-page. The booklet renders the sequence as a real UML lifeline diagram
-with crossing arrows; here it's a plain ordered list of messages
-grouped by actor color instead of fragile positioned-arrow SVG, same
-approach as every other diagram in this app. `CompetencyDiagram.tsx`
-gained a `case 7`.
+bold), and a bespoke diagram (`AdrSequenceDiagram.tsx`). No pull-quote
+on this page. `CompetencyDiagram.tsx` gained a `case 7`.
+
+**Diagram content later replaced** (this session, prompted by "can the
+docs and diagrams be more visual, crisp"): the diagram originally
+mirrored the booklet's own example — a fabricated Stripe/checkout
+feature shown two ways (an ADR mock + a sequence-diagram message list)
+— accurate to nothing in this codebase. Swapped for this app's own
+real decision and its own real sequence: `docs/features/
+0020-branded-login-company-restriction.md` (the why) and
+`lib/auth.ts`'s `authorize()` (the behavior) — the actual fix for the
+live "acme learning portal should give acme data only and not
+codewalnut" bug report. Same plain-message-list idiom as every other
+diagram in this app (still no positioned-arrow SVG), just grounded in
+real files, real functions, and a real bug instead of an invented one
+— a competency about generating docs and diagrams from code now shows
+one built that way itself.
 
 `toolkitTags` reconciled once more (booklet's 6 vs. the seed's
 previous 4: added `spec.md`, `backlog.md`). Adding `backlog.md`

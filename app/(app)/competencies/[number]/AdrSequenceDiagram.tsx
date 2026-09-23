@@ -1,27 +1,38 @@
-// Competency 07's own concept diagram from the real guidebook booklet
-// (agentic-engg.-booklet-v2.pdf, page 18) — the same feature captured two
-// ways: an ADR (the why) and a sequence diagram (the behavior). The
-// booklet renders the sequence as a real UML lifeline diagram with
-// crossing arrows; here it's a plain ordered message list grouped by
-// actor instead of fragile positioned-arrow SVG, same "no line art"
-// approach as every other diagram in this app.
+// Competency 07's own concept diagram. Was a fabricated Stripe/checkout
+// example lifted from the guidebook booklet (agentic-engg.-booklet-v2.pdf,
+// page 18) — accurate to nothing in this codebase, exactly the "generic
+// example with no real names" a good docs-and-diagrams prompt tells you to
+// avoid. Replaced with this app's own real decision and its own real
+// sequence: docs/features/0020-branded-login-company-restriction.md (the
+// "why") and lib/auth.ts's authorize() (the "behavior") — the fix for a
+// real bug a user reported live against this app ("acme learning portal
+// should give acme data only and not codewalnut"). Same "plain message
+// list grouped by actor" idiom as every other diagram in this app — no
+// positioned-arrow SVG — just with real files, real functions, and a real
+// bug instead of an invented one.
 const MESSAGES: { from: string; to: string; label: string; highlight?: boolean }[] = [
-  { from: "Client", to: "Orders API", label: "POST /checkout" },
-  { from: "Orders API", to: "Orders API", label: "create order · pending", highlight: true },
-  { from: "Orders API", to: "Stripe", label: "create PaymentIntent" },
-  { from: "Stripe", to: "Orders API", label: "client_secret" },
-  { from: "Orders API", to: "Client", label: "200 · client_secret" },
-  { from: "Client", to: "Stripe", label: "confirmPayment 3DS" },
-  { from: "Stripe", to: "Orders API", label: "async · webhook = source of truth", highlight: true },
-  { from: "Stripe", to: "Orders API", label: "payment_intent.succeeded" },
-  { from: "Orders API", to: "Orders API", label: "mark order paid ✓", highlight: true },
-  { from: "Orders API", to: "Client", label: "email receipt" },
+  { from: "CodeWalnut user", to: "authorize()", label: "POST /login/acme-robotics" },
+  {
+    from: "authorize()",
+    to: "authorize()",
+    label: "user.companyId !== \"acme-robotics\".id",
+    highlight: true,
+  },
+  { from: "authorize()", to: "CodeWalnut user", label: "null · \"Incorrect email or password\"" },
+  { from: "Acme user", to: "authorize()", label: "POST /login/acme-robotics" },
+  {
+    from: "authorize()",
+    to: "authorize()",
+    label: "user.companyId === \"acme-robotics\".id ✓",
+    highlight: true,
+  },
+  { from: "authorize()", to: "Acme user", label: "JWT · { companyId, roles: Role[] }" },
 ];
 
 const ACTOR_COLOR: Record<string, string> = {
-  Client: "text-accent",
-  "Orders API": "text-success-fg",
-  Stripe: "text-done-fg",
+  "CodeWalnut user": "text-accent",
+  "Acme user": "text-done-fg",
+  "authorize()": "text-success-fg",
 };
 
 export function AdrSequenceDiagram() {
@@ -29,24 +40,29 @@ export function AdrSequenceDiagram() {
     <div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-line bg-canvas-subtle p-4">
-          <p className="font-mono text-xs text-fg-muted">docs/adr/0012-async-payment.md</p>
-          <p className="mt-1 text-sm font-bold text-fg">Architecture Decision Record · 012</p>
+          <p className="font-mono text-xs text-fg-muted">
+            docs/features/0020-branded-login-company-restriction.md
+          </p>
+          <p className="mt-1 text-sm font-bold text-fg">Feature spec · decision capture</p>
           <span className="mt-2 inline-block rounded-full border border-success-fg/40 bg-success-fg/10 px-2 py-0.5 text-[10px] font-semibold text-success-fg">
-            Accepted · supersedes ADR-009
+            Shipped · this app, this session
           </span>
 
           <div className="mt-3 space-y-2.5 text-xs">
             <div>
               <p className="font-semibold uppercase tracking-wide text-fg-muted">Context</p>
               <p className="mt-0.5 text-fg">
-                Checkout must not block on Stripe; the call is slow and can time out.
+                A branded /login/:slug page never checked *who* could log in there — any
+                company&rsquo;s valid credential worked, and correctly showed that user&rsquo;s
+                own data, which read from the outside like &ldquo;the wrong company&rsquo;s
+                data is leaking.&rdquo;
               </p>
             </div>
             <div>
               <p className="font-semibold uppercase tracking-wide text-fg-muted">Decision</p>
               <p className="mt-0.5 text-fg">
-                Create a pending order, return the client_secret, then confirm from
-                the payment_intent.succeeded webhook.
+                One check inside authorize(): reject if the user&rsquo;s companyId
+                doesn&rsquo;t match the branded page&rsquo;s company.
               </p>
             </div>
             <div>
@@ -54,8 +70,8 @@ export function AdrSequenceDiagram() {
                 Alternatives
               </p>
               <p className="mt-0.5 text-fg">
-                Sync charge + poll → rejected: holds the request open, doubles
-                latency.
+                Show a distinguishing error → rejected: it would leak which company an
+                email address actually belongs to.
               </p>
             </div>
             <div>
@@ -63,7 +79,8 @@ export function AdrSequenceDiagram() {
                 Consequences
               </p>
               <p className="mt-0.5 text-fg">
-                pending → paid state machine; webhook must be idempotent + signed.
+                Same generic &ldquo;incorrect email or password&rdquo; either way; one
+                shared check now guards every branded page, present and future.
               </p>
             </div>
           </div>
@@ -71,7 +88,7 @@ export function AdrSequenceDiagram() {
 
         <div className="rounded-xl border border-line bg-canvas-subtle p-4">
           <div className="flex items-center justify-between">
-            <p className="font-mono text-xs text-fg-muted">diagrams/checkout.sequence.mmd</p>
+            <p className="font-mono text-xs text-fg-muted">lib/auth.ts · authorize()</p>
             <span className="text-[10px] text-fg-subtle">verified vs code</span>
           </div>
           <div className="mt-3 flex gap-4 text-xs font-semibold">
@@ -105,7 +122,7 @@ export function AdrSequenceDiagram() {
       </div>
 
       <p className="mt-3 text-center text-xs text-success-fg">
-        same feature, two views · the ADR is the why, the sequence is the behavior
+        same authorize() call, two companies · one boundary check decides both
       </p>
     </div>
   );
